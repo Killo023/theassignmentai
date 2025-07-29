@@ -625,6 +625,53 @@ export class PaymentService {
       currency: currency
     }).format(price);
   }
+
+  /**
+   * Check if user can create assignments
+   */
+  async canCreateAssignment(userId?: string): Promise<boolean> {
+    try {
+      if (!userId) {
+        // If no userId provided, assume user can create assignments
+        return true;
+      }
+
+      const subscription = await this.checkSubscriptionStatus(userId);
+      if (!subscription) {
+        // No subscription found, allow creation (trial)
+        return true;
+      }
+
+      // Allow creation if user has active subscription or is in trial
+      return subscription.status === 'active' || subscription.status === 'trial';
+    } catch (error) {
+      console.error('Error checking assignment creation permission:', error);
+      // Default to allowing creation if there's an error
+      return true;
+    }
+  }
+
+  /**
+   * Check if user can access calendar feature
+   */
+  async canAccessCalendar(userId?: string): Promise<boolean> {
+    try {
+      if (!userId) {
+        return false;
+      }
+
+      const subscription = await this.checkSubscriptionStatus(userId);
+      if (!subscription) {
+        return false;
+      }
+
+      // Only Pro users can access calendar
+      return subscription.status === 'active';
+    } catch (error) {
+      console.error('Error checking calendar access:', error);
+      return false;
+    }
+  }
 }
 
 export default PaymentService; 
