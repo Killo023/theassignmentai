@@ -55,16 +55,6 @@ const nextConfig: NextConfig = {
   generateBuildId: async () => {
     return 'enhanced-assignment-form-v2-' + Date.now();
   },
-  // Add webpack configuration to handle CSS issues
-  webpack: (config, { isServer }) => {
-    // Ensure CSS is properly processed
-    config.module.rules.push({
-      test: /\.css$/,
-      use: ['style-loader', 'css-loader', 'postcss-loader'],
-    });
-    
-    return config;
-  },
 };
 
 export default nextConfig; 
