@@ -401,7 +401,7 @@ const SettingsPage = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-lg font-semibold text-foreground">Pro Plan</h3>
-                        <p className="text-muted-foreground">$29.99/month</p>
+                        <p className="text-muted-foreground">$14.99/month</p>
                         {subscriptionStatus?.isTrialActive && (
                           <p className="text-sm text-green-600 mt-1">
                             ⭐ Pro user - {subscriptionStatus.trialDaysRemaining} days of trial remaining
@@ -455,7 +455,7 @@ const SettingsPage = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="text-lg font-semibold text-foreground">Free Trial</h3>
-                        <p className="text-muted-foreground">$0 for 14 days</p>
+                        <p className="text-muted-foreground">$0 forever</p>
                         {subscriptionStatus?.isTrialActive && (
                           <p className="text-sm text-muted-foreground mt-1">
                             {subscriptionStatus.trialDaysRemaining} days remaining
@@ -495,7 +495,7 @@ const SettingsPage = () => {
                           className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
                         >
                           <CreditCard className="w-4 h-4 mr-2" />
-                          Upgrade to Pro - $29.99/month
+                          Upgrade to Basic - $14.99/month
                         </Button>
                       )}
                     </div>

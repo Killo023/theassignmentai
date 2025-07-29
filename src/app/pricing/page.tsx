@@ -5,39 +5,59 @@ import { CheckCircle, Star } from 'lucide-react';
 export default function PricingPage() {
   const plans = [
     {
-      name: "Free Trial",
+      name: "Free Tier",
       price: "$0",
-      period: "14 days",
+      period: "forever",
       description: "Perfect for trying out our platform",
       features: [
-        "Unlimited assignment generation",
+        "2 assignments per month",
         "AI-powered content creation",
-        "Multiple export formats",
         "Basic formatting options",
-        "Email support"
+        "Email support",
+        "No export functionality",
+        "No calendar access"
       ],
       popular: false,
-      cta: "Start Free Trial",
+      cta: "Start Free",
       href: "/auth/signup"
     },
     {
-      name: "Pro Plan",
-      price: "$29.99",
+      name: "Basic Plan",
+      price: "$14.99",
       period: "per month",
       description: "Everything you need for academic success",
       features: [
-        "Everything in Free Trial",
+        "Unlimited assignments",
+        "Full calendar access",
         "Advanced AI features",
         "Priority customer support",
-        "Calendar integration",
+        "Multiple export formats",
         "Collaboration tools",
         "Premium templates",
-        "Advanced formatting",
-        "Multiple citation styles"
+        "Advanced formatting"
       ],
       popular: true,
-      cta: "Upgrade to Pro",
+      cta: "Upgrade to Basic",
       href: "/auth/signup"
+    },
+    {
+      name: "Enterprise",
+      price: "Coming Soon",
+      period: "",
+      description: "For universities and large institutions",
+      features: [
+        "Everything in Basic Plan",
+        "Custom integrations",
+        "Dedicated support",
+        "SLA guarantees",
+        "Advanced analytics",
+        "White-label options",
+        "Custom training",
+        "API access"
+      ],
+      popular: false,
+      cta: "Contact Sales",
+      href: "/contact"
     }
   ];
 
@@ -66,57 +86,61 @@ export default function PricingPage() {
       </div>
 
       {/* Hero Section */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
         <div className="text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-6">
             Simple, Transparent
             <span className="text-blue-600"> Pricing</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Choose the plan that works best for you. Start with a free trial and upgrade when you're ready.
+          <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+            Choose the plan that works best for you. Start with a free tier and upgrade when you're ready.
           </p>
         </div>
       </div>
 
       {/* Pricing Cards */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
           {plans.map((plan, index) => (
-            <div key={index} className={`relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow ${
+            <div key={index} className={`relative bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-xl transition-shadow ${
               plan.popular ? 'ring-2 ring-blue-500' : ''
             }`}>
               {plan.popular && (
                 <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
-                    <Star className="w-4 h-4 mr-2" />
+                  <span className="bg-blue-500 text-white px-3 py-2 rounded-full text-xs sm:text-sm font-semibold flex items-center">
+                    <Star className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                     Most Popular
                   </span>
                 </div>
               )}
               
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+              <div className="text-center mb-6 sm:mb-8">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                  <span className="text-gray-600 ml-2">{plan.period}</span>
+                  <span className="text-3xl sm:text-4xl font-bold text-gray-900">{plan.price}</span>
+                  {plan.period && (
+                    <span className="text-gray-600 ml-2 text-sm sm:text-base">{plan.period}</span>
+                  )}
                 </div>
-                <p className="text-gray-600">{plan.description}</p>
+                <p className="text-gray-600 text-sm sm:text-base">{plan.description}</p>
               </div>
 
-              <div className="space-y-4 mb-8">
+              <div className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                 {plan.features.map((feature, featureIndex) => (
                   <div key={featureIndex} className="flex items-start space-x-3">
-                    <CheckCircle className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
-                    <span className="text-gray-700">{feature}</span>
+                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mt-1 flex-shrink-0" />
+                    <span className="text-gray-700 text-sm sm:text-base">{feature}</span>
                   </div>
                 ))}
               </div>
 
               <Link href={plan.href} className="block">
                 <Button 
-                  className={`w-full ${
+                  className={`w-full h-12 sm:h-14 text-base sm:text-lg ${
                     plan.popular 
                       ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                      : plan.name === 'Enterprise'
+                      ? 'bg-gray-100 hover:bg-gray-200 text-gray-900'
                       : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
                   }`}
                 >
@@ -149,10 +173,10 @@ export default function PricingPage() {
 
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                What happens after my free trial ends?
+                What happens when I reach my free tier limit?
               </h3>
               <p className="text-gray-600">
-                After your 14-day free trial, you can upgrade to the Pro plan to continue using all features. No charges until you decide to upgrade.
+                When you reach your 2-assignment limit on the free tier, you can upgrade to the Basic plan for unlimited assignments and additional features.
               </p>
             </div>
 
@@ -188,7 +212,7 @@ export default function PricingPage() {
           </p>
           <Link href="/auth/signup">
             <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
-              Start Your Free Trial
+              Start Your Free Tier
             </Button>
           </Link>
         </div>

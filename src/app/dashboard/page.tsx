@@ -158,7 +158,7 @@ const DashboardPage = () => {
                   className="bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90"
                 >
                   <Lock className="w-4 h-4 mr-2" />
-                  Upgrade to Pro - $29.99/month
+                  Upgrade to Basic - $14.99/month
                 </Button>
                 <Button variant="outline">
                   <MessageSquare className="w-4 h-4 mr-2" />

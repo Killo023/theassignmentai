@@ -44,7 +44,7 @@ const DashboardSidebar = () => {
       initial={{ width: 280 }}
       animate={{ width: isCollapsed ? 80 : 280 }}
       transition={{ duration: 0.3 }}
-      className="h-screen border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+      className="h-screen border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:block hidden"
     >
       <div className="flex h-full flex-col">
         {/* Navigation */}
@@ -100,30 +100,24 @@ const DashboardSidebar = () => {
                 {recentAssignments.map((assignment) => (
                   <motion.div
                     key={assignment.id}
-                    className="flex items-center justify-between p-2 rounded-lg hover:bg-muted transition-colors"
-                    whileHover={{ x: 3 }}
+                    whileHover={{ x: 3, transition: { duration: 0.2 } }}
+                    className="p-2 rounded-lg hover:bg-muted transition-colors cursor-pointer"
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{assignment.title}</p>
-                      <p className="text-xs text-muted-foreground">{assignment.date}</p>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <span
-                        className={`w-2 h-2 rounded-full ${
-                          assignment.status === "completed"
-                            ? "bg-green-500"
-                            : assignment.status === "draft"
-                            ? "bg-yellow-500"
-                            : "bg-blue-500"
-                        }`}
-                      />
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" className="w-6 h-6">
-                          <Download className="w-3 h-3" />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="w-6 h-6">
-                          <Trash2 className="w-3 h-3" />
-                        </Button>
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">
+                          {assignment.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{assignment.date}</p>
+                      </div>
+                      <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        assignment.status === 'completed' 
+                          ? 'bg-green-100 text-green-800' 
+                          : assignment.status === 'draft'
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {assignment.status}
                       </div>
                     </div>
                   </motion.div>
@@ -132,43 +126,6 @@ const DashboardSidebar = () => {
             )}
           </div>
         )}
-
-        {/* Quick Actions */}
-        {!isCollapsed && (
-          <div className="border-t p-4">
-            <h3 className="text-sm font-medium text-muted-foreground mb-3">Quick Actions</h3>
-            <div className="space-y-2">
-              <motion.div whileHover={{ x: 3 }} whileTap={{ scale: 0.95 }}>
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <Bot className="w-4 h-4 mr-2" />
-                  AI Chat
-                </Button>
-              </motion.div>
-              <motion.div whileHover={{ x: 3 }} whileTap={{ scale: 0.95 }}>
-                <Button variant="outline" size="sm" className="w-full justify-start">
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Get Help
-                </Button>
-              </motion.div>
-            </div>
-          </div>
-        )}
-
-        {/* Collapse Toggle */}
-        <div className="border-t p-4">
-          <motion.button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="w-full flex items-center justify-center p-2 rounded-lg hover:bg-muted transition-colors"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <ChevronDown
-              className={`w-4 h-4 transition-transform ${
-                isCollapsed ? "rotate-90" : "-rotate-90"
-              }`}
-            />
-          </motion.button>
-        </div>
       </div>
     </motion.aside>
   );

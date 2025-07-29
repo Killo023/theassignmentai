@@ -47,117 +47,133 @@ export default function Home() {
       <Testimonials />
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <section id="pricing" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-12 sm:mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               Simple, transparent pricing
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Start with a free trial, then choose the plan that works for you
+            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
+              Start with a free tier, then choose the plan that works for you
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Free Trial Plan */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
+            {/* Free Tier Plan */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               viewport={{ once: true }}
-              className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 relative"
+              className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 relative"
             >
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Free Trial</h3>
+              <div className="text-center mb-6 sm:mb-8">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Free Tier</h3>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold text-gray-900">$0</span>
-                  <span className="text-gray-600 ml-2">for 14 days</span>
+                  <span className="text-3xl sm:text-4xl font-bold text-gray-900">$0</span>
+                  <span className="text-gray-600 ml-2 text-sm sm:text-base">forever</span>
                 </div>
-                <p className="text-gray-600">Perfect for trying out our AI assistant</p>
+                <p className="text-gray-600 text-sm sm:text-base">Perfect for trying out our AI assistant</p>
               </div>
 
-              <ul className="space-y-4 mb-8">
+              <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                  <span className="text-gray-700">Full access to all features</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">2 assignments per month</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                  <span className="text-gray-700">3 assignments per day</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">AI-powered content creation</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                  <span className="text-gray-700">Basic support</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">Basic formatting options</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                  <span className="text-gray-700">Standard export formats</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">Email support</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-500 text-sm sm:text-base">No export functionality</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-500 text-sm sm:text-base">No calendar access</span>
                 </li>
               </ul>
 
-              <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
-                <Link href="/auth/signup">Start Free Trial</Link>
+              <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 h-12 sm:h-14 text-base sm:text-lg">
+                <Link href="/auth/signup">Start Free</Link>
               </Button>
             </motion.div>
 
-            {/* Pro Plan */}
+            {/* Basic Plan */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               viewport={{ once: true }}
-              className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-xl border-2 border-blue-500 p-8 relative transform scale-105"
+              className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-xl border-2 border-blue-500 p-6 sm:p-8 relative transform scale-105"
             >
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full text-sm font-semibold">
+                <span className="bg-yellow-400 text-yellow-900 px-3 py-2 rounded-full text-xs sm:text-sm font-semibold">
                   Most Popular
                 </span>
               </div>
 
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-white mb-2">Pro Plan</h3>
+              <div className="text-center mb-6 sm:mb-8">
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Basic Plan</h3>
                 <div className="mb-4">
-                  <span className="text-5xl font-bold text-white">$29.99</span>
-                  <span className="text-blue-100 ml-2">per month</span>
+                  <span className="text-4xl sm:text-5xl font-bold text-white">$14.99</span>
+                  <span className="text-blue-100 ml-2 text-sm sm:text-base">per month</span>
                 </div>
-                <p className="text-blue-100">Unlimited access for serious students</p>
+                <p className="text-blue-100 text-sm sm:text-base">Unlimited access for serious students</p>
               </div>
 
-              <ul className="space-y-4 mb-8">
+              <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                  <span className="text-white">Unlimited assignments</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
+                  <span className="text-white text-sm sm:text-base">Unlimited assignments</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                  <span className="text-white">Priority AI processing</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
+                  <span className="text-white text-sm sm:text-base">Full calendar access</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                  <span className="text-white">Advanced export formats</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
+                  <span className="text-white text-sm sm:text-base">Priority AI processing</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                  <span className="text-white">Priority support</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
+                  <span className="text-white text-sm sm:text-base">Advanced export formats</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                  <span className="text-white">Version history</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
+                  <span className="text-white text-sm sm:text-base">Priority support</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-400 mr-3" />
-                  <span className="text-white">Collaboration tools</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
+                  <span className="text-white text-sm sm:text-base">Version history</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
+                  <span className="text-white text-sm sm:text-base">Collaboration tools</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
+                  <span className="text-white text-sm sm:text-base">Custom templates</span>
                 </li>
               </ul>
 
-              <Button asChild className="w-full bg-white text-blue-600 hover:bg-gray-100">
-                <Link href="/auth/signup">Start Free Trial</Link>
+              <Button asChild className="w-full bg-white text-blue-600 hover:bg-gray-100 h-12 sm:h-14 text-base sm:text-lg">
+                <Link href="/auth/signup">Upgrade to Basic</Link>
               </Button>
 
               <p className="text-sm text-blue-100 mt-4 text-center">
@@ -171,36 +187,44 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
               viewport={{ once: true }}
-              className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 relative"
+              className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 relative"
             >
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">Enterprise</h3>
+              <div className="text-center mb-6 sm:mb-8">
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Enterprise</h3>
                 <div className="mb-4">
-                  <span className="text-4xl font-bold text-gray-900">Custom</span>
+                  <span className="text-3xl sm:text-4xl font-bold text-gray-900">Coming Soon</span>
                 </div>
-                <p className="text-gray-600">For universities and large institutions</p>
+                <p className="text-gray-600 text-sm sm:text-base">For universities and large institutions</p>
               </div>
 
-              <ul className="space-y-4 mb-8">
+              <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                  <span className="text-gray-700">Everything in Pro</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">Everything in Basic Plan</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                  <span className="text-gray-700">Custom integrations</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">Custom integrations</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                  <span className="text-gray-700">Dedicated support</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">Dedicated support</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-500 mr-3" />
-                  <span className="text-gray-700">SLA guarantees</span>
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">SLA guarantees</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">Advanced analytics</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">White-label options</span>
                 </li>
               </ul>
 
-              <Button asChild variant="outline" className="w-full">
+              <Button asChild variant="outline" className="w-full h-12 sm:h-14 text-base sm:text-lg">
                 <Link href="/contact">Contact Sales</Link>
               </Button>
             </motion.div>
@@ -211,7 +235,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             viewport={{ once: true }}
-            className="text-center mt-12"
+            className="text-center mt-8 sm:mt-12"
           >
             <p className="text-sm text-gray-500 mt-4">No credit card required • Cancel anytime</p>
           </motion.div>

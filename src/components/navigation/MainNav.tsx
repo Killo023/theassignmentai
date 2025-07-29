@@ -94,53 +94,65 @@ const MainNav: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur border-b">
-      <div className="container flex h-16 items-center">
-        <Link href="/" className="mr-8 flex items-center">
-          <GraduationCap className="h-6 w-6 mr-2 text-primary" />
-          <span className="font-bold text-xl">AcademiaAI Pro</span>
-        </Link>
-        
-        <nav className="hidden md:flex space-x-6">
-          <NavLink href="/">Home</NavLink>
-          <NavLink href="/features">Features</NavLink>
-          <NavLink href="/pricing">Pricing</NavLink>
-          {user && <NavLink href="/dashboard">Dashboard</NavLink>}
-        </nav>
-        
-        <div className="ml-auto flex items-center space-x-4">
-          <ThemeToggle />
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200">
+                <GraduationCap className="h-6 w-6 text-white" />
+              </div>
+              <div className="hidden sm:block">
+                <span className="font-bold text-xl text-gray-900">AcademiaAI Pro</span>
+                <p className="text-xs text-gray-500 -mt-1">AI-Powered Academic Assistant</p>
+              </div>
+            </Link>
+          </div>
           
-          {user ? (
-            <div className="flex items-center gap-3">
-              {getStatusBadge()}
-              <UserDropdown 
-                user={{
-                  id: user.id,
-                  email: user.email,
-                  name: `${user.firstName} ${user.lastName}`,
-                  subscription: {
-                    status: subscriptionStatus?.status as "active" | "trial" | "expired" || "trial",
-                    plan: subscriptionStatus?.status === 'active' ? "Pro" : "Trial"
-                  }
-                }} 
-              />
-            </div>
-          ) : (
-            <>
-              <Button variant="ghost" asChild>
-                <Link href="/auth/login">Login</Link>
-              </Button>
-              <Button asChild className="bg-gradient-to-r from-primary to-purple-600">
-                <Link href="/auth/signup" className="flex items-center gap-2">
-                  <Crown className="w-4 h-4" />
-                  Start Free Trial
-                </Link>
-              </Button>
-            </>
-          )}
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center space-x-8">
+            <NavLink href="/" className="nav-link">Home</NavLink>
+            <NavLink href="/features" className="nav-link">Features</NavLink>
+            <NavLink href="/pricing" className="nav-link">Pricing</NavLink>
+            {user && <NavLink href="/dashboard" className="nav-link">Dashboard</NavLink>}
+          </nav>
           
-          <MobileNav />
+          {/* Right Side Actions */}
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            
+            {user ? (
+              <div className="flex items-center gap-3">
+                {getStatusBadge()}
+                <UserDropdown 
+                  user={{
+                    id: user.id,
+                    email: user.email,
+                    name: `${user.firstName} ${user.lastName}`,
+                    subscription: {
+                      status: subscriptionStatus?.status as "active" | "trial" | "expired" || "trial",
+                      plan: subscriptionStatus?.status === 'active' ? "Basic" : "Free"
+                    }
+                  }} 
+                />
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Button variant="ghost" asChild className="nav-link">
+                  <Link href="/auth/login">Sign In</Link>
+                </Button>
+                <Button asChild className="btn-primary">
+                  <Link href="/auth/signup" className="flex items-center gap-2">
+                    <Crown className="w-4 h-4" />
+                    Start Free
+                  </Link>
+                </Button>
+              </div>
+            )}
+            
+            <MobileNav />
+          </div>
         </div>
       </div>
     </header>

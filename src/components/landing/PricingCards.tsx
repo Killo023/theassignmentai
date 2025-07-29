@@ -7,39 +7,59 @@ import Link from "next/link";
 
 const plans = [
   {
-    name: "Free Trial",
+    name: "Free Tier",
     price: "$0",
-          duration: "14 days",
+    duration: "forever",
     description: "Perfect for trying out our AI assistant",
     features: [
-      "Full access to all features",
-      "3 assignments per day",
-      "Basic support",
-      "Standard export formats",
-      "Community forum access"
+      "2 assignments per month",
+      "AI-powered content creation",
+      "Basic formatting options",
+      "Email support",
+      "No export functionality",
+      "No calendar access"
     ],
-    cta: "Start Free Trial",
+    cta: "Start Free",
     popular: false,
     color: "from-blue-500 to-blue-600"
   },
   {
-    name: "Premium",
-    price: "$29.99",
+    name: "Basic Plan",
+    price: "$14.99",
     duration: "per month",
     description: "Unlimited access for serious students",
     features: [
       "Unlimited assignments",
+      "Full calendar access",
       "Priority AI processing",
       "Advanced export formats (PDF, DOCX, Excel)",
       "Priority support",
       "Version history",
       "Collaboration tools",
-      "Custom templates",
-      "Advanced analytics"
+      "Custom templates"
     ],
-    cta: "Start Free Trial",
+    cta: "Upgrade to Basic",
     popular: true,
     color: "from-primary to-purple-600"
+  },
+  {
+    name: "Enterprise",
+    price: "Coming Soon",
+    duration: "",
+    description: "For universities and large institutions",
+    features: [
+      "Everything in Basic Plan",
+      "Custom integrations",
+      "Dedicated support",
+      "SLA guarantees",
+      "Advanced analytics",
+      "White-label options",
+      "Custom training",
+      "API access"
+    ],
+    cta: "Contact Sales",
+    popular: false,
+    color: "from-gray-500 to-gray-600"
   }
 ];
 
@@ -93,16 +113,15 @@ const PricingCards = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
-              initial={{ opacity: 0, y: 20, rotateX: 15 }}
-              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
               viewport={{ once: true }}
               className="relative"
-              style={{ perspective: "1000px" }}
             >
               {plan.popular && (
                 <motion.div 
@@ -111,28 +130,25 @@ const PricingCards = () => {
                   whileInView={{ scale: 1, rotate: 0 }}
                   transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
                 >
-                  <div className="bg-gradient-to-r from-primary to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-2 shadow-lg">
-                    <Star className="w-4 h-4" />
+                  <div className="bg-gradient-to-r from-primary to-purple-600 text-white px-3 py-2 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-2 shadow-lg">
+                    <Star className="w-3 h-3 sm:w-4 sm:h-4" />
                     Most Popular
                   </div>
                 </motion.div>
               )}
 
               <motion.div 
-                className={`bg-background rounded-2xl p-8 border-2 relative overflow-hidden ${
+                className={`bg-background rounded-2xl p-4 sm:p-6 lg:p-8 border-2 relative overflow-hidden ${
                   plan.popular 
                     ? 'border-primary shadow-xl' 
                     : 'border-border shadow-lg'
                 }`}
                 whileHover={{ 
-                  rotateY: plan.popular ? 8 : 5,
-                  rotateX: 2,
                   scale: 1.02,
                   transition: { duration: 0.3 }
                 }}
                 style={{ 
-                  transformStyle: "preserve-3d",
-                  transform: plan.popular ? "scale(1.05)" : "scale(1)"
+                  transform: plan.popular ? "scale(1.02)" : "scale(1)"
                 }}
               >
                 {/* Background Gradient Effect */}
@@ -155,7 +171,7 @@ const PricingCards = () => {
                 {/* Floating accent for popular plan */}
                 {plan.popular && (
                   <motion.div
-                    className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-primary to-purple-600 rounded-full"
+                    className="absolute -top-2 -right-2 w-4 h-4 sm:w-6 sm:h-6 bg-gradient-to-r from-primary to-purple-600 rounded-full"
                     animate={{
                       scale: [1, 1.5, 1],
                       opacity: [0.5, 1, 0.5],
@@ -169,9 +185,9 @@ const PricingCards = () => {
                 )}
                 
                 {/* Plan Header */}
-                <div className="text-center mb-8 relative z-10">
+                <div className="text-center mb-6 sm:mb-8 relative z-10">
                   <motion.h3 
-                    className="text-2xl font-bold text-foreground mb-2"
+                    className="text-xl sm:text-2xl font-bold text-foreground mb-2"
                     whileHover={{ 
                       scale: 1.05,
                       transition: { duration: 0.2 }
@@ -186,14 +202,16 @@ const PricingCards = () => {
                       transition: { duration: 0.2 }
                     }}
                   >
-                    <span className="text-4xl font-bold text-foreground">{plan.price}</span>
-                    <span className="text-muted-foreground ml-2">{plan.duration}</span>
+                    <span className="text-3xl sm:text-4xl font-bold text-foreground">{plan.price}</span>
+                    {plan.duration && (
+                      <span className="text-muted-foreground ml-2 text-sm sm:text-base">{plan.duration}</span>
+                    )}
                   </motion.div>
-                  <p className="text-muted-foreground">{plan.description}</p>
+                  <p className="text-muted-foreground text-sm sm:text-base">{plan.description}</p>
                 </div>
 
                 {/* Features */}
-                <ul className="space-y-4 mb-8 relative z-10">
+                <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8 relative z-10">
                   {plan.features.map((feature, featureIndex) => (
                     <motion.li 
                       key={featureIndex} 
@@ -207,16 +225,16 @@ const PricingCards = () => {
                       }}
                     >
                       <motion.div 
-                        className="w-5 h-5 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 sm:w-5 sm:h-5 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                         whileHover={{ 
                           scale: 1.2,
                           rotate: 360,
                           transition: { duration: 0.3 }
                         }}
                       >
-                        <Check className="w-3 h-3 text-green-600" />
+                        <Check className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-600" />
                       </motion.div>
-                      <span className="text-foreground">{feature}</span>
+                      <span className="text-foreground text-sm sm:text-base">{feature}</span>
                     </motion.li>
                   ))}
                 </ul>
@@ -226,24 +244,24 @@ const PricingCards = () => {
                   <motion.div
                     whileHover={{ 
                       scale: 1.05,
-                      rotateY: 5,
                       transition: { duration: 0.3 }
                     }}
                     whileTap={{ scale: 0.95 }}
-                    style={{ transformStyle: "preserve-3d" }}
                   >
                     <Button 
                       asChild 
                       size="lg" 
-                      className={`w-full h-12 text-lg font-semibold shadow-lg ${
+                      className={`w-full h-12 sm:h-14 text-base sm:text-lg font-semibold shadow-lg ${
                         plan.popular 
                           ? 'bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90' 
+                          : plan.name === 'Enterprise'
+                          ? 'bg-gray-100 hover:bg-gray-200 text-gray-900'
                           : ''
                       }`}
                     >
-                      <Link href="/auth/signup" className="flex items-center justify-center gap-2">
+                      <Link href={plan.name === 'Enterprise' ? '/contact' : '/auth/signup'} className="flex items-center justify-center gap-2">
                         {plan.cta}
-                        {plan.popular && <Zap className="w-5 h-5" />}
+                        {plan.popular && <Zap className="w-4 h-4 sm:w-5 sm:h-5" />}
                       </Link>
                     </Button>
                   </motion.div>
@@ -252,12 +270,12 @@ const PricingCards = () => {
                 {/* Risk Reversal */}
                 {plan.popular && (
                   <motion.div 
-                    className="mt-6 text-center relative z-10"
+                    className="mt-4 sm:mt-6 text-center relative z-10"
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
                   >
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-xs sm:text-sm text-muted-foreground">
                       🔒 30-day money-back guarantee
                     </p>
                   </motion.div>

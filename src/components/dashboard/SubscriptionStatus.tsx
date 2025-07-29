@@ -146,7 +146,7 @@ export default function SubscriptionStatus({ userId }: SubscriptionStatusProps) 
               </p>
             </div>
             <div className="text-right">
-              <p className="text-yellow-800 font-medium">$29.99/month</p>
+              <p className="text-yellow-800 font-medium">$14.99/month</p>
               <p className="text-yellow-700 text-sm">After trial</p>
             </div>
           </div>
@@ -165,14 +165,14 @@ export default function SubscriptionStatus({ userId }: SubscriptionStatusProps) 
         <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-800 font-medium">Pro Plan Active</p>
+              <p className="text-green-800 font-medium">Basic Plan Active</p>
               <p className="text-green-700 text-sm">
                 {trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''} of trial remaining
               </p>
             </div>
             <div className="text-right">
-              <p className="text-green-800 font-medium">$29.99/month</p>
-              <p className="text-green-700 text-sm">Pro Plan</p>
+              <p className="text-green-800 font-medium">$14.99/month</p>
+              <p className="text-green-700 text-sm">Basic Plan</p>
             </div>
           </div>
         </div>
@@ -188,8 +188,8 @@ export default function SubscriptionStatus({ userId }: SubscriptionStatusProps) 
               </p>
             </div>
             <div className="text-right">
-              <p className="text-green-800 font-medium">$29.99/month</p>
-              <p className="text-green-700 text-sm">Pro Plan</p>
+              <p className="text-green-800 font-medium">$14.99/month</p>
+              <p className="text-green-700 text-sm">Basic Plan</p>
             </div>
           </div>
         </div>
@@ -248,12 +248,12 @@ export default function SubscriptionStatus({ userId }: SubscriptionStatusProps) 
 
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">Plan</span>
-          <span className="font-medium text-gray-900">Pro Plan</span>
+          <span className="font-medium text-gray-900">Basic Plan</span>
         </div>
 
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-600">Price</span>
-          <span className="font-medium text-gray-900">$29.99/month</span>
+          <span className="font-medium text-gray-900">$14.99/month</span>
         </div>
       </div>
 
