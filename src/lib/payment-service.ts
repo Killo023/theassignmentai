@@ -78,6 +78,27 @@ export class PaymentService {
               supabaseAnonKey !== 'your-anon-key');
   }
 
+  // Check if Supabase is actually reachable
+  private async isSupabaseReachable(): Promise<boolean> {
+    try {
+      if (!this.isSupabaseConfigured()) {
+        return false;
+      }
+
+      // Try a simple query to test connectivity
+      const { error } = await supabase
+        .from('subscriptions')
+        .select('count')
+        .limit(1);
+
+      // If we get any response (even an error), the connection is working
+      return true;
+    } catch (error) {
+      console.error('Supabase connectivity test failed:', error);
+      return false;
+    }
+  }
+
   /**
    * Get available subscription plans
    */
@@ -361,24 +382,42 @@ export class PaymentService {
       let subscription: any = null;
       
       if (this.isSupabaseConfigured()) {
-        // Fetch subscription from Supabase
-        console.log(`📡 Fetching from Supabase for user: ${userId}`);
-        let { data: supabaseData, error } = await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', userId)
-          .single();
+        // Check if Supabase is actually reachable
+        const isReachable = await this.isSupabaseReachable();
+        console.log(`🌐 Supabase reachable: ${isReachable}`);
+        
+        if (isReachable) {
+          try {
+            // Fetch subscription from Supabase
+            console.log(`📡 Fetching from Supabase for user: ${userId}`);
+            let { data: supabaseData, error } = await supabase
+              .from('subscriptions')
+              .select('*')
+              .eq('user_id', userId)
+              .single();
 
-        if (error) {
-          if (error.code === 'PGRST116') {
-            console.log(`📭 No subscription found in Supabase for user: ${userId}`);
-          } else {
-            console.error(`❌ Supabase error for user ${userId}:`, error);
-            return null;
+            if (error) {
+              if (error.code === 'PGRST116') {
+                console.log(`📭 No subscription found in Supabase for user: ${userId}`);
+              } else {
+                console.error(`❌ Supabase error for user ${userId}:`, error);
+                // Fall back to in-memory storage on error
+                console.log(`🔄 Falling back to in-memory storage due to Supabase error`);
+                subscription = this.fallbackSubscriptions.get(userId);
+              }
+            } else {
+              console.log(`✅ Found subscription in Supabase:`, supabaseData);
+              subscription = supabaseData;
+            }
+          } catch (supabaseError) {
+            console.error(`❌ Supabase connection failed for user ${userId}:`, supabaseError);
+            // Fall back to in-memory storage on connection failure
+            console.log(`🔄 Falling back to in-memory storage due to connection failure`);
+            subscription = this.fallbackSubscriptions.get(userId);
           }
         } else {
-          console.log(`✅ Found subscription in Supabase:`, supabaseData);
-          subscription = supabaseData;
+          console.log(`🌐 Supabase not reachable, using fallback storage for user: ${userId}`);
+          subscription = this.fallbackSubscriptions.get(userId);
         }
       } else {
         // Fallback to in-memory storage
@@ -669,6 +708,7 @@ export class PaymentService {
       return subscription.status === 'active';
     } catch (error) {
       console.error('Error checking calendar access:', error);
+      // Default to false for calendar access on error
       return false;
     }
   }
