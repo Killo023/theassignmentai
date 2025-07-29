@@ -8,7 +8,22 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["localhost"],
+    domains: ["localhost", "www.theassignmentai.com", "theassignmentai.com"],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'www.theassignmentai.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'theassignmentai.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+    unoptimized: true, // Add this to bypass image optimization issues
   },
   // Add cache-busting headers
   async headers() {
@@ -39,6 +54,16 @@ const nextConfig: NextConfig = {
   // Force rebuild - Enhanced Assignment Form Update v2.0
   generateBuildId: async () => {
     return 'enhanced-assignment-form-v2-' + Date.now();
+  },
+  // Add webpack configuration to handle CSS issues
+  webpack: (config, { isServer }) => {
+    // Ensure CSS is properly processed
+    config.module.rules.push({
+      test: /\.css$/,
+      use: ['style-loader', 'css-loader', 'postcss-loader'],
+    });
+    
+    return config;
   },
 };
 

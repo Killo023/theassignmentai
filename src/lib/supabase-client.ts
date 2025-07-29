@@ -1,21 +1,33 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Temporarily hardcode the values for testing
-const supabaseUrl = 'https://zhovjlnatfkdsphbtoju.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpob3ZqbG5hdGZrZHNwaGJ0b2p1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyMjE1MTQsImV4cCI6MjA2ODc5NzUxNH0.keXWxxyiJPGQNCOZ2RnUaecXtgVjDYuk8D7nq-Pjn5A';
+// Use environment variables with fallback for development
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ibhrkjbcpxyjfbkepgwd.supabase.co';
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImliaHJramJjcHh5amZia2VwZ3dkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM3OTY4MzksImV4cCI6MjA2OTM3MjgzOX0.Nt5V0DblrtW_XX0rVoM__1zGqv7p0cO_5tJmC9u-L60';
 
-console.log('Using hardcoded Supabase credentials for testing');
+console.log('🔧 Supabase configured:', !!supabaseUrl && !!supabaseAnonKey);
+console.log('🔧 Supabase URL:', supabaseUrl);
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-// Test the connection
-supabase.from('subscriptions').select('count').limit(1).then(({ error }) => {
-  if (error) {
-    console.error('Supabase connection test failed:', error.message);
-  } else {
-    console.log('Supabase connection successful');
+// Test the connection with better error handling
+const testConnection = async () => {
+  try {
+    const { data, error } = await supabase.from('subscriptions').select('count').limit(1);
+    if (error) {
+      console.error('❌ Supabase connection test failed:', error.message);
+      console.error('❌ Error details:', error);
+    } else {
+      console.log('✅ Supabase connection successful');
+    }
+  } catch (err) {
+    console.error('❌ Supabase connection test failed with exception:', err);
   }
-});
+};
+
+// Test connection on client side only
+if (typeof window !== 'undefined') {
+  testConnection();
+}
 
 // Database types for TypeScript
 export interface Database {
