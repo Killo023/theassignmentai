@@ -45,6 +45,7 @@ import Paywall from "@/components/Paywall";
 import { AssignmentService } from "@/lib/assignment-service";
 import { EnhancedExportService } from "@/lib/enhanced-export-service";
 import EnhancedAssignmentForm from "@/components/assignment/EnhancedAssignmentForm";
+import ProfessionalAssignmentDisplay from "@/components/assignment/ProfessionalAssignmentDisplay";
 import Link from "next/link";
 
 interface Assignment {
@@ -117,7 +118,7 @@ const AssignmentCreator = () => {
   const [showPaywall, setShowPaywall] = useState(false);
   const [aiStatus, setAiStatus] = useState<"checking" | "available" | "unavailable">("checking");
 
-  const paymentService = new PaymentService(user?.id || "");
+  const paymentService = PaymentService.getInstance();
   const assignmentService = new AssignmentService(user?.id || "");
 
   useEffect(() => {
@@ -127,13 +128,17 @@ const AssignmentCreator = () => {
 
   const checkSubscriptionStatus = async () => {
     try {
-      const status = await paymentService.checkSubscriptionStatus();
-      setIsPro(status.plan === "pro");
-      setIsBasic(status.plan === "basic");
-      setAssignmentUsage(status.usage || 0);
+      if (!user?.id) return;
+      
+      const status = await paymentService.checkSubscriptionStatus(user.id);
+      const usage = await paymentService.getAssignmentUsage(user.id);
+      
+      setIsPro(status?.planId === "pro");
+      setIsBasic(status?.planId === "basic");
+      setAssignmentUsage(usage.used);
       
       // Check if user can create assignments
-      const canCreate = await paymentService.canCreateAssignment();
+      const canCreate = await paymentService.canCreateAssignment(user.id);
       setCanCreateAssignment(canCreate);
       
       if (!canCreate) {
@@ -146,9 +151,14 @@ const AssignmentCreator = () => {
 
   const handleUpgrade = async (paymentData: any): Promise<boolean> => {
     try {
-      await paymentService.handlePayment(paymentData);
-      await checkSubscriptionStatus();
-      return true;
+      if (!user?.id) return false;
+      
+      const result = await paymentService.convertToPaid(user.id, 'basic', paymentData);
+      if (result.success) {
+        await checkSubscriptionStatus();
+        return true;
+      }
+      return false;
     } catch (error) {
       console.error("Payment error:", error);
       return false;
@@ -256,14 +266,16 @@ const AssignmentCreator = () => {
         title: formData.title,
         subject: formData.subject,
         type: formData.type,
-        wordCount: formData.wordCount,
+        word_count: formData.wordCount,
         content: response.content,
         status: "completed",
         requirements: formData.requirements,
       });
 
       // Update usage
-      await paymentService.incrementUsage();
+      if (user?.id) {
+        await paymentService.incrementAssignmentCount(user.id);
+      }
       await checkSubscriptionStatus();
     } catch (error) {
       console.error("Error generating assignment:", error);
@@ -280,11 +292,11 @@ const AssignmentCreator = () => {
     }
   };
 
-  const exportAssignment = async (format: "docx" | "pdf" | "txt" | "xlsx") => {
+  const exportAssignment = async (format: string) => {
     if (!assignment.content) return;
 
     const options = {
-      format,
+      format: format as "txt" | "docx" | "pdf" | "xlsx",
       includeCoverPage: assignment.includeCoverPage || false,
       includeTableOfContents: assignment.includeTableOfContents || false,
       includeExecutiveSummary: assignment.includeExecutiveSummary || false,
@@ -322,9 +334,9 @@ const AssignmentCreator = () => {
   if (showPaywall) {
     return (
       <Paywall
+        isVisible={showPaywall}
         onUpgrade={handleUpgrade}
-        currentPlan={isPro ? "pro" : isBasic ? "basic" : "free"}
-        usage={assignmentUsage}
+        onClose={() => setShowPaywall(false)}
       />
     );
   }
@@ -384,61 +396,18 @@ const AssignmentCreator = () => {
               </div>
 
               {assignment.content ? (
-                <div className="space-y-4">
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900">{assignment.title}</h3>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyToClipboard(assignment.content)}
-                      >
-                        <Copy className="w-4 h-4 mr-1" />
-                        Copy
-                      </Button>
-                    </div>
-                    <div className="prose prose-sm max-w-none">
-                      <pre className="whitespace-pre-wrap text-sm text-gray-700 bg-white p-3 rounded border">
-                        {assignment.content}
-                      </pre>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      onClick={() => exportAssignment("txt")}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <FileText className="w-4 h-4 mr-1" />
-                      Export TXT
-                    </Button>
-                    <Button
-                      onClick={() => exportAssignment("docx")}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Download className="w-4 h-4 mr-1" />
-                      Export DOCX
-                    </Button>
-                    <Button
-                      onClick={() => exportAssignment("pdf")}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <FileText className="w-4 h-4 mr-1" />
-                      Export PDF
-                    </Button>
-                    <Button
-                      onClick={() => exportAssignment("xlsx")}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Download className="w-4 h-4 mr-1" />
-                      Export XLSX
-                    </Button>
-                  </div>
-                </div>
+                <ProfessionalAssignmentDisplay
+                  assignment={assignment}
+                  tables={[]} // Will be populated from AI response
+                  charts={[]} // Will be populated from AI response
+                  references={[]} // Will be populated from AI response
+                  onExport={exportAssignment}
+                  onCopy={() => copyToClipboard(assignment.content)}
+                  onSave={() => {
+                    // Save functionality
+                    console.log('Saving assignment...');
+                  }}
+                />
               ) : (
                 <div className="text-center py-12">
                   <Wand2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
