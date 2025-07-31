@@ -100,12 +100,21 @@ const MobileNav: React.FC = () => {
       </Button>
       <AnimatePresence>
         {open && (
-          <motion.nav
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-40 bg-black bg-opacity-50"
+              onClick={() => setOpen(false)}
+            />
+            <motion.nav
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-0 z-50 bg-background border-l border-border flex flex-col p-6"
+            className="fixed inset-0 z-50 bg-white border-l border-gray-200 flex flex-col p-6 shadow-xl"
           >
             <div className="flex justify-end">
               <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close menu">
@@ -133,7 +142,7 @@ const MobileNav: React.FC = () => {
             {user ? (
               <div className="mt-8 space-y-4">
                 {/* User Info */}
-                <div className="p-4 bg-muted rounded-lg">
+                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
                       <User className="h-5 w-5 text-primary-foreground" />
@@ -181,7 +190,8 @@ const MobileNav: React.FC = () => {
                 </Button>
               </div>
             )}
-          </motion.nav>
+            </motion.nav>
+          </>
         )}
       </AnimatePresence>
     </div>
