@@ -106,7 +106,8 @@ const MobileNav: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40 bg-black bg-opacity-50"
+              className="fixed inset-0 z-40 bg-black"
+              style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
               onClick={() => setOpen(false)}
             />
             <motion.nav
@@ -114,8 +115,13 @@ const MobileNav: React.FC = () => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-0 z-50 bg-white border-l border-gray-200 flex flex-col p-6 shadow-xl backdrop-blur-none !bg-white"
-            style={{ backgroundColor: '#ffffff' }}
+            className="fixed right-0 top-0 bottom-0 w-80 z-50 bg-white border-l border-gray-200 flex flex-col p-6 shadow-2xl overflow-y-auto"
+            style={{ 
+              backgroundColor: '#ffffff !important',
+              backgroundImage: 'none !important',
+              backdropFilter: 'none !important',
+              WebkitBackdropFilter: 'none !important'
+            }}
           >
             <div className="flex justify-end">
               <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close menu">
