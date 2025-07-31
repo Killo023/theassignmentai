@@ -244,18 +244,21 @@ export class PaymentService {
               .from('subscriptions')
               .upsert({
                 user_id: userId,
-                plan: planId,
+                plan_id: planId,
                 status: planId,
                 assignments_used: 0,
+                assignment_limit: plan.assignmentLimit,
+                has_calendar_access: plan.hasCalendarAccess,
                 upgraded_at: new Date().toISOString(),
                 created_at: new Date().toISOString()
               });
 
             if (error) {
               console.error(`❌ Error upserting subscription in Supabase:`, error);
+              console.error(`❌ Error details:`, JSON.stringify(error, null, 2));
               return {
                 success: false,
-                message: 'Failed to update subscription status: ' + error.message
+                message: 'Failed to update subscription status: ' + (error.message || 'Database error')
               };
             }
             console.log(`✅ Successfully upserted subscription in Supabase for user: ${userId}`);
@@ -267,17 +270,21 @@ export class PaymentService {
             if (existingSub) {
               this.fallbackSubscriptions.set(userId, {
                 ...existingSub,
-                plan: planId,
+                plan_id: planId,
                 status: planId,
+                assignment_limit: plan.assignmentLimit,
+                has_calendar_access: plan.hasCalendarAccess,
                 upgraded_at: new Date().toISOString()
               });
             } else {
               // Create new subscription in fallback storage
               this.fallbackSubscriptions.set(userId, {
                 user_id: userId,
-                plan: planId,
+                plan_id: planId,
                 status: planId,
                 assignments_used: 0,
+                assignment_limit: plan.assignmentLimit,
+                has_calendar_access: plan.hasCalendarAccess,
                 upgraded_at: new Date().toISOString(),
                 created_at: new Date().toISOString()
               });
@@ -326,9 +333,11 @@ export class PaymentService {
               .from('subscriptions')
               .upsert({
                 user_id: userId,
-                plan: planId,
+                plan_id: planId,
                 status: planId,
                 assignments_used: 0,
+                assignment_limit: plan.assignmentLimit,
+                has_calendar_access: plan.hasCalendarAccess,
                 upgraded_at: new Date().toISOString(),
                 created_at: new Date().toISOString()
               });
@@ -349,8 +358,10 @@ export class PaymentService {
             if (existingSub) {
               this.fallbackSubscriptions.set(userId, {
                 ...existingSub,
-                plan: planId,
+                plan_id: planId,
                 status: planId,
+                assignment_limit: plan.assignmentLimit,
+                has_calendar_access: plan.hasCalendarAccess,
                 upgraded_at: new Date().toISOString()
               });
             }
@@ -377,14 +388,16 @@ export class PaymentService {
         if (this.isSupabaseConfigured()) {
           // Update subscription in Supabase
           console.log(`💾 Updating subscription in Supabase for user: ${userId}`);
-          const { error } = await supabase
-            .from('subscriptions')
-            .update({
-              plan: planId,
-              status: planId,
-              upgraded_at: new Date().toISOString()
-            })
-            .eq('user_id', userId);
+                      const { error } = await supabase
+              .from('subscriptions')
+              .update({
+                plan_id: planId,
+                status: planId,
+                assignment_limit: plan.assignmentLimit,
+                has_calendar_access: plan.hasCalendarAccess,
+                upgraded_at: new Date().toISOString()
+              })
+              .eq('user_id', userId);
 
           if (error) {
             console.error(`❌ Error updating subscription in Supabase:`, error);
@@ -495,9 +508,11 @@ export class PaymentService {
             .from('subscriptions')
             .insert([{
               user_id: userId,
-              plan: 'free',
+              plan_id: 'free',
               status: 'free',
               assignments_used: 0,
+              assignment_limit: 4,
+              has_calendar_access: false,
               created_at: new Date().toISOString()
             }]);
 
@@ -511,9 +526,11 @@ export class PaymentService {
           console.log(`💾 Creating new subscription in fallback storage for user: ${userId}`);
           this.fallbackSubscriptions.set(userId, {
             user_id: userId,
-            plan: 'free',
+            plan_id: 'free',
             status: 'free',
             assignments_used: 0,
+            assignment_limit: 4,
+            has_calendar_access: false,
             created_at: new Date().toISOString()
           });
           this.fallbackAssignmentCounts.set(userId, 0);
@@ -531,7 +548,7 @@ export class PaymentService {
       }
 
       // Subscription exists - get the plan details
-      const plan = this.getPlan(subscription.plan || 'free');
+      const plan = this.getPlan(subscription.plan_id || 'free');
       if (!plan) {
         throw new Error('Plan not found');
       }
@@ -544,7 +561,7 @@ export class PaymentService {
       
       return {
         userId,
-        planId: subscription.plan || 'free',
+        planId: subscription.plan_id || 'free',
         status: subscription.status || 'free',
         assignmentsUsed,
         assignmentLimit: plan.assignmentLimit,
