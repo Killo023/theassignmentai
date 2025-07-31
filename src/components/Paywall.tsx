@@ -35,14 +35,15 @@ const Paywall: React.FC<PaywallProps> = ({ onUpgrade, onClose, isVisible }) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const features = [
-    "Unlimited assignment generation",
-    "AI-powered charts and graphs", 
-    "Multiple export formats (PDF, DOCX, TXT)",
-    "University-level academic standards",
-    "Plagiarism-free content",
-    "Priority customer support",
-    "Advanced editing tools",
-    "Version history"
+    "Unlimited assignments",
+    "Full calendar access",
+    "Priority AI processing",
+    "PDF & DOCX export",
+    "Priority email/chat support",
+    "Version history",
+    "Collaboration tools",
+    "Custom templates",
+    "Basic usage analytics"
   ];
 
   const validateForm = () => {
@@ -137,7 +138,7 @@ const Paywall: React.FC<PaywallProps> = ({ onUpgrade, onClose, isVisible }) => {
               <Crown className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-foreground">Upgrade to Pro</h2>
+              <h2 className="text-2xl font-bold text-foreground">Upgrade to Basic</h2>
               <p className="text-muted-foreground">Upgrade to continue with unlimited access.</p>
             </div>
           </div>
@@ -160,7 +161,7 @@ const Paywall: React.FC<PaywallProps> = ({ onUpgrade, onClose, isVisible }) => {
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <Star className="w-5 h-5 text-yellow-500" />
-                Pro Plan Benefits
+                Basic Plan Benefits
               </h3>
               
               <div className="space-y-3">

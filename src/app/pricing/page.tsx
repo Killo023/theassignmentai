@@ -5,59 +5,60 @@ import { CheckCircle, Star } from 'lucide-react';
 export default function PricingPage() {
   const plans = [
     {
-      name: "Free Tier",
+      name: "Free Plan",
       price: "$0",
       period: "forever",
-      description: "Perfect for trying out our platform",
+      description: "Perfect for trying the platform",
       features: [
-        "2 assignments per month",
-        "AI-powered content creation",
+        "4 assignments per month",
+        "AI-powered content creation", 
         "Basic formatting options",
         "Email support",
-        "No export functionality",
-        "No calendar access"
+        "No calendar access",
+        "No export functionality"
       ],
-      popular: false,
       cta: "Start Free",
-      href: "/auth/signup"
+      href: "/auth/signup",
+      popular: false
     },
     {
       name: "Basic Plan",
       price: "$14.99",
       period: "per month",
-      description: "Everything you need for academic success",
+      description: "Perfect for serious students",
       features: [
         "Unlimited assignments",
         "Full calendar access",
-        "Advanced AI features",
-        "Priority customer support",
-        "Multiple export formats",
+        "Priority AI processing",
+        "PDF & DOCX export",
+        "Priority email/chat support",
+        "Version history",
         "Collaboration tools",
-        "Premium templates",
-        "Advanced formatting"
+        "Custom templates",
+        "Basic usage analytics"
       ],
-      popular: true,
       cta: "Upgrade to Basic",
-      href: "/auth/signup"
+      href: "/upgrade",
+      popular: true
     },
     {
-      name: "Enterprise",
-      price: "Coming Soon",
-      period: "",
-      description: "For universities and large institutions",
+      name: "Pro Plan",
+      price: "$29.99",
+      period: "per month", 
+      description: "Perfect for researchers & power users",
       features: [
-        "Everything in Basic Plan",
-        "Custom integrations",
-        "Dedicated support",
-        "SLA guarantees",
-        "Advanced analytics",
-        "White-label options",
-        "Custom training",
-        "API access"
+        "Everything in Basic Plan, PLUS:",
+        "AI-powered charts and graphs",
+        "Advanced export (PDF, DOCX, TXT + more)",
+        "University-level academic standards",
+        "Plagiarism-free guarantee",
+        "24/7 premium support",
+        "Advanced performance analytics",
+        "Highest priority AI processing"
       ],
-      popular: false,
-      cta: "Contact Sales",
-      href: "/contact"
+      cta: "Upgrade to Pro",
+      href: "/upgrade",
+      popular: false
     }
   ];
 

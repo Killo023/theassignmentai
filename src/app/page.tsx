@@ -16,7 +16,8 @@ import {
   Bot,
   MessageSquare,
   Download,
-  Eye
+  Eye,
+  X
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -65,13 +66,13 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
-            {/* Free Tier Plan */}
+            {/* Free Plan */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
               viewport={{ once: true }}
-              className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 relative"
+              className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8"
             >
               <div className="text-center mb-6 sm:mb-8">
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Free Plan</h3>
@@ -79,7 +80,7 @@ export default function Home() {
                   <span className="text-3xl sm:text-4xl font-bold text-gray-900">$0</span>
                   <span className="text-gray-600 ml-2 text-sm sm:text-base">forever</span>
                 </div>
-                <p className="text-gray-600 text-sm sm:text-base">Perfect for trying out our AI assistant</p>
+                <p className="text-gray-600 text-sm sm:text-base">Perfect for trying the platform</p>
               </div>
 
               <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
@@ -100,12 +101,12 @@ export default function Home() {
                   <span className="text-gray-700 text-sm sm:text-base">Email support</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-500 text-sm sm:text-base">No export functionality</span>
+                  <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-500 text-sm sm:text-base">Calendar access</span>
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-500 text-sm sm:text-base">No calendar access</span>
+                  <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 mr-3 flex-shrink-0" />
+                  <span className="text-gray-500 text-sm sm:text-base">Export functionality</span>
                 </li>
               </ul>
 
@@ -134,7 +135,7 @@ export default function Home() {
                   <span className="text-4xl sm:text-5xl font-bold text-white">$14.99</span>
                   <span className="text-blue-100 ml-2 text-sm sm:text-base">per month</span>
                 </div>
-                <p className="text-blue-100 text-sm sm:text-base">Unlimited access for serious students</p>
+                <p className="text-blue-100 text-sm sm:text-base">Perfect for serious students</p>
               </div>
 
               <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
@@ -152,11 +153,11 @@ export default function Home() {
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
-                  <span className="text-white text-sm sm:text-base">Advanced export formats</span>
+                  <span className="text-white text-sm sm:text-base">PDF & DOCX export</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
-                  <span className="text-white text-sm sm:text-base">Priority support</span>
+                  <span className="text-white text-sm sm:text-base">Priority email/chat support</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
@@ -170,10 +171,14 @@ export default function Home() {
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
                   <span className="text-white text-sm sm:text-base">Custom templates</span>
                 </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
+                  <span className="text-white text-sm sm:text-base">Basic usage analytics</span>
+                </li>
               </ul>
 
               <Button asChild className="w-full bg-white text-blue-600 hover:bg-gray-100 h-12 sm:h-14 text-base sm:text-lg">
-                <Link href="/auth/signup">Upgrade to Basic</Link>
+                <Link href="/upgrade">Upgrade to Basic</Link>
               </Button>
 
               <p className="text-sm text-blue-100 mt-4 text-center">
@@ -195,13 +200,13 @@ export default function Home() {
                   <span className="text-3xl sm:text-4xl font-bold text-gray-900">$29.99</span>
                   <span className="text-gray-600 ml-2 text-sm sm:text-base">per month</span>
                 </div>
-                <p className="text-gray-600 text-sm sm:text-base">Advanced features for power users</p>
+                <p className="text-gray-600 text-sm sm:text-base">Perfect for researchers & power users</p>
               </div>
 
               <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Everything in Basic Plan</span>
+                  <span className="text-gray-700 text-sm sm:text-base font-medium">Everything in Basic Plan, PLUS:</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
@@ -209,7 +214,7 @@ export default function Home() {
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Multiple export formats (PDF, DOCX, TXT)</span>
+                  <span className="text-gray-700 text-sm sm:text-base">Advanced export (PDF, DOCX, TXT + more)</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
@@ -217,20 +222,24 @@ export default function Home() {
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Plagiarism-free content</span>
+                  <span className="text-gray-700 text-sm sm:text-base">Plagiarism-free guarantee</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Priority customer support</span>
+                  <span className="text-gray-700 text-sm sm:text-base">24/7 premium support</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Advanced analytics</span>
+                  <span className="text-gray-700 text-sm sm:text-base">Advanced performance analytics</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">Highest priority AI processing</span>
                 </li>
               </ul>
 
               <Button asChild className="w-full bg-gray-900 hover:bg-gray-800 text-white h-12 sm:h-14 text-base sm:text-lg">
-                <Link href="/auth/signup">Upgrade to Pro</Link>
+                <Link href="/upgrade">Upgrade to Pro</Link>
               </Button>
             </motion.div>
           </div>
@@ -267,7 +276,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
-                <Link href="/auth/signup" className="flex items-center">
+                <Link href="/upgrade" className="flex items-center">
                   Start Free Plan
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>

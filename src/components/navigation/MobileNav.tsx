@@ -31,12 +31,12 @@ const MobileNav: React.FC = () => {
           setIsLoading(true);
           const paymentService = PaymentService.getInstance();
           const subscription = await paymentService.checkSubscriptionStatus(user.id);
-          const trialDaysRemaining = await paymentService.getTrialDaysRemaining(user.id);
+          const usage = await paymentService.getAssignmentUsage(user.id);
           
           setSubscriptionStatus({
-            isTrialActive: subscription?.isTrialActive || false,
-            trialDaysRemaining: trialDaysRemaining || 0,
-            status: subscription?.status || 'trial'
+            isTrialActive: subscription?.status === 'free',
+            trialDaysRemaining: usage.remaining,
+            status: subscription?.status || 'free'
           });
         } catch (error) {
           console.error('Error loading subscription status:', error);
@@ -66,30 +66,21 @@ const MobileNav: React.FC = () => {
   const getStatusBadge = () => {
     if (!user || isLoading) return null;
 
-    // Check if user is upgraded but trial is still active
-    if (subscriptionStatus?.status === 'active' && subscriptionStatus?.isTrialActive && subscriptionStatus.trialDaysRemaining > 0) {
+    // Check if user is upgraded but still in free plan
+    if (subscriptionStatus?.status === 'basic' || subscriptionStatus?.status === 'pro') {
       return (
         <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium border border-green-200">
           <CheckCircle className="w-3 h-3" />
-          Pro ({subscriptionStatus.trialDaysRemaining}d trial left)
+          {subscriptionStatus.status === 'basic' ? 'Basic' : 'Pro'}
         </div>
       );
     }
 
-    if (subscriptionStatus?.isTrialActive && subscriptionStatus.trialDaysRemaining > 0) {
+    if (subscriptionStatus?.status === 'free' && subscriptionStatus?.trialDaysRemaining > 0) {
       return (
-        <div className="flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium border border-yellow-200">
+        <div className="flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium border border-blue-200">
           <Clock className="w-3 h-3" />
-          Trial ({subscriptionStatus.trialDaysRemaining}d left)
-        </div>
-      );
-    }
-
-    if (subscriptionStatus?.status === 'active') {
-      return (
-        <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium border border-green-200">
-          <CheckCircle className="w-3 h-3" />
-          Pro
+          Free ({subscriptionStatus.trialDaysRemaining} assignments left)
         </div>
       );
     }
@@ -114,7 +105,7 @@ const MobileNav: React.FC = () => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-0 z-50 bg-background/95 backdrop-blur flex flex-col p-6"
+            className="fixed inset-0 z-50 bg-background border-l border-border flex flex-col p-6"
           >
             <div className="flex justify-end">
               <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close menu">
@@ -163,11 +154,11 @@ const MobileNav: React.FC = () => {
                       Settings
                     </Link>
                   </Button>
-                  {subscriptionStatus?.isTrialActive && subscriptionStatus?.status !== 'active' && (
+                  {subscriptionStatus?.status === 'free' && (
                     <Button variant="outline" asChild className="w-full justify-start">
-                      <Link href="/dashboard/settings?tab=subscription" onClick={() => setOpen(false)}>
+                      <Link href="/upgrade" onClick={() => setOpen(false)}>
                         <Crown className="w-4 h-4 mr-2" />
-                        Upgrade to Pro
+                        Upgrade to Basic
                       </Link>
                     </Button>
                   )}
@@ -183,9 +174,9 @@ const MobileNav: React.FC = () => {
                   <Link href="/auth/login" onClick={() => setOpen(false)}>Login</Link>
                 </Button>
                 <Button asChild className="bg-gradient-to-r from-primary to-purple-600">
-                  <Link href="/auth/signup" onClick={() => setOpen(false)} className="flex items-center gap-2">
+                  <Link href="/upgrade" onClick={() => setOpen(false)} className="flex items-center gap-2">
                     <Crown className="w-4 h-4" />
-                    Start Free Trial
+                    Start Free Plan
                   </Link>
                 </Button>
               </div>

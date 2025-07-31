@@ -50,11 +50,12 @@ export class PaymentService {
         'Unlimited assignments',
         'Full calendar access',
         'Priority AI processing',
-        'Advanced export formats',
-        'Priority support',
+        'PDF & DOCX export',
+        'Priority email/chat support',
         'Version history',
         'Collaboration tools',
-        'Custom templates'
+        'Custom templates',
+        'Basic usage analytics'
       ]
     },
     {
@@ -65,14 +66,14 @@ export class PaymentService {
       assignmentLimit: -1, // Unlimited
       hasCalendarAccess: true,
       features: [
-        'Unlimited assignment generation',
+        'Everything in Basic Plan, PLUS:',
         'AI-powered charts and graphs',
-        'Multiple export formats (PDF, DOCX, TXT)',
+        'Advanced export (PDF, DOCX, TXT + more)',
         'University-level academic standards',
-        'Plagiarism-free content',
-        'Priority customer support',
-        'Full calendar access',
-        'Advanced analytics'
+        'Plagiarism-free guarantee',
+        '24/7 premium support',
+        'Advanced performance analytics',
+        'Highest priority AI processing'
       ]
     }
   ];
@@ -217,6 +218,7 @@ export class PaymentService {
       
       const plan = this.getPlan(planId);
       if (!plan) {
+        console.error('❌ Invalid plan ID:', planId);
         return { success: false, message: 'Invalid plan selected' };
       }
       
@@ -234,51 +236,69 @@ export class PaymentService {
         console.log('🎭 PayPal not configured, simulating payment success');
         await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate processing time
         
-        if (this.isSupabaseConfigured()) {
-          // Upsert subscription in Supabase (create if doesn't exist, update if exists)
-          console.log(`💾 Upserting subscription in Supabase for user: ${userId}`);
-          const { error } = await supabase
-            .from('subscriptions')
-            .upsert({
-              user_id: userId,
-              plan: planId,
-              status: planId,
-              assignments_used: 0,
-              upgraded_at: new Date().toISOString(),
-              created_at: new Date().toISOString()
-            });
+        try {
+          if (this.isSupabaseConfigured()) {
+            // Upsert subscription in Supabase (create if doesn't exist, update if exists)
+            console.log(`💾 Upserting subscription in Supabase for user: ${userId}`);
+            const { error } = await supabase
+              .from('subscriptions')
+              .upsert({
+                user_id: userId,
+                plan: planId,
+                status: planId,
+                assignments_used: 0,
+                upgraded_at: new Date().toISOString(),
+                created_at: new Date().toISOString()
+              });
 
-          if (error) {
-            console.error(`❌ Error upserting subscription in Supabase:`, error);
-            return {
-              success: false,
-              message: 'Failed to update subscription status'
-            };
+            if (error) {
+              console.error(`❌ Error upserting subscription in Supabase:`, error);
+              return {
+                success: false,
+                message: 'Failed to update subscription status: ' + error.message
+              };
+            }
+            console.log(`✅ Successfully upserted subscription in Supabase for user: ${userId}`);
+          } else {
+            // Fallback to in-memory storage
+            console.log(`💾 Updating subscription in fallback storage for user: ${userId}`);
+            this.fallbackUpgradedUsers.add(userId);
+            const existingSub = this.fallbackSubscriptions.get(userId);
+            if (existingSub) {
+              this.fallbackSubscriptions.set(userId, {
+                ...existingSub,
+                plan: planId,
+                status: planId,
+                upgraded_at: new Date().toISOString()
+              });
+            } else {
+              // Create new subscription in fallback storage
+              this.fallbackSubscriptions.set(userId, {
+                user_id: userId,
+                plan: planId,
+                status: planId,
+                assignments_used: 0,
+                upgraded_at: new Date().toISOString(),
+                created_at: new Date().toISOString()
+              });
+            }
           }
-          console.log(`✅ Successfully upserted subscription in Supabase for user: ${userId}`);
-        } else {
-          // Fallback to in-memory storage
-          console.log(`💾 Updating subscription in fallback storage for user: ${userId}`);
-          this.fallbackUpgradedUsers.add(userId);
-          const existingSub = this.fallbackSubscriptions.get(userId);
-          if (existingSub) {
-            this.fallbackSubscriptions.set(userId, {
-              ...existingSub,
-              plan: planId,
-              status: planId,
-              upgraded_at: new Date().toISOString()
-            });
-          }
+
+          console.log(`🎉 User ${userId} upgraded to ${planId} (demo mode)`);
+          // Notify all listeners about the subscription change
+          this.notifySubscriptionChange();
+          
+          return {
+            success: true,
+            message: `Payment processed successfully - upgraded to ${plan.name} (demo mode)`
+          };
+        } catch (demoError) {
+          console.error('❌ Demo payment simulation failed:', demoError);
+          return {
+            success: false,
+            message: 'Demo payment failed: ' + (demoError instanceof Error ? demoError.message : 'Unknown error')
+          };
         }
-
-        console.log(`🎉 User ${userId} upgraded to ${planId} (demo mode)`);
-        // Notify all listeners about the subscription change
-        this.notifySubscriptionChange();
-        
-        return {
-          success: true,
-          message: `Payment processed successfully - upgraded to ${plan.name} (demo mode)`
-        };
       }
 
       // PayPal is configured - try to use it
@@ -574,12 +594,20 @@ export class PaymentService {
   async incrementAssignmentCount(userId: string): Promise<void> {
     try {
       if (this.isSupabaseConfigured()) {
+        // Get current count first, then update
+        const { data: currentData } = await supabase
+          .from('subscriptions')
+          .select('assignments_used')
+          .eq('user_id', userId)
+          .single();
+
+        const currentCount = currentData?.assignments_used || 0;
+        const newCount = currentCount + 1;
+
         // Update assignment count in Supabase
         const { error } = await supabase
           .from('subscriptions')
-          .update({ 
-            assignments_used: supabase.sql`assignments_used + 1` 
-          })
+          .update({ assignments_used: newCount })
           .eq('user_id', userId);
 
         if (error) {

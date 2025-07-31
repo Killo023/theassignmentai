@@ -94,7 +94,7 @@ export default function FeaturesPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link href="/auth/signup" className="flex items-center gap-2">
+              <Link href="/upgrade" className="flex items-center gap-2">
                 Start Free Plan
                 <ArrowRight className="w-5 h-5" />
               </Link>
@@ -181,7 +181,7 @@ export default function FeaturesPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link href="/auth/signup" className="flex items-center gap-2">
+              <Link href="/upgrade" className="flex items-center gap-2">
                 Start Free Plan
                 <ArrowRight className="w-5 h-5" />
               </Link>

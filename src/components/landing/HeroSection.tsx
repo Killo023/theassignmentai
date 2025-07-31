@@ -62,7 +62,7 @@ const HeroSection = () => {
             className="flex flex-col sm:flex-row gap-4 justify-center mb-12"
           >
             <Button asChild size="lg" className="btn-primary text-lg px-8 py-4">
-              <Link href="/auth/signup" className="flex items-center gap-2">
+              <Link href="/upgrade" className="flex items-center gap-2">
                 Start Free Plan
                 <ArrowRight className="w-5 h-5" />
               </Link>

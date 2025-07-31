@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { 
   Menu, 
@@ -56,8 +57,14 @@ const DashboardHeader = () => {
 
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Home className="w-5 h-5 text-primary-foreground" />
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+              <Image 
+                src="/logo.svg" 
+                alt="AcademiaAI Pro Logo" 
+                width={32} 
+                height={32}
+                className="w-full h-full object-cover"
+              />
             </div>
             <span className="font-bold text-lg hidden sm:block">Dashboard</span>
           </Link>

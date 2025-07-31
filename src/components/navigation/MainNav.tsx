@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { GraduationCap, Crown, Clock, CheckCircle } from "lucide-react";
+import Image from "next/image";
+import { Crown, Clock, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/ThemeToggle";
 import UserDropdown from "@/components/UserDropdown";
@@ -14,9 +15,10 @@ import PaymentService from "@/lib/payment-service";
 const MainNav: React.FC = () => {
   const { user } = useAuth();
   const [subscriptionStatus, setSubscriptionStatus] = useState<{
-    isTrialActive: boolean;
-    trialDaysRemaining: number;
     status: string;
+    plan: string;
+    assignmentsUsed: number;
+    assignmentLimit: number;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -27,12 +29,13 @@ const MainNav: React.FC = () => {
           setIsLoading(true);
           const paymentService = PaymentService.getInstance();
           const subscription = await paymentService.checkSubscriptionStatus(user.id);
-          const trialDaysRemaining = await paymentService.getTrialDaysRemaining(user.id);
+          const usage = await paymentService.getAssignmentUsage(user.id);
           
           setSubscriptionStatus({
-            isTrialActive: subscription?.isTrialActive || false,
-            trialDaysRemaining: trialDaysRemaining || 0,
-            status: subscription?.status || 'trial'
+            status: subscription?.status || 'free',
+            plan: subscription?.planId || 'free',
+            assignmentsUsed: usage.used,
+            assignmentLimit: usage.limit
           });
         } catch (error) {
           console.error('Error loading subscription status:', error);
@@ -46,46 +49,40 @@ const MainNav: React.FC = () => {
 
     loadSubscriptionStatus();
 
-    // Listen for subscription changes
-    const paymentService = PaymentService.getInstance();
-    paymentService.addSubscriptionChangeListener(loadSubscriptionStatus);
-
     // Refresh subscription status every 10 seconds as backup
     const interval = setInterval(loadSubscriptionStatus, 10000);
     
     return () => {
       clearInterval(interval);
-      paymentService.removeSubscriptionChangeListener(loadSubscriptionStatus);
     };
   }, [user]);
 
   const getStatusBadge = () => {
     if (!user || isLoading) return null;
 
-    // Check if user is upgraded but trial is still active
-    if (subscriptionStatus?.status === 'active' && subscriptionStatus?.isTrialActive && subscriptionStatus.trialDaysRemaining > 0) {
+    if (subscriptionStatus?.status === 'active' && subscriptionStatus?.plan === 'pro') {
       return (
-        <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium border border-green-200">
-          <CheckCircle className="w-3 h-3" />
-          Pro ({subscriptionStatus.trialDaysRemaining}d trial left)
-        </div>
-      );
-    }
-
-    if (subscriptionStatus?.isTrialActive && subscriptionStatus.trialDaysRemaining > 0) {
-      return (
-        <div className="flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium border border-yellow-200">
-          <Clock className="w-3 h-3" />
-          Trial ({subscriptionStatus.trialDaysRemaining}d left)
-        </div>
-      );
-    }
-
-    if (subscriptionStatus?.status === 'active') {
-      return (
-        <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium border border-green-200">
+        <div className="flex items-center gap-1 px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-medium border border-purple-200">
           <CheckCircle className="w-3 h-3" />
           Pro
+        </div>
+      );
+    }
+
+    if (subscriptionStatus?.status === 'active' && subscriptionStatus?.plan === 'basic') {
+      return (
+        <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium border border-green-200">
+          <CheckCircle className="w-3 h-3" />
+          Basic
+        </div>
+      );
+    }
+
+    if (subscriptionStatus?.status === 'free') {
+      return (
+        <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium border border-gray-200">
+          <Clock className="w-3 h-3" />
+          Free ({subscriptionStatus.assignmentLimit - subscriptionStatus.assignmentsUsed} left)
         </div>
       );
     }
@@ -100,8 +97,14 @@ const MainNav: React.FC = () => {
           {/* Logo */}
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200">
-                <GraduationCap className="h-6 w-6 text-white" />
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200 overflow-hidden">
+                <Image 
+                  src="/logo.svg" 
+                  alt="AcademiaAI Pro Logo" 
+                  width={40} 
+                  height={40}
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="hidden sm:block">
                 <span className="font-bold text-xl text-gray-900">AcademiaAI Pro</span>
