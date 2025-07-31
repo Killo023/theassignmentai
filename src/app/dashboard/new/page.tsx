@@ -272,10 +272,6 @@ const AssignmentCreator = () => {
         requirements: formData.requirements,
       });
 
-      // Update usage
-      if (user?.id) {
-        await paymentService.incrementAssignmentCount(user.id);
-      }
       await checkSubscriptionStatus();
     } catch (error) {
       console.error("Error generating assignment:", error);

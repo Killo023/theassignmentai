@@ -19,6 +19,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { useAuth } from "@/lib/auth-context";
+import { AssignmentService } from "@/lib/assignment-service";
+import { EnhancedExportService } from "@/lib/enhanced-export-service";
 
 interface Assignment {
   id: string;
@@ -30,6 +33,7 @@ interface Assignment {
   updatedAt: Date;
   wordCount: number;
   isFavorite: boolean;
+  content?: string;
 }
 
 const mockAssignments: Assignment[] = [
@@ -91,12 +95,45 @@ const mockAssignments: Assignment[] = [
 ];
 
 const AssignmentsPage = () => {
-  const [assignments, setAssignments] = useState<Assignment[]>(mockAssignments);
+  const { user } = useAuth();
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [subjectFilter, setSubjectFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("updatedAt");
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+  const [isLoading, setIsLoading] = useState(true);
+
+  const assignmentService = user ? new AssignmentService(user.id) : null;
+
+  useEffect(() => {
+    const loadAssignments = async () => {
+      if (!assignmentService) return;
+      
+      try {
+        setIsLoading(true);
+        const data = await assignmentService.getAssignments();
+        setAssignments(data.map(assignment => ({
+          id: assignment.id,
+          title: assignment.title,
+          subject: assignment.subject,
+          type: assignment.type,
+          status: assignment.status,
+          createdAt: new Date(assignment.created_at),
+          updatedAt: new Date(assignment.updated_at),
+          wordCount: assignment.word_count,
+          isFavorite: assignment.is_favorite,
+          content: assignment.content
+        })));
+      } catch (error) {
+        console.error('Error loading assignments:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadAssignments();
+  }, [assignmentService]);
 
   const filteredAssignments = assignments.filter(assignment => {
     const matchesSearch = assignment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -122,18 +159,73 @@ const AssignmentsPage = () => {
     }
   });
 
-  const toggleFavorite = (id: string) => {
-    setAssignments(prev => 
-      prev.map(assignment => 
-        assignment.id === id 
-          ? { ...assignment, isFavorite: !assignment.isFavorite }
-          : assignment
-      )
-    );
+  const toggleFavorite = async (id: string) => {
+    if (!assignmentService) return;
+    
+    try {
+      const success = await assignmentService.toggleFavorite(id);
+      if (success) {
+        setAssignments(prev => 
+          prev.map(assignment => 
+            assignment.id === id 
+              ? { ...assignment, isFavorite: !assignment.isFavorite }
+              : assignment
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+    }
   };
 
-  const deleteAssignment = (id: string) => {
-    setAssignments(prev => prev.filter(assignment => assignment.id !== id));
+  const deleteAssignment = async (id: string) => {
+    if (!assignmentService) return;
+    
+    try {
+      const success = await assignmentService.deleteAssignment(id);
+      if (success) {
+        setAssignments(prev => prev.filter(assignment => assignment.id !== id));
+      }
+    } catch (error) {
+      console.error('Error deleting assignment:', error);
+    }
+  };
+
+  const exportAssignment = async (assignment: Assignment, format: string) => {
+    try {
+      const options = {
+        format: format as "txt" | "docx" | "pdf" | "xlsx",
+        includeCoverPage: false,
+        includeTableOfContents: false,
+        includeExecutiveSummary: false,
+        includeAppendices: false,
+        fontFamily: "Times New Roman",
+        fontSize: 12,
+        lineSpacing: 1.5,
+        marginSize: 1,
+        pageSize: "A4",
+        includePageNumbers: true,
+        includeHeaders: true,
+        includeFooters: true,
+      };
+
+      switch (format) {
+        case "txt":
+          await EnhancedExportService.exportAsTXT(assignment.content || '', options);
+          break;
+        case "docx":
+          await EnhancedExportService.exportAsDOCX(assignment.content || '', options);
+          break;
+        case "pdf":
+          await EnhancedExportService.exportAsPDF(assignment.content || '', options);
+          break;
+        case "xlsx":
+          await EnhancedExportService.exportAsXLSX(assignment.content || '', options);
+          break;
+      }
+    } catch (error) {
+      console.error(`Error exporting as ${format}:`, error);
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -299,19 +391,27 @@ const AssignmentsPage = () => {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm">
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => exportAssignment(assignment, 'pdf')}
+                    title="Export as PDF"
+                  >
                     <Download className="w-4 h-4" />
                   </Button>
                   <Button 
                     variant="ghost" 
                     size="sm"
+                    onClick={() => exportAssignment(assignment, 'docx')}
+                    title="Export as DOCX"
+                  >
+                    <FileText className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
                     onClick={() => toggleFavorite(assignment.id)}
+                    title={assignment.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                   >
                     <Star className={`w-4 h-4 ${assignment.isFavorite ? 'text-yellow-500 fill-current' : ''}`} />
                   </Button>
@@ -319,6 +419,7 @@ const AssignmentsPage = () => {
                     variant="ghost" 
                     size="sm"
                     onClick={() => deleteAssignment(assignment.id)}
+                    title="Delete assignment"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -370,16 +471,19 @@ const AssignmentsPage = () => {
                 </span>
                 
                 <div className="flex items-center gap-1">
-                  <Button variant="ghost" size="sm">
-                    <Eye className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => exportAssignment(assignment, 'pdf')}
+                    title="Export as PDF"
+                  >
                     <Download className="w-4 h-4" />
                   </Button>
                   <Button 
                     variant="ghost" 
                     size="sm"
                     onClick={() => toggleFavorite(assignment.id)}
+                    title={assignment.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                   >
                     <Star className={`w-4 h-4 ${assignment.isFavorite ? 'text-yellow-500 fill-current' : ''}`} />
                   </Button>
@@ -390,8 +494,20 @@ const AssignmentsPage = () => {
         </div>
       )}
 
+      {/* Loading State */}
+      {isLoading && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center py-12"
+        >
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading assignments...</p>
+        </motion.div>
+      )}
+
       {/* Empty State */}
-      {sortedAssignments.length === 0 && (
+      {!isLoading && sortedAssignments.length === 0 && (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
