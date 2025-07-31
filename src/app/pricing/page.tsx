@@ -101,7 +101,7 @@ export default function PricingPage() {
           <div className="relative">
             <div className="bg-white rounded-2xl shadow-xl p-6 transform -rotate-2 hover:rotate-0 transition-transform duration-300">
               <img 
-                src="/images/hero-dashboard.jpg" 
+                src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2015&q=80" 
                 alt="Dashboard showing pricing and features"
                 className="w-full h-48 object-cover rounded-lg mb-4"
               />
@@ -233,7 +233,7 @@ export default function PricingPage() {
             <div className="text-center">
               <div className="relative inline-block mb-4">
                 <img 
-                  src="/images/student-1.jpg" 
+                  src="https://images.unsplash.com/photo-1494790108755-2616b612b47c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" 
                   alt="Student success story"
                   className="w-20 h-20 rounded-full object-cover mx-auto"
                 />
@@ -249,7 +249,7 @@ export default function PricingPage() {
             <div className="text-center">
               <div className="relative inline-block mb-4">
                 <img 
-                  src="/images/student-2.jpg" 
+                  src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" 
                   alt="Student success story"
                   className="w-20 h-20 rounded-full object-cover mx-auto"
                 />
@@ -265,7 +265,7 @@ export default function PricingPage() {
             <div className="text-center">
               <div className="relative inline-block mb-4">
                 <img 
-                  src="/images/student-3.jpg" 
+                  src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
                   alt="Student success story"
                   className="w-20 h-20 rounded-full object-cover mx-auto"
                 />

@@ -1,0 +1,5 @@
+[33mb111dcb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Integrate MailerLite email service for verification, password reset, and welcome emails
+[33m22596ab[m Update authentication, dashboard, and landing page components
+[33m9da42ed[m Add beautiful images to landing page components
+[33m716e796[m Improve subscription upgrade error handling and add troubleshooting guide
+[33m03f1efe[m Fix missing Crown import and database table issues

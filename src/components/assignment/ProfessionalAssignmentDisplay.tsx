@@ -412,8 +412,23 @@ export default function ProfessionalAssignmentDisplay({
                     lineHeight: assignment.lineSpacing || 1.5
                   }}
                 >
-                  {assignment.content}
+                  {assignment.content || 'No content available. Please regenerate the assignment.'}
                 </div>
+                
+                {/* Show warning if content seems incomplete */}
+                {assignment.content && assignment.wordCount && assignment.content.length < (assignment.wordCount * 0.3) && (
+                  <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex items-center">
+                      <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />
+                      <div>
+                        <h4 className="text-sm font-medium text-yellow-800">Content May Be Incomplete</h4>
+                        <p className="text-sm text-yellow-700 mt-1">
+                          The generated content appears to be shorter than expected. Consider regenerating the assignment with more specific requirements.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

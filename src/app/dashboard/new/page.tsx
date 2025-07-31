@@ -38,7 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { aiService, type AssignmentRequest } from "@/lib/ai-service";
+import { aiService, type AssignmentRequest, type TableData, type ChartData, type Reference } from "@/lib/ai-service";
 import { useAuth } from "@/lib/auth-context";
 import PaymentService from "@/lib/payment-service";
 import Paywall from "@/components/Paywall";
@@ -117,9 +117,18 @@ const AssignmentCreator = () => {
   const [canCreateAssignment, setCanCreateAssignment] = useState(true);
   const [showPaywall, setShowPaywall] = useState(false);
   const [aiStatus, setAiStatus] = useState<"checking" | "available" | "unavailable">("checking");
+  const [tables, setTables] = useState<TableData[]>([]);
+  const [charts, setCharts] = useState<ChartData[]>([]);
+  const [references, setReferences] = useState<Reference[]>([]);
 
   const paymentService = PaymentService.getInstance();
-  const assignmentService = new AssignmentService(user?.id || "");
+  // Only create assignment service when we have a valid user
+  const getAssignmentService = () => {
+    if (!user?.id) {
+      throw new Error("User not authenticated");
+    }
+    return new AssignmentService(user.id);
+  };
 
   useEffect(() => {
     checkSubscriptionStatus();
@@ -182,8 +191,16 @@ const AssignmentCreator = () => {
       return;
     }
 
+    if (!user?.id) {
+      console.error("No user ID available for assignment creation");
+      return;
+    }
+
     setIsGenerating(true);
     try {
+      // Log current usage before assignment creation
+      const currentUsage = await paymentService.getAssignmentUsage(user.id);
+      console.log("Assignment usage before creation:", currentUsage);
       const request: AssignmentRequest = {
         title: formData.title,
         subject: formData.subject,
@@ -223,6 +240,11 @@ const AssignmentCreator = () => {
 
       const response = await aiService.generateAssignment(request);
       
+      // Update the parsed data
+      setTables(response.tables);
+      setCharts(response.charts);
+      setReferences(response.references);
+      
       setAssignment({
         ...assignment,
         title: formData.title,
@@ -261,6 +283,8 @@ const AssignmentCreator = () => {
       });
 
       // Save to database
+      console.log("Creating assignment with user ID:", user.id);
+      const assignmentService = getAssignmentService();
       await assignmentService.createAssignment({
         ...assignment,
         title: formData.title,
@@ -271,6 +295,10 @@ const AssignmentCreator = () => {
         status: "completed",
         requirements: formData.requirements,
       });
+
+      // Log usage after assignment creation
+      const updatedUsage = await paymentService.getAssignmentUsage(user.id);
+      console.log("Assignment usage after creation:", updatedUsage);
 
       await checkSubscriptionStatus();
     } catch (error) {
@@ -394,9 +422,9 @@ const AssignmentCreator = () => {
               {assignment.content ? (
                 <ProfessionalAssignmentDisplay
                   assignment={assignment}
-                  tables={[]} // Will be populated from AI response
-                  charts={[]} // Will be populated from AI response
-                  references={[]} // Will be populated from AI response
+                  tables={tables}
+                  charts={charts}
+                  references={references}
                   onExport={exportAssignment}
                   onCopy={() => copyToClipboard(assignment.content)}
                   onSave={() => {

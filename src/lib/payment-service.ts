@@ -578,16 +578,32 @@ export class PaymentService {
    */
   async incrementAssignmentCount(userId: string): Promise<void> {
     try {
+      console.log(`🔢 Incrementing assignment count for user: ${userId}`);
+      
+      if (!userId) {
+        console.error('❌ Cannot increment assignment count: userId is empty');
+        return;
+      }
+      
       if (this.isSupabaseConfigured()) {
+        console.log(`💾 Using Supabase to increment count for user: ${userId}`);
+        
         // Get current count first, then update
-        const { data: currentData } = await supabase
+        const { data: currentData, error: fetchError } = await supabase
           .from('subscriptions')
           .select('assignments_used')
           .eq('user_id', userId)
           .single();
 
+        if (fetchError) {
+          console.error('❌ Error fetching current assignment count:', fetchError);
+          throw fetchError;
+        }
+
         const currentCount = currentData?.assignments_used || 0;
         const newCount = currentCount + 1;
+        
+        console.log(`📊 Updating assignment count from ${currentCount} to ${newCount}`);
 
         // Update assignment count in Supabase
         const { error } = await supabase
@@ -596,23 +612,36 @@ export class PaymentService {
           .eq('user_id', userId);
 
         if (error) {
-          console.error('Error incrementing assignment count:', error);
+          console.error('❌ Error incrementing assignment count in Supabase:', error);
+          throw error;
         }
+        
+        console.log(`✅ Successfully incremented assignment count for user: ${userId}`);
       } else {
+        console.log(`💾 Using fallback storage to increment count for user: ${userId}`);
+        
         // Update in fallback storage
         const currentCount = this.fallbackAssignmentCounts.get(userId) || 0;
-        this.fallbackAssignmentCounts.set(userId, currentCount + 1);
+        const newCount = currentCount + 1;
+        
+        console.log(`📊 Updating fallback assignment count from ${currentCount} to ${newCount}`);
+        
+        this.fallbackAssignmentCounts.set(userId, newCount);
         
         const existingSub = this.fallbackSubscriptions.get(userId);
         if (existingSub) {
           this.fallbackSubscriptions.set(userId, {
             ...existingSub,
-            assignments_used: currentCount + 1
+            assignments_used: newCount
           });
+          console.log(`✅ Successfully incremented assignment count in fallback storage for user: ${userId}`);
+        } else {
+          console.warn(`⚠️ No existing subscription found in fallback storage for user: ${userId}`);
         }
       }
     } catch (error) {
-      console.error('Error incrementing assignment count:', error);
+      console.error('❌ Error incrementing assignment count:', error);
+      throw error; // Re-throw to surface the issue
     }
   }
 

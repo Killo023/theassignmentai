@@ -86,11 +86,13 @@ export class AssignmentService {
       }
 
       // Increment assignment count for the user
+      console.log(`📝 Assignment created successfully, incrementing count for user: ${this.userId}`);
       await this.paymentService.incrementAssignmentCount(this.userId);
+      console.log(`✅ Assignment count incremented for user: ${this.userId}`);
 
       return data;
     } catch (error) {
-      console.error('Error in createAssignment:', error);
+      console.error('❌ Error in createAssignment:', error);
       throw error;
     }
   }

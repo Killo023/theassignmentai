@@ -110,7 +110,7 @@ export default function FeaturesPage() {
           <div className="relative">
             <div className="bg-white rounded-2xl shadow-2xl p-8 transform rotate-1 hover:rotate-0 transition-transform duration-300">
               <img 
-                src="/images/ai-generation.jpg" 
+                src="https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80" 
                 alt="AI-powered assignment generation interface"
                 className="w-full h-64 object-cover rounded-lg mb-4"
               />
@@ -182,7 +182,7 @@ export default function FeaturesPage() {
             <div className="flex justify-center">
               <div className="relative">
                 <img 
-                  src="/images/export-formats.jpg" 
+                  src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
                   alt="Multiple export formats available"
                   className="w-64 h-80 object-cover rounded-2xl shadow-lg"
                 />
@@ -210,7 +210,7 @@ export default function FeaturesPage() {
               <div className="bg-gray-50 rounded-xl p-6">
                 <div className="flex items-center mb-4">
                   <img 
-                    src="/images/student-1.jpg" 
+                    src="https://images.unsplash.com/photo-1494790108755-2616b612b47c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" 
                     alt="Student testimonial"
                     className="w-12 h-12 rounded-full object-cover mr-4"
                   />
@@ -224,7 +224,7 @@ export default function FeaturesPage() {
               <div className="bg-gray-50 rounded-xl p-6">
                 <div className="flex items-center mb-4">
                   <img 
-                    src="/images/student-2.jpg" 
+                    src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" 
                     alt="Student testimonial"
                     className="w-12 h-12 rounded-full object-cover mr-4"
                   />
@@ -238,7 +238,7 @@ export default function FeaturesPage() {
               <div className="bg-gray-50 rounded-xl p-6">
                 <div className="flex items-center mb-4">
                   <img 
-                    src="/images/student-3.jpg" 
+                    src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" 
                     alt="Student testimonial"
                     className="w-12 h-12 rounded-full object-cover mr-4"
                   />
