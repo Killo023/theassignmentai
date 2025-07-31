@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, X } from 'lucide-react';
 import SubscriptionStatus from '@/components/dashboard/SubscriptionStatus';
+import SubscriptionFeatures from '@/components/dashboard/SubscriptionFeatures';
 import { Button } from '@/components/ui/button';
 
 export default function Dashboard() {
@@ -74,13 +75,18 @@ export default function Dashboard() {
             <SubscriptionStatus userId={user.id} />
           </div>
 
+          {/* Subscription Features */}
+          <div className="lg:col-span-1">
+            <SubscriptionFeatures userId={user.id} />
+          </div>
+
           {/* Quick Actions */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-1">
             <div className="bg-card rounded-lg shadow-sm border p-6">
               <h2 className="text-xl font-semibold text-foreground mb-4">Quick Actions</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <Button asChild className="h-16 text-lg">
-                  <a href="/dashboard/assignments/new">Create New Assignment</a>
+                  <a href="/dashboard/new">Create New Assignment</a>
                 </Button>
                 <Button asChild variant="outline" className="h-16 text-lg">
                   <a href="/dashboard/assignments">View All Assignments</a>
