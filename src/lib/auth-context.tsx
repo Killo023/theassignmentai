@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import EmailService from './email-service';
 
 interface User {
   id: string;
@@ -120,9 +121,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       localStorage.setItem(`temp-user-${userData.email}`, JSON.stringify(tempUserData));
       
-      // Simulate sending verification email
-      console.log(`📧 Verification email sent to ${userData.email}`);
-      console.log(`🔑 Verification code: ${verificationCode}`); // In real app, this would be sent via email
+      // Send verification email via EmailService
+      const emailService = EmailService.getInstance();
+      await emailService.sendVerificationEmail({
+        to: userData.email,
+        code: verificationCode,
+        firstName: userData.firstName
+      });
       
       return { 
         success: true, 
@@ -180,6 +185,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Clean up temporary data
       localStorage.removeItem(`temp-user-${email}`);
       
+      // Send welcome email
+      const emailService = EmailService.getInstance();
+      await emailService.sendWelcomeEmail({
+        to: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName
+      });
+      
       return true;
     } catch (error) {
       console.error('Email verification failed:', error);
@@ -211,9 +224,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       localStorage.setItem(`temp-user-${email}`, JSON.stringify(updatedUserData));
       
-      // Simulate sending new verification email
-      console.log(`📧 New verification email sent to ${email}`);
-      console.log(`🔑 New verification code: ${verificationCode}`); // In real app, this would be sent via email
+      // Send new verification email via EmailService
+      const emailService = EmailService.getInstance();
+      await emailService.sendVerificationEmail({
+        to: email,
+        code: verificationCode,
+        firstName: userData.firstName
+      });
       
       return true;
     } catch (error) {
@@ -234,8 +251,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Simulate API call for password reset
       await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // In a real app, you would call your backend to send reset email
-      console.log('Password reset email sent to:', email);
+      // Generate reset token (in a real app, this would be stored securely)
+      const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://theassignmentai.com'}/reset-password?token=${resetToken}`;
+      
+      // Store reset token temporarily (in a real app, this would be in a database)
+      localStorage.setItem(`reset-token-${email}`, JSON.stringify({
+        token: resetToken,
+        email,
+        expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString() // 1 hour
+      }));
+      
+      // Send password reset email via EmailService
+      const emailService = EmailService.getInstance();
+      await emailService.sendPasswordResetEmail({
+        to: email,
+        resetLink,
+        firstName: 'User' // In a real app, get from user data
+      });
+      
       return true;
     } catch (error) {
       console.error('Password reset failed:', error);
