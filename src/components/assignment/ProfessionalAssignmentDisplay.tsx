@@ -127,14 +127,18 @@ export default function ProfessionalAssignmentDisplay({
     const chartProps = {
       data: chart.data,
       options: {
-        ...chart.options,
+        responsive: true,
+        maintainAspectRatio: false,
         plugins: {
-          ...chart.options.plugins,
+          legend: {
+            position: 'top' as const,
+          },
           title: {
-            ...chart.options.plugins?.title,
+            display: true,
             text: chart.title
           }
-        }
+        },
+        ...(chart.options || {})
       }
     };
 
@@ -166,7 +170,7 @@ export default function ProfessionalAssignmentDisplay({
           <thead className="bg-gray-50">
             <tr>
               {table.headers.map((header, index) => (
-                <th key={index} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200">
+                <th key={index} className="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider border-b border-gray-200 bg-gray-50">
                   {header}
                 </th>
               ))}
@@ -174,10 +178,29 @@ export default function ProfessionalAssignmentDisplay({
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {table.rows.map((row, rowIndex) => (
-              <tr key={rowIndex} className={rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+              <tr key={rowIndex} className={`${rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-100 transition-colors duration-150`}>
                 {row.map((cell, cellIndex) => (
-                  <td key={cellIndex} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 border-b border-gray-200">
-                    {cell}
+                  <td key={cellIndex} className="px-6 py-4 text-sm text-gray-900 border-b border-gray-200">
+                    <div className="flex items-center">
+                      {/* Check if cell contains numeric data for better formatting */}
+                      {!isNaN(Number(cell)) && cell !== '' ? (
+                        <span className="font-mono text-gray-800">
+                          {Number(cell).toLocaleString()}
+                        </span>
+                      ) : cell.includes('%') ? (
+                        <span className="font-semibold text-green-600">
+                          {cell}
+                        </span>
+                      ) : cell.includes('$') ? (
+                        <span className="font-semibold text-blue-600">
+                          {cell}
+                        </span>
+                      ) : (
+                        <span className="text-gray-900">
+                          {cell}
+                        </span>
+                      )}
+                    </div>
                   </td>
                 ))}
               </tr>
@@ -188,9 +211,10 @@ export default function ProfessionalAssignmentDisplay({
       
       {table.source && (
         <div className="px-6 py-3 bg-gray-50 border-t border-gray-200">
-          <p className="text-xs text-gray-500">
-            Source: {table.source}
-          </p>
+          <div className="flex items-center text-xs text-gray-500">
+            <BookOpen className="w-3 h-3 mr-2" />
+            <span>Source: {table.source}</span>
+          </div>
         </div>
       )}
     </div>
@@ -412,14 +436,17 @@ export default function ProfessionalAssignmentDisplay({
                   )}
                 </div>
                 <div className="p-6">
-                  <div className="h-64">
-                    {renderChart(chart)}
+                  <div className="h-80 w-full">
+                    <div className="relative w-full h-full">
+                      {renderChart(chart)}
+                    </div>
                   </div>
                   {chart.source && (
                     <div className="mt-4 pt-4 border-t border-gray-200">
-                      <p className="text-xs text-gray-500">
-                        Source: {chart.source}
-                      </p>
+                      <div className="flex items-center text-xs text-gray-500">
+                        <BookOpen className="w-3 h-3 mr-2" />
+                        <span>Source: {chart.source}</span>
+                      </div>
                     </div>
                   )}
                 </div>

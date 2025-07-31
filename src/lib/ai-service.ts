@@ -261,7 +261,38 @@ QUALITY REQUIREMENTS:
 - Include proper transitions between sections
 - Maintain academic objectivity and neutrality
 
-IMPORTANT: Generate the complete assignment content now. Do not ask for confirmation or provide repetitive text. Write the full assignment as specified above.`;
+${request.includeTables ? `TABLE FORMATTING REQUIREMENTS:
+- Include realistic, context-appropriate data tables
+- Use the following format for each table:
+  TABLE:
+  TITLE: [Descriptive table title]
+  CAPTION: [Table caption explaining the data]
+  SOURCE: [Data source or reference]
+  [Header1]|[Header2]|[Header3]|[Header4]
+  [Data1]|[Data2]|[Data3]|[Data4]
+  [Data5]|[Data6]|[Data7]|[Data8]
+  [Continue with more rows as needed]
+- Ensure all data is realistic and relevant to the topic
+- Include proper column headers and row labels
+- Use appropriate data types (numbers, percentages, text)
+- Include source citations for all data` : ''}
+
+${request.includeCharts ? `CHART FORMATTING REQUIREMENTS:
+- Include realistic, context-appropriate charts and graphs
+- Use the following format for each chart:
+  CHART:
+  TITLE: [Descriptive chart title]
+  TYPE: [bar|line|pie|scatter]
+  CAPTION: [Chart caption explaining the visualization]
+  SOURCE: [Data source or reference]
+  DATA: [JSON format chart data with labels and datasets]
+- Generate realistic data that matches the topic and context
+- Use appropriate chart types for the data being presented
+- Include proper labels, legends, and color schemes
+- Ensure data is consistent with the analysis and conclusions
+- Use professional color schemes and formatting` : ''}
+
+IMPORTANT: Generate the complete assignment content now. Do not ask for confirmation or provide repetitive text. Write the full assignment as specified above. Include realistic tables and charts with proper formatting as requested.`;
   }
 
   private getAcademicStandards(level?: string): string {
@@ -425,14 +456,32 @@ IMPORTANT: Generate the complete assignment content now. Do not ask for confirma
       const sourceMatch = tableText.match(/SOURCE:\s*(.+)/);
       
       // Extract headers and rows from the table data
-      const dataLines = lines.filter(line => !line.includes('TITLE:') && !line.includes('CAPTION:') && !line.includes('SOURCE:'));
+      const dataLines = lines.filter(line => 
+        !line.includes('TITLE:') && 
+        !line.includes('CAPTION:') && 
+        !line.includes('SOURCE:') &&
+        line.trim() !== ''
+      );
       
       if (dataLines.length < 2) return null;
       
-      const headers = dataLines[0].split('|').map(h => h.trim()).filter(h => h);
-      const rows = dataLines.slice(1).map(line => 
-        line.split('|').map(cell => cell.trim()).filter(cell => cell)
-      );
+      // Parse headers (first line)
+      const headerLine = dataLines[0];
+      const headers = headerLine.split('|').map(h => h.trim()).filter(h => h);
+      
+      if (headers.length === 0) return null;
+      
+      // Parse data rows (remaining lines)
+      const rows = dataLines.slice(1).map(line => {
+        const cells = line.split('|').map(cell => cell.trim());
+        // Ensure all rows have the same number of columns as headers
+        while (cells.length < headers.length) {
+          cells.push('');
+        }
+        return cells.slice(0, headers.length);
+      }).filter(row => row.some(cell => cell !== '')); // Remove empty rows
+      
+      if (rows.length === 0) return null;
       
       return {
         id: `table-${index}`,
@@ -454,23 +503,198 @@ IMPORTANT: Generate the complete assignment content now. Do not ask for confirma
       const typeMatch = chartText.match(/TYPE:\s*(.+)/);
       const captionMatch = chartText.match(/CAPTION:\s*(.+)/);
       const sourceMatch = chartText.match(/SOURCE:\s*(.+)/);
+      const dataMatch = chartText.match(/DATA:\s*(\{[\s\S]*?\})/);
       
-      // Generate sample chart data based on the type
+      // Parse chart type
       const chartType = typeMatch?.[1]?.toLowerCase() || 'bar';
-      const data = this.generateChartData(chartType);
+      
+      // Try to parse actual chart data from the AI response
+      let chartData;
+      if (dataMatch && dataMatch[1]) {
+        try {
+          chartData = JSON.parse(dataMatch[1]);
+        } catch (parseError) {
+          console.warn('Failed to parse chart data JSON, using fallback:', parseError);
+          chartData = this.generateChartData(chartType);
+        }
+      } else {
+        // Generate context-appropriate chart data based on the title and type
+        chartData = this.generateContextualChartData(chartType, titleMatch?.[1] || '');
+      }
       
       return {
         id: `chart-${index}`,
         title: titleMatch?.[1] || `Chart ${index + 1}`,
         type: chartType as any,
-        data,
-        options: this.getChartOptions(chartType),
+        data: chartData,
+        options: this.getChartOptions(chartType, titleMatch?.[1]),
         caption: captionMatch?.[1],
         source: sourceMatch?.[1]
       };
     } catch (error) {
       console.error('Error parsing chart data:', error);
       return null;
+    }
+  }
+
+  private generateContextualChartData(type: string, title: string): any {
+    // Generate more realistic data based on the chart title and type
+    const lowerTitle = title.toLowerCase();
+    
+    // Financial/Performance data
+    if (lowerTitle.includes('revenue') || lowerTitle.includes('profit') || lowerTitle.includes('financial')) {
+      return this.generateFinancialChartData(type);
+    }
+    
+    // Survey/Research data
+    if (lowerTitle.includes('survey') || lowerTitle.includes('response') || lowerTitle.includes('participant')) {
+      return this.generateSurveyChartData(type);
+    }
+    
+    // Time series data
+    if (lowerTitle.includes('trend') || lowerTitle.includes('growth') || lowerTitle.includes('over time')) {
+      return this.generateTimeSeriesChartData(type);
+    }
+    
+    // Demographic data
+    if (lowerTitle.includes('age') || lowerTitle.includes('gender') || lowerTitle.includes('demographic')) {
+      return this.generateDemographicChartData(type);
+    }
+    
+    // Default to generic data
+    return this.generateChartData(type);
+  }
+
+  private generateFinancialChartData(type: string): any {
+    const years = ['2019', '2020', '2021', '2022', '2023'];
+    const revenue = [85, 92, 78, 105, 120];
+    const profit = [12, 15, 8, 18, 25];
+    const expenses = [73, 77, 70, 87, 95];
+    
+    switch (type) {
+      case 'line':
+        return {
+          labels: years,
+          datasets: [
+            {
+              label: 'Revenue ($M)',
+              data: revenue,
+              borderColor: '#36A2EB',
+              backgroundColor: 'rgba(54, 162, 235, 0.1)',
+              fill: true
+            },
+            {
+              label: 'Profit ($M)',
+              data: profit,
+              borderColor: '#4BC0C0',
+              backgroundColor: 'rgba(75, 192, 192, 0.1)',
+              fill: true
+            }
+          ]
+        };
+      case 'bar':
+        return {
+          labels: years,
+          datasets: [
+            {
+              label: 'Revenue ($M)',
+              data: revenue,
+              backgroundColor: '#36A2EB'
+            },
+            {
+              label: 'Expenses ($M)',
+              data: expenses,
+              backgroundColor: '#FF6384'
+            }
+          ]
+        };
+      default:
+        return this.generateChartData(type);
+    }
+  }
+
+  private generateSurveyChartData(type: string): any {
+    const categories = ['Very Satisfied', 'Satisfied', 'Neutral', 'Dissatisfied', 'Very Dissatisfied'];
+    const responses = [45, 30, 15, 8, 2];
+    
+    switch (type) {
+      case 'pie':
+        return {
+          labels: categories,
+          datasets: [{
+            data: responses,
+            backgroundColor: ['#4BC0C0', '#36A2EB', '#FFCE56', '#FF6384', '#9966FF']
+          }]
+        };
+      case 'bar':
+        return {
+          labels: categories,
+          datasets: [{
+            label: 'Number of Responses',
+            data: responses,
+            backgroundColor: ['#4BC0C0', '#36A2EB', '#FFCE56', '#FF6384', '#9966FF']
+          }]
+        };
+      default:
+        return this.generateChartData(type);
+    }
+  }
+
+  private generateTimeSeriesChartData(type: string): any {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const values = [65, 72, 68, 75, 82, 78, 85, 90, 88, 92, 95, 98];
+    
+    switch (type) {
+      case 'line':
+        return {
+          labels: months,
+          datasets: [{
+            label: 'Growth Trend',
+            data: values,
+            borderColor: '#36A2EB',
+            backgroundColor: 'rgba(54, 162, 235, 0.1)',
+            fill: true,
+            tension: 0.4
+          }]
+        };
+      case 'bar':
+        return {
+          labels: months,
+          datasets: [{
+            label: 'Monthly Values',
+            data: values,
+            backgroundColor: '#36A2EB'
+          }]
+        };
+      default:
+        return this.generateChartData(type);
+    }
+  }
+
+  private generateDemographicChartData(type: string): any {
+    const ageGroups = ['18-24', '25-34', '35-44', '45-54', '55+'];
+    const percentages = [25, 35, 20, 15, 5];
+    
+    switch (type) {
+      case 'bar':
+        return {
+          labels: ageGroups,
+          datasets: [{
+            label: 'Percentage (%)',
+            data: percentages,
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+          }]
+        };
+      case 'pie':
+        return {
+          labels: ageGroups,
+          datasets: [{
+            data: percentages,
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+          }]
+        };
+      default:
+        return this.generateChartData(type);
     }
   }
 
@@ -535,17 +759,75 @@ IMPORTANT: Generate the complete assignment content now. Do not ask for confirma
     }
   }
 
-  private getChartOptions(type: string): any {
+  private getChartOptions(type: string, title?: string): any {
     return {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: {
           position: 'top' as const,
+          labels: {
+            usePointStyle: true,
+            padding: 20,
+            font: {
+              size: 12,
+              weight: '500'
+            }
+          }
         },
         title: {
           display: true,
-          text: 'Chart Title'
+          text: title || 'Chart Title',
+          font: {
+            size: 16,
+            weight: 'bold'
+          },
+          padding: {
+            top: 10,
+            bottom: 20
+          }
+        },
+        tooltip: {
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          borderColor: '#fff',
+          borderWidth: 1,
+          cornerRadius: 6,
+          displayColors: true
+        }
+      },
+      scales: type === 'line' || type === 'bar' ? {
+        x: {
+          grid: {
+            display: true,
+            color: 'rgba(0, 0, 0, 0.1)'
+          },
+          ticks: {
+            font: {
+              size: 11
+            }
+          }
+        },
+        y: {
+          grid: {
+            display: true,
+            color: 'rgba(0, 0, 0, 0.1)'
+          },
+          ticks: {
+            font: {
+              size: 11
+            }
+          }
+        }
+      } : {},
+      elements: {
+        point: {
+          radius: 4,
+          hoverRadius: 6
+        },
+        line: {
+          tension: 0.4
         }
       }
     };
