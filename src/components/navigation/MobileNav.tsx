@@ -114,7 +114,8 @@ const MobileNav: React.FC = () => {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="fixed inset-0 z-50 bg-white border-l border-gray-200 flex flex-col p-6 shadow-xl"
+            className="fixed inset-0 z-50 bg-white border-l border-gray-200 flex flex-col p-6 shadow-xl backdrop-blur-none !bg-white"
+            style={{ backgroundColor: '#ffffff' }}
           >
             <div className="flex justify-end">
               <Button variant="ghost" size="icon" onClick={() => setOpen(false)} aria-label="Close menu">
