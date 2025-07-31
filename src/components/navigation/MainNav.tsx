@@ -100,14 +100,14 @@ const MainNav: React.FC = () => {
               <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200 overflow-hidden">
                 <Image 
                   src="/logo.svg" 
-                  alt="AcademiaAI Pro Logo" 
+                  alt="The Assignment AI Logo" 
                   width={40} 
                   height={40}
                   className="w-full h-full object-cover"
                 />
               </div>
               <div className="hidden sm:block">
-                <span className="font-bold text-xl text-gray-900">AcademiaAI Pro</span>
+                <span className="font-bold text-xl text-gray-900">The Assignment AI</span>
                 <p className="text-xs text-gray-500 -mt-1">AI-Powered Academic Assistant</p>
               </div>
             </Link>

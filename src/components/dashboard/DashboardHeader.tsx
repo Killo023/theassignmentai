@@ -60,7 +60,7 @@ const DashboardHeader = () => {
             <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
               <Image 
                 src="/logo.svg" 
-                alt="AcademiaAI Pro Logo" 
+                alt="The Assignment AI Logo" 
                 width={32} 
                 height={32}
                 className="w-full h-full object-cover"

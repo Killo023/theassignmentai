@@ -1,4 +1,4 @@
-# AcademiaAI Pro - AI-Powered Assignment Creation System
+# The Assignment AI - AI-Powered Assignment Creation System
 
 A modern, AI-powered academic assignment creation platform built with Next.js 14, Together AI, and Tailwind CSS.
 

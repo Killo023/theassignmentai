@@ -27,7 +27,7 @@ echo "NEXT_PUBLIC_TOGETHER_API_KEY=your_together_ai_api_key_here" > .env.local
 2. **Sign up/Login** to your PayPal account
 3. **Navigate to "My Apps & Credentials"**
 4. **Click "Create App"**
-5. **Name it**: "AcademiaAI Pro"
+5. **Name it**: "The Assignment AI"
 6. **Copy the Client ID** (starts with `A`)
 
 #### Step 2: Configure Environment

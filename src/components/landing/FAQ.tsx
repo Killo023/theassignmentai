@@ -60,7 +60,7 @@ const FAQ = () => {
             Frequently Asked Questions
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Everything you need to know about AcademiaAI Pro
+            Everything you need to know about The Assignment AI
           </p>
         </motion.div>
 
@@ -121,7 +121,7 @@ const FAQ = () => {
               Still have questions?
             </h3>
             <p className="text-muted-foreground mb-6">
-              Our support team is here to help you get the most out of AcademiaAI Pro
+              Our support team is here to help you get the most out of The Assignment AI
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button className="bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors">

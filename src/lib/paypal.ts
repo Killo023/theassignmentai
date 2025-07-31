@@ -258,7 +258,7 @@ export class PayPalService {
           email_address: userData.email,
         },
         application_context: {
-          brand_name: 'AcademiaAI Pro',
+          brand_name: 'The Assignment AI',
           locale: 'en-US',
           shipping_preference: 'NO_SHIPPING',
           user_action: 'SUBSCRIBE_NOW',
