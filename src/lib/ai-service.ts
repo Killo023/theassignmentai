@@ -107,8 +107,24 @@ class AIService {
       };
     } catch (error) {
       console.error('Error generating assignment:', error);
+      
+      // Provide more specific error messages
+      let errorMessage = 'Error generating assignment. Please try again.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('repetitive content')) {
+          errorMessage = 'The AI generated repetitive content. Please try again with different parameters or requirements.';
+        } else if (error.message.includes('All AI models failed')) {
+          errorMessage = 'All AI models are currently unavailable. Please try again in a few minutes.';
+        } else if (error.message.includes('API key not configured')) {
+          errorMessage = 'AI service is not properly configured. Please contact support.';
+        } else if (error.message.includes('API request failed')) {
+          errorMessage = 'AI service is temporarily unavailable. Please try again later.';
+        }
+      }
+      
       return {
-        content: 'Error generating assignment. Please try again.',
+        content: errorMessage,
         tables: [],
         charts: [],
         references: [],
@@ -145,16 +161,24 @@ class AIService {
     const academicLevel = request.academicLevel || 'undergraduate';
     const qualityLevel = request.qualityLevel || 'standard';
 
-    return `You are an expert academic writer with extensive experience in university-level assignments. Generate a comprehensive, publication-ready ${assignmentType} that meets the highest academic standards.
+    return `You are an expert academic writer. Generate a comprehensive ${assignmentType} for the following requirements.
 
-ASSIGNMENT DETAILS:
-- Title: "${request.title}"
-- Subject: ${request.subject}
-- Type: ${request.type}
-- Academic Level: ${academicLevel}
-- Quality Level: ${qualityLevel}
-- Word Count: ${request.wordCount} words
-- Citation Style: ${request.citationStyle || 'APA'}
+CRITICAL INSTRUCTIONS:
+- Write the complete assignment content directly
+- Do NOT include any confirmation messages or repetitive text
+- Do NOT ask for confirmation or additional information
+- Generate the full assignment as requested
+- Focus on the specific topic and requirements provided
+- Use professional academic language throughout
+
+ASSIGNMENT SPECIFICATIONS:
+Title: "${request.title}"
+Subject: ${request.subject}
+Type: ${request.type}
+Academic Level: ${academicLevel}
+Quality Level: ${qualityLevel}
+Word Count: ${request.wordCount} words
+Citation Style: ${request.citationStyle || 'APA'}
 
 ACADEMIC STANDARDS (${academicLevel.toUpperCase()} LEVEL):
 ${academicStandards}
@@ -165,22 +189,18 @@ ${formattingGuidelines}
 DATA AND ANALYSIS REQUIREMENTS:
 ${dataRequirements}
 
-UNIVERSITY-LEVEL STRUCTURE REQUIREMENTS:
+SPECIFIC REQUIREMENTS:
+${request.requirements || 'Focus on producing a high-quality, university-standard assignment that demonstrates deep understanding of the subject matter and critical thinking skills.'}
 
-1. TITLE PAGE (if cover page requested):
-   - Professional title formatting
-   - Student information
-   - Course and instructor details
-   - Submission date
+${request.citations ? `CITATION REQUIREMENTS: Include proper ${request.citationStyle || 'APA'} in-text citations and a comprehensive reference list with at least 10-15 academic sources.` : ''}
 
-2. EXECUTIVE SUMMARY (if requested):
-   - Concise overview of key findings
-   - Main conclusions and recommendations
-   - Professional executive summary format
+STRUCTURE REQUIREMENTS:
 
-3. TABLE OF CONTENTS (if requested):
-   - Complete section listing with page numbers
-   - Professional formatting
+1. ${request.includeCoverPage ? 'TITLE PAGE: Professional title formatting with student information, course details, and submission date.' : ''}
+
+2. ${request.includeExecutiveSummary ? 'EXECUTIVE SUMMARY: Concise overview of key findings, main conclusions, and recommendations.' : ''}
+
+3. ${request.includeTableOfContents ? 'TABLE OF CONTENTS: Complete section listing with page numbers and professional formatting.' : ''}
 
 4. INTRODUCTION:
    - Clear research problem statement
@@ -241,12 +261,7 @@ QUALITY REQUIREMENTS:
 - Include proper transitions between sections
 - Maintain academic objectivity and neutrality
 
-ADDITIONAL REQUIREMENTS:
-${request.requirements || 'Focus on producing a high-quality, university-standard assignment that demonstrates deep understanding of the subject matter and critical thinking skills.'}
-
-${request.citations ? `CITATION REQUIREMENTS: Include proper ${request.citationStyle || 'APA'} in-text citations and a comprehensive reference list with at least 10-15 academic sources.` : ''}
-
-IMPORTANT: This assignment must meet university-level standards with professional presentation, rigorous analysis, and academic excellence. Write as if this will be submitted to a university professor for grading.`;
+IMPORTANT: Generate the complete assignment content now. Do not ask for confirmation or provide repetitive text. Write the full assignment as specified above.`;
   }
 
   private getAcademicStandards(level?: string): string {
@@ -541,30 +556,96 @@ IMPORTANT: This assignment must meet university-level standards with professiona
       throw new Error('API key not configured');
     }
 
-    const response = await fetch('https://api.together.xyz/v1/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'meta-llama/Llama-Vision-Free',
-        prompt: prompt,
-        max_tokens: maxTokens,
-        temperature: 0.7,
-        top_p: 0.9
-      })
-    });
+    const models = [
+      'meta-llama/Llama-2-70b-chat-hf',
+      'meta-llama/Llama-2-13b-chat-hf',
+      'meta-llama/Llama-Vision-Free'
+    ];
 
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`);
+    for (const model of models) {
+      try {
+        const response = await fetch('https://api.together.xyz/v1/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${this.apiKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            model: model,
+            prompt: prompt,
+            max_tokens: maxTokens,
+            temperature: 0.3, // Reduced temperature for more consistent outputs
+            top_p: 0.9,
+            frequency_penalty: 0.1, // Add frequency penalty to reduce repetition
+            presence_penalty: 0.1, // Add presence penalty to encourage diverse content
+            stop: ['\n\n\n', 'END_OF_ASSIGNMENT', '---'] // Add stop sequences to prevent runaway generation
+          })
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`API Error Response for model ${model}:`, errorText);
+          continue; // Try next model
+        }
+
+        const data = await response.json();
+        
+        // Validate the response
+        if (!data.choices || !data.choices[0] || !data.choices[0].text) {
+          console.error(`Invalid response format from model ${model}`);
+          continue; // Try next model
+        }
+
+        const content = data.choices[0].text.trim();
+        
+        // Check for repetitive content
+        if (this.isRepetitiveContent(content)) {
+          console.error(`Model ${model} generated repetitive content`);
+          continue; // Try next model
+        }
+
+        return {
+          content: content,
+          usage: data.usage
+        };
+      } catch (error) {
+        console.error(`Error with model ${model}:`, error);
+        continue; // Try next model
+      }
     }
 
-    const data = await response.json();
-    return {
-      content: data.choices[0].text,
-      usage: data.usage
-    };
+    throw new Error('All AI models failed to generate content. Please try again later.');
+  }
+
+  private isRepetitiveContent(content: string): boolean {
+    // Check for repetitive patterns
+    const lines = content.split('\n').filter(line => line.trim());
+    if (lines.length < 3) return false;
+    
+    // Check if the same line appears multiple times
+    const uniqueLines = new Set(lines);
+    if (uniqueLines.size < lines.length * 0.3) { // If less than 30% unique lines
+      return true;
+    }
+    
+    // Check for repetitive phrases
+    const words = content.toLowerCase().split(/\s+/);
+    const wordCounts = new Map<string, number>();
+    
+    for (const word of words) {
+      if (word.length > 3) { // Only check words longer than 3 characters
+        wordCounts.set(word, (wordCounts.get(word) || 0) + 1);
+      }
+    }
+    
+    // If any word appears too frequently
+    for (const [word, count] of wordCounts) {
+      if (count > words.length * 0.1) { // If a word appears more than 10% of the time
+        return true;
+      }
+    }
+    
+    return false;
   }
 }
 
