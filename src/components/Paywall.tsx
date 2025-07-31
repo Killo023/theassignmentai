@@ -138,7 +138,7 @@ const Paywall: React.FC<PaywallProps> = ({ onUpgrade, onClose, isVisible }) => {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-foreground">Upgrade to Pro</h2>
-              <p className="text-muted-foreground">Your trial has ended. Continue with unlimited access.</p>
+              <p className="text-muted-foreground">Upgrade to continue with unlimited access.</p>
             </div>
           </div>
           

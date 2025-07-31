@@ -6,17 +6,19 @@ export interface SubscriptionPlan {
   name: string;
   price: number;
   currency: string;
-  trialDays: number;
+  assignmentLimit: number;
+  hasCalendarAccess: boolean;
   features: string[];
 }
 
 export interface UserSubscription {
   userId: string;
   planId: string;
-  status: 'trial' | 'active' | 'cancelled' | 'expired';
-  trialEndDate: Date;
-  nextBillingDate: Date;
-  isTrialActive: boolean;
+  status: 'free' | 'basic' | 'pro' | 'cancelled' | 'expired';
+  assignmentsUsed: number;
+  assignmentLimit: number;
+  hasCalendarAccess: boolean;
+  nextBillingDate?: Date;
   requiresPaymentMethod: boolean;
 }
 
@@ -24,18 +26,53 @@ export class PaymentService {
   private static instance: PaymentService;
   private plans: SubscriptionPlan[] = [
     {
+      id: 'free',
+      name: 'Free Plan',
+      price: 0,
+      currency: 'USD',
+      assignmentLimit: 4,
+      hasCalendarAccess: false,
+      features: [
+        '4 assignments per month',
+        'AI-powered content creation',
+        'Basic formatting options',
+        'Email support'
+      ]
+    },
+    {
+      id: 'basic',
+      name: 'Basic Plan',
+      price: 14.99,
+      currency: 'USD',
+      assignmentLimit: -1, // Unlimited
+      hasCalendarAccess: true,
+      features: [
+        'Unlimited assignments',
+        'Full calendar access',
+        'Priority AI processing',
+        'Advanced export formats',
+        'Priority support',
+        'Version history',
+        'Collaboration tools',
+        'Custom templates'
+      ]
+    },
+    {
       id: 'pro',
       name: 'Pro Plan',
       price: 29.99,
       currency: 'USD',
-      trialDays: 14,
+      assignmentLimit: -1, // Unlimited
+      hasCalendarAccess: true,
       features: [
         'Unlimited assignment generation',
         'AI-powered charts and graphs',
         'Multiple export formats (PDF, DOCX, TXT)',
         'University-level academic standards',
         'Plagiarism-free content',
-        'Priority customer support'
+        'Priority customer support',
+        'Full calendar access',
+        'Advanced analytics'
       ]
     }
   ];
@@ -43,6 +80,7 @@ export class PaymentService {
   // Fallback in-memory storage for when Supabase is not configured
   private fallbackUpgradedUsers: Set<string> = new Set();
   private fallbackSubscriptions: Map<string, any> = new Map();
+  private fallbackAssignmentCounts: Map<string, number> = new Map();
 
   // Event listeners for subscription changes
   private subscriptionChangeListeners: Set<() => void> = new Set();
@@ -114,16 +152,13 @@ export class PaymentService {
   }
 
   /**
-   * Create a new subscription with trial period (no payment required)
+   * Create a new free subscription
    */
-  async createSubscription(userId: string, planId: string): Promise<UserSubscription> {
-    const plan = this.getPlan(planId);
+  async createFreeSubscription(userId: string): Promise<UserSubscription> {
+    const plan = this.getPlan('free');
     if (!plan) {
-      throw new Error('Invalid plan ID');
+      throw new Error('Free plan not found');
     }
-
-    const now = new Date();
-    const trialEndDate = new Date(now.getTime() + (plan.trialDays * 24 * 60 * 60 * 1000));
 
     if (this.isSupabaseConfigured()) {
       // Create subscription in Supabase
@@ -131,34 +166,35 @@ export class PaymentService {
         .from('subscriptions')
         .insert([{
           user_id: userId,
-          plan: planId,
-          status: 'trial',
-          trial_end_date: trialEndDate.toISOString(),
-          created_at: now.toISOString()
+          plan: 'free',
+          status: 'free',
+          assignments_used: 0,
+          created_at: new Date().toISOString()
         }]);
 
       if (error) {
-        console.error('Error creating subscription:', error);
+        console.error('Error creating free subscription:', error);
         throw new Error('Failed to create subscription');
       }
     } else {
       // Fallback to in-memory storage
       this.fallbackSubscriptions.set(userId, {
         user_id: userId,
-        plan: planId,
-        status: 'trial',
-        trial_end_date: trialEndDate.toISOString(),
-        created_at: now.toISOString()
+        plan: 'free',
+        status: 'free',
+        assignments_used: 0,
+        created_at: new Date().toISOString()
       });
+      this.fallbackAssignmentCounts.set(userId, 0);
     }
 
     const subscription: UserSubscription = {
       userId,
-      planId,
-      status: 'trial',
-      trialEndDate,
-      nextBillingDate: trialEndDate,
-      isTrialActive: true,
+      planId: 'free',
+      status: 'free',
+      assignmentsUsed: 0,
+      assignmentLimit: plan.assignmentLimit,
+      hasCalendarAccess: plan.hasCalendarAccess,
       requiresPaymentMethod: false
     };
 
@@ -166,18 +202,23 @@ export class PaymentService {
   }
 
   /**
-   * Convert trial to paid subscription using PayPal
+   * Convert free to paid subscription using PayPal
    */
-  async convertTrialToPaid(userId: string, paymentData: {
+  async convertToPaid(userId: string, planId: string, paymentData: {
     cardNumber: string;
     expiryDate: string;
     cvv: string;
     nameOnCard: string;
   }): Promise<{ success: boolean; message: string }> {
     try {
-      console.log(`🚀 Starting upgrade process for user: ${userId}`);
+      console.log(`🚀 Starting upgrade process for user: ${userId} to plan: ${planId}`);
       console.log(`🔧 Supabase configured: ${this.isSupabaseConfigured()}`);
       console.log(`💳 Payment data:`, { ...paymentData, cardNumber: '***' });
+      
+      const plan = this.getPlan(planId);
+      if (!plan) {
+        return { success: false, message: 'Invalid plan selected' };
+      }
       
       // Check if PayPal is configured
       const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
@@ -193,29 +234,29 @@ export class PaymentService {
         console.log('🎭 PayPal not configured, simulating payment success');
         await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate processing time
         
-                  if (this.isSupabaseConfigured()) {
-            // Upsert subscription in Supabase (create if doesn't exist, update if exists)
-            console.log(`💾 Upserting subscription in Supabase for user: ${userId}`);
-            const { error } = await supabase
-              .from('subscriptions')
-              .upsert({
-                user_id: userId,
-                plan: 'pro',
-                status: 'active',
-                trial_end_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-                upgraded_at: new Date().toISOString(),
-                created_at: new Date().toISOString()
-              });
+        if (this.isSupabaseConfigured()) {
+          // Upsert subscription in Supabase (create if doesn't exist, update if exists)
+          console.log(`💾 Upserting subscription in Supabase for user: ${userId}`);
+          const { error } = await supabase
+            .from('subscriptions')
+            .upsert({
+              user_id: userId,
+              plan: planId,
+              status: planId,
+              assignments_used: 0,
+              upgraded_at: new Date().toISOString(),
+              created_at: new Date().toISOString()
+            });
 
-            if (error) {
-              console.error(`❌ Error upserting subscription in Supabase:`, error);
-              return {
-                success: false,
-                message: 'Failed to update subscription status'
-              };
-            }
-            console.log(`✅ Successfully upserted subscription in Supabase for user: ${userId}`);
-          } else {
+          if (error) {
+            console.error(`❌ Error upserting subscription in Supabase:`, error);
+            return {
+              success: false,
+              message: 'Failed to update subscription status'
+            };
+          }
+          console.log(`✅ Successfully upserted subscription in Supabase for user: ${userId}`);
+        } else {
           // Fallback to in-memory storage
           console.log(`💾 Updating subscription in fallback storage for user: ${userId}`);
           this.fallbackUpgradedUsers.add(userId);
@@ -223,19 +264,20 @@ export class PaymentService {
           if (existingSub) {
             this.fallbackSubscriptions.set(userId, {
               ...existingSub,
-              status: 'active',
+              plan: planId,
+              status: planId,
               upgraded_at: new Date().toISOString()
             });
           }
         }
 
-        console.log(`🎉 User ${userId} upgraded to Pro (demo mode)`);
+        console.log(`🎉 User ${userId} upgraded to ${planId} (demo mode)`);
         // Notify all listeners about the subscription change
         this.notifySubscriptionChange();
         
         return {
           success: true,
-          message: 'Payment processed successfully (demo mode)'
+          message: `Payment processed successfully - upgraded to ${plan.name} (demo mode)`
         };
       }
 
@@ -246,23 +288,11 @@ export class PaymentService {
         const { default: PayPalService } = await import('./paypal');
         const paypalService = PayPalService.getInstance();
         
-        // Create PayPal plan if it doesn't exist
-        const planData = {
-          name: 'AcademiaAI Pro Monthly',
-          description: 'Unlimited AI-powered assignment generation',
-          price: 29.99,
-          currency: 'USD'
-        };
-        
-        // For demo purposes, we'll use a mock plan ID
-        // In production, you'd store and retrieve the actual plan ID
-        const planId = 'P-5ML4271244454362XMQIZHI'; // Mock PayPal plan ID
-        
         // Process payment through PayPal
         const paymentResult = await paypalService.processPayment({
-          amount: 29.99,
-          currency: 'USD',
-          description: 'AcademiaAI Pro Monthly Subscription',
+          amount: plan.price,
+          currency: plan.currency,
+          description: `${plan.name} Subscription`,
           payerEmail: paymentData.nameOnCard // In real app, get from user data
         });
 
@@ -270,15 +300,15 @@ export class PaymentService {
 
         if (paymentResult.success) {
           if (this.isSupabaseConfigured()) {
-            // Upsert subscription in Supabase (create if doesn't exist, update if exists)
+            // Upsert subscription in Supabase
             console.log(`💾 Upserting subscription in Supabase for user: ${userId}`);
             const { error } = await supabase
               .from('subscriptions')
               .upsert({
                 user_id: userId,
-                plan: 'pro',
-                status: 'active',
-                trial_end_date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+                plan: planId,
+                status: planId,
+                assignments_used: 0,
                 upgraded_at: new Date().toISOString(),
                 created_at: new Date().toISOString()
               });
@@ -299,18 +329,19 @@ export class PaymentService {
             if (existingSub) {
               this.fallbackSubscriptions.set(userId, {
                 ...existingSub,
-                status: 'active',
+                plan: planId,
+                status: planId,
                 upgraded_at: new Date().toISOString()
               });
             }
           }
 
-          console.log(`🎉 User ${userId} upgraded to Pro`);
+          console.log(`🎉 User ${userId} upgraded to ${planId}`);
           // Notify all listeners about the subscription change
           this.notifySubscriptionChange();
           return {
             success: true,
-            message: 'Successfully converted to paid subscription'
+            message: `Successfully upgraded to ${plan.name}`
           };
         } else {
           return {
@@ -329,7 +360,8 @@ export class PaymentService {
           const { error } = await supabase
             .from('subscriptions')
             .update({
-              status: 'active',
+              plan: planId,
+              status: planId,
               upgraded_at: new Date().toISOString()
             })
             .eq('user_id', userId);
@@ -350,16 +382,17 @@ export class PaymentService {
           if (existingSub) {
             this.fallbackSubscriptions.set(userId, {
               ...existingSub,
-              status: 'active',
+              plan: planId,
+              status: planId,
               upgraded_at: new Date().toISOString()
             });
           }
         }
 
-        console.log(`🎉 User ${userId} upgraded to Pro (demo mode)`);
+        console.log(`🎉 User ${userId} upgraded to ${planId} (demo mode)`);
         return {
           success: true,
-          message: 'Payment processed successfully (demo mode - PayPal unavailable)'
+          message: `Payment processed successfully - upgraded to ${plan.name} (demo mode - PayPal unavailable)`
         };
       }
     } catch (error) {
@@ -426,21 +459,14 @@ export class PaymentService {
         console.log(`📦 Fallback subscription data:`, subscription);
       }
 
-      const now = new Date();
-      let trialEndDate: Date;
-      let status: 'trial' | 'active' | 'cancelled' | 'expired';
-      let isTrialActive: boolean;
-
       if (!subscription) {
-        // No subscription found - create a new trial
-        console.log(`🆕 No subscription found for user ${userId}, creating new trial`);
+        // No subscription found - create a new free subscription
+        console.log(`🆕 No subscription found for user ${userId}, creating new free subscription`);
         
-        const plan = this.getPlan('pro');
+        const plan = this.getPlan('free');
         if (!plan) {
-          throw new Error('Pro plan not found');
+          throw new Error('Free plan not found');
         }
-
-        trialEndDate = new Date(now.getTime() + (plan.trialDays * 24 * 60 * 60 * 1000));
         
         if (this.isSupabaseConfigured()) {
           // Create new subscription in Supabase
@@ -449,10 +475,10 @@ export class PaymentService {
             .from('subscriptions')
             .insert([{
               user_id: userId,
-              plan: 'pro',
-              status: 'trial',
-              trial_end_date: trialEndDate.toISOString(),
-              created_at: now.toISOString()
+              plan: 'free',
+              status: 'free',
+              assignments_used: 0,
+              created_at: new Date().toISOString()
             }]);
 
           if (insertError) {
@@ -465,80 +491,45 @@ export class PaymentService {
           console.log(`💾 Creating new subscription in fallback storage for user: ${userId}`);
           this.fallbackSubscriptions.set(userId, {
             user_id: userId,
-            plan: 'pro',
-            status: 'trial',
-            trial_end_date: trialEndDate.toISOString(),
-            created_at: now.toISOString()
+            plan: 'free',
+            status: 'free',
+            assignments_used: 0,
+            created_at: new Date().toISOString()
           });
+          this.fallbackAssignmentCounts.set(userId, 0);
         }
 
-        status = 'trial';
-        isTrialActive = true;
-      } else {
-        // Subscription exists
-        console.log(`📋 Processing existing subscription for user: ${userId}`);
-        trialEndDate = new Date(subscription.trial_end_date);
-        status = subscription.status;
-        
-        // Check if user has been upgraded (has upgraded_at timestamp)
-        const isUpgraded = subscription.upgraded_at != null;
-        console.log(`👑 User upgrade status: ${isUpgraded}, upgraded_at: ${subscription.upgraded_at}`);
-        
-        // Check if trial is still active
-        if (status === 'active' && isUpgraded) {
-          // User is upgraded but trial might still be active
-          isTrialActive = now < trialEndDate;
-          console.log(`👑 User is upgraded but trial active: ${isTrialActive}`);
-        } else if (status === 'trial') {
-          // User is in trial
-          isTrialActive = now < trialEndDate;
-          console.log(`⏰ User in trial, active: ${isTrialActive}`);
-          if (!isTrialActive) {
-            // Trial has expired
-            status = 'expired';
-            console.log(`⏰ Trial expired for user: ${userId}`);
-            
-            if (this.isSupabaseConfigured()) {
-              // Update status in database
-              console.log(`💾 Updating status to expired in Supabase for user: ${userId}`);
-              await supabase
-                .from('subscriptions')
-                .update({ status: 'expired' })
-                .eq('user_id', userId);
-            } else {
-              // Update in fallback storage
-              console.log(`💾 Updating status to expired in fallback storage for user: ${userId}`);
-              const existingSub = this.fallbackSubscriptions.get(userId);
-              if (existingSub) {
-                this.fallbackSubscriptions.set(userId, {
-                  ...existingSub,
-                  status: 'expired'
-                });
-              }
-            }
-          }
-        } else if (status === 'active' && !isUpgraded) {
-          // User has active status but no upgrade timestamp - this shouldn't happen
-          console.log(`⚠️ User has active status but no upgrade timestamp`);
-          isTrialActive = false;
-        } else {
-          isTrialActive = false;
-          console.log(`📊 User status: ${status}, trial active: ${isTrialActive}`);
-        }
+        return {
+          userId,
+          planId: 'free',
+          status: 'free',
+          assignmentsUsed: 0,
+          assignmentLimit: plan.assignmentLimit,
+          hasCalendarAccess: plan.hasCalendarAccess,
+          requiresPaymentMethod: false
+        };
       }
+
+      // Subscription exists - get the plan details
+      const plan = this.getPlan(subscription.plan || 'free');
+      if (!plan) {
+        throw new Error('Plan not found');
+      }
+
+      const assignmentsUsed = subscription.assignments_used || 0;
       
-      console.log(`🎯 Final status for user ${userId}:`, status);
-      console.log(`⏰ Trial active:`, isTrialActive);
-      console.log(`📅 Trial end date:`, trialEndDate);
+      console.log(`🎯 Final status for user ${userId}:`, subscription.status);
+      console.log(`📊 Assignments used: ${assignmentsUsed}/${plan.assignmentLimit}`);
+      console.log(`📅 Calendar access: ${plan.hasCalendarAccess}`);
       
       return {
         userId,
-        planId: 'pro',
-        status,
-        trialEndDate,
-        nextBillingDate: trialEndDate,
-        isTrialActive,
-        requiresPaymentMethod: status === 'expired' || status === 'active'
+        planId: subscription.plan || 'free',
+        status: subscription.status || 'free',
+        assignmentsUsed,
+        assignmentLimit: plan.assignmentLimit,
+        hasCalendarAccess: plan.hasCalendarAccess,
+        requiresPaymentMethod: subscription.status === 'free' && assignmentsUsed >= plan.assignmentLimit
       };
     } catch (error) {
       console.error(`❌ Error checking subscription status for user ${userId}:`, error);
@@ -547,50 +538,117 @@ export class PaymentService {
   }
 
   /**
-   * Check if user is in trial period
+   * Check if user can create assignments
    */
-  async isInTrial(userId: string): Promise<boolean> {
-    const subscription = await this.checkSubscriptionStatus(userId);
-    if (!subscription) return false;
+  async canCreateAssignment(userId?: string): Promise<boolean> {
+    try {
+      if (!userId) {
+        // If no userId provided, assume user can create assignments
+        return true;
+      }
 
-    const now = new Date();
-    return subscription.isTrialActive && now < subscription.trialEndDate;
+      const subscription = await this.checkSubscriptionStatus(userId);
+      if (!subscription) {
+        // No subscription found, allow creation (free tier)
+        return true;
+      }
+
+      // Check if user has unlimited assignments or still has assignments left
+      if (subscription.assignmentLimit === -1) {
+        // Unlimited plan
+        return true;
+      }
+
+      // Check if user has assignments remaining
+      return subscription.assignmentsUsed < subscription.assignmentLimit;
+    } catch (error) {
+      console.error('Error checking assignment creation permission:', error);
+      // Default to allowing creation if there's an error
+      return true;
+    }
   }
 
   /**
-   * Check if user has expired trial
+   * Increment assignment count for user
    */
-  async hasExpiredTrial(userId: string): Promise<boolean> {
-    const subscription = await this.checkSubscriptionStatus(userId);
-    if (!subscription) return false;
+  async incrementAssignmentCount(userId: string): Promise<void> {
+    try {
+      if (this.isSupabaseConfigured()) {
+        // Update assignment count in Supabase
+        const { error } = await supabase
+          .from('subscriptions')
+          .update({ 
+            assignments_used: supabase.sql`assignments_used + 1` 
+          })
+          .eq('user_id', userId);
 
-    const now = new Date();
-    return subscription.status === 'expired' || 
-           (subscription.isTrialActive && now > subscription.trialEndDate);
+        if (error) {
+          console.error('Error incrementing assignment count:', error);
+        }
+      } else {
+        // Update in fallback storage
+        const currentCount = this.fallbackAssignmentCounts.get(userId) || 0;
+        this.fallbackAssignmentCounts.set(userId, currentCount + 1);
+        
+        const existingSub = this.fallbackSubscriptions.get(userId);
+        if (existingSub) {
+          this.fallbackSubscriptions.set(userId, {
+            ...existingSub,
+            assignments_used: currentCount + 1
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error incrementing assignment count:', error);
+    }
   }
 
   /**
-   * Check if user has active paid subscription
+   * Check if user can access calendar feature
    */
-  async hasActiveSubscription(userId: string): Promise<boolean> {
-    const subscription = await this.checkSubscriptionStatus(userId);
-    if (!subscription) return false;
+  async canAccessCalendar(userId?: string): Promise<boolean> {
+    try {
+      if (!userId) {
+        return false;
+      }
 
-    return subscription.status === 'active';
+      const subscription = await this.checkSubscriptionStatus(userId);
+      if (!subscription) {
+        return false;
+      }
+
+      // Only paid users can access calendar
+      return subscription.hasCalendarAccess;
+    } catch (error) {
+      console.error('Error checking calendar access:', error);
+      // Default to false for calendar access on error
+      return false;
+    }
   }
 
   /**
-   * Get days remaining in trial
+   * Get assignment usage for user
    */
-  async getTrialDaysRemaining(userId: string): Promise<number> {
-    const subscription = await this.checkSubscriptionStatus(userId);
-    if (!subscription || !subscription.isTrialActive) return 0;
+  async getAssignmentUsage(userId: string): Promise<{ used: number; limit: number; remaining: number }> {
+    try {
+      const subscription = await this.checkSubscriptionStatus(userId);
+      if (!subscription) {
+        return { used: 0, limit: 4, remaining: 4 }; // Default free tier
+      }
 
-    const now = new Date();
-    const timeRemaining = subscription.trialEndDate.getTime() - now.getTime();
-    const daysRemaining = Math.ceil(timeRemaining / (24 * 60 * 60 * 1000));
-    
-    return Math.max(0, daysRemaining);
+      const remaining = subscription.assignmentLimit === -1 
+        ? -1 // Unlimited
+        : Math.max(0, subscription.assignmentLimit - subscription.assignmentsUsed);
+
+      return {
+        used: subscription.assignmentsUsed,
+        limit: subscription.assignmentLimit,
+        remaining
+      };
+    } catch (error) {
+      console.error('Error getting assignment usage:', error);
+      return { used: 0, limit: 4, remaining: 4 }; // Default free tier
+    }
   }
 
   /**
@@ -623,31 +681,6 @@ export class PaymentService {
   }
 
   /**
-   * Process payment (for demo purposes)
-   */
-  async processPayment(paymentData: {
-    cardNumber: string;
-    expiryDate: string;
-    cvv: string;
-    nameOnCard: string;
-    amount: number;
-  }): Promise<{ success: boolean; message: string }> {
-    // In a real app, you would:
-    // 1. Validate payment data
-    // 2. Process payment through payment provider
-    // 3. Handle success/failure responses
-
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // For demo, always succeed
-    return {
-      success: true,
-      message: 'Payment processed successfully'
-    };
-  }
-
-  /**
    * Get subscription features
    */
   getSubscriptionFeatures(planId: string): string[] {
@@ -663,54 +696,6 @@ export class PaymentService {
       style: 'currency',
       currency: currency
     }).format(price);
-  }
-
-  /**
-   * Check if user can create assignments
-   */
-  async canCreateAssignment(userId?: string): Promise<boolean> {
-    try {
-      if (!userId) {
-        // If no userId provided, assume user can create assignments
-        return true;
-      }
-
-      const subscription = await this.checkSubscriptionStatus(userId);
-      if (!subscription) {
-        // No subscription found, allow creation (trial)
-        return true;
-      }
-
-      // Allow creation if user has active subscription or is in trial
-      return subscription.status === 'active' || subscription.status === 'trial';
-    } catch (error) {
-      console.error('Error checking assignment creation permission:', error);
-      // Default to allowing creation if there's an error
-      return true;
-    }
-  }
-
-  /**
-   * Check if user can access calendar feature
-   */
-  async canAccessCalendar(userId?: string): Promise<boolean> {
-    try {
-      if (!userId) {
-        return false;
-      }
-
-      const subscription = await this.checkSubscriptionStatus(userId);
-      if (!subscription) {
-        return false;
-      }
-
-      // Only Pro users can access calendar
-      return subscription.status === 'active';
-    } catch (error) {
-      console.error('Error checking calendar access:', error);
-      // Default to false for calendar access on error
-      return false;
-    }
   }
 }
 

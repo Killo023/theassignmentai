@@ -12,7 +12,6 @@ import {
   CheckCircle,
   Sparkles
 } from "lucide-react";
-import Image from "next/image";
 
 const features = [
   {
@@ -20,24 +19,21 @@ const features = [
     title: "AI Document Generation",
     description: "Describe your assignment requirements and get instant, well-structured drafts with proper formatting and citations.",
     benefits: ["Instant draft generation", "Proper academic formatting", "Automatic citations"],
-    color: "from-blue-500 to-blue-600",
-    image: "/images/ai-generation.jpg"
+    color: "from-blue-500 to-blue-600"
   },
   {
     icon: MessageSquare,
     title: "Real-time Refinement",
     description: "Chat with AI to iterate, improve, and perfect your content with intelligent suggestions and feedback.",
     benefits: ["Interactive chat interface", "Smart suggestions", "Version history"],
-    color: "from-purple-500 to-purple-600",
-    image: "/images/chat-refinement.jpg"
+    color: "from-purple-500 to-purple-600"
   },
   {
     icon: FileText,
     title: "Multi-format Export",
     description: "Export your assignments in multiple formats including DOCX, PDF, and Excel with one-click convenience.",
     benefits: ["Multiple formats", "One-click export", "Professional formatting"],
-    color: "from-green-500 to-green-600",
-    image: "/images/export-formats.jpg"
+    color: "from-green-500 to-green-600"
   }
 ];
 
@@ -114,22 +110,12 @@ const FeatureGrid = () => {
               >
                 {/* Feature Image */}
                 <motion.div
-                  className="relative h-48 overflow-hidden rounded-t-xl"
+                  className="relative h-48 overflow-hidden rounded-t-xl bg-gradient-to-br from-blue-500 to-purple-600"
                   whileHover={{ 
                     scale: 1.05,
                     transition: { duration: 0.3 }
                   }}
                 >
-                  <Image
-                    src={feature.image}
-                    alt={feature.title}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      // Fallback gradient if image fails to load
-                      e.currentTarget.style.background = `linear-gradient(135deg, ${feature.color})`;
-                    }}
-                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                   
                   {/* Floating Icon Overlay */}
@@ -251,19 +237,19 @@ const FeatureGrid = () => {
               {
                 name: "Sarah Johnson",
                 university: "MIT",
-                image: "/images/student-1.jpg",
+                initials: "SJ",
                 quote: "Saved 10 hours every week on assignments"
               },
               {
                 name: "Michael Chen",
                 university: "Stanford",
-                image: "/images/student-2.jpg",
+                initials: "MC",
                 quote: "Improved my grades from B to A+"
               },
               {
                 name: "Emily Rodriguez",
                 university: "Harvard",
-                image: "/images/student-3.jpg",
+                initials: "ER",
                 quote: "Perfect citations every time"
               }
             ].map((student, index) => (
@@ -282,17 +268,10 @@ const FeatureGrid = () => {
                     transition: { duration: 0.3 }
                   }}
                 >
-                  <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden shadow-lg">
-                    <Image
-                      src={student.image}
-                      alt={student.name}
-                      fill
-                      className="object-cover"
-                      onError={(e) => {
-                        // Fallback to gradient avatar
-                        e.currentTarget.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                      }}
-                    />
+                  <div className="relative w-24 h-24 mx-auto rounded-full overflow-hidden shadow-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <span className="text-white font-bold text-xl">
+                      {student.initials}
+                    </span>
                   </div>
                   <motion.div
                     className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white"

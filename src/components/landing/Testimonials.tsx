@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { Star, Quote, Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 
 const testimonials = [
   {
@@ -13,8 +12,7 @@ const testimonials = [
     major: "Computer Science",
     rating: 5,
     quote: "This tool saved me 10 hours every week! The AI understands exactly what I need and generates high-quality content that actually gets me better grades.",
-    avatar: "SJ",
-    image: "/images/testimonial-1.jpg"
+    avatar: "SJ"
   },
   {
     id: 2,
@@ -23,8 +21,7 @@ const testimonials = [
     major: "Business Administration",
     rating: 5,
     quote: "As a business student, I need to write a lot of case studies and reports. This AI assistant has been a game-changer for my academic performance.",
-    avatar: "MC",
-    image: "/images/testimonial-2.jpg"
+    avatar: "MC"
   },
   {
     id: 3,
@@ -33,8 +30,7 @@ const testimonials = [
     major: "Psychology",
     rating: 5,
     quote: "The citation feature is incredible! It automatically formats everything in APA style, which saves me so much time on research papers.",
-    avatar: "ER",
-    image: "/images/testimonial-3.jpg"
+    avatar: "ER"
   },
   {
     id: 4,
@@ -43,8 +39,7 @@ const testimonials = [
     major: "Engineering",
     rating: 5,
     quote: "Perfect for technical writing. The AI helps me structure complex engineering reports and ensures all technical details are accurate.",
-    avatar: "DK",
-    image: "/images/testimonial-4.jpg"
+    avatar: "DK"
   },
   {
     id: 5,
@@ -53,8 +48,7 @@ const testimonials = [
     major: "English Literature",
     rating: 5,
     quote: "Even as an English major, I find this tool incredibly helpful for brainstorming and structuring my essays. It's like having a brilliant writing partner.",
-    avatar: "LT",
-    image: "/images/testimonial-5.jpg"
+    avatar: "LT"
   }
 ];
 
@@ -232,17 +226,10 @@ const Testimonials = () => {
                       }}
                       style={{ transformStyle: "preserve-3d" }}
                     >
-                      <div className="w-16 h-16 rounded-full overflow-hidden shadow-lg border-2 border-white">
-                        <Image
-                          src={testimonial.image}
-                          alt={testimonial.name}
-                          fill
-                          className="object-cover"
-                          onError={(e) => {
-                            // Fallback to gradient avatar
-                            e.currentTarget.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                          }}
-                        />
+                      <div className="w-16 h-16 rounded-full overflow-hidden shadow-lg border-2 border-white bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">
+                          {testimonial.avatar}
+                        </span>
                       </div>
                       <motion.div
                         className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white"

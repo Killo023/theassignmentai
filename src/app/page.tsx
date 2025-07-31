@@ -74,7 +74,7 @@ export default function Home() {
               className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 relative"
             >
               <div className="text-center mb-6 sm:mb-8">
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Free Tier</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Free Plan</h3>
                 <div className="mb-4">
                   <span className="text-3xl sm:text-4xl font-bold text-gray-900">$0</span>
                   <span className="text-gray-600 ml-2 text-sm sm:text-base">forever</span>
@@ -85,7 +85,7 @@ export default function Home() {
               <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">2 assignments per month</span>
+                  <span className="text-gray-700 text-sm sm:text-base">4 assignments per month</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
@@ -181,7 +181,7 @@ export default function Home() {
               </p>
             </motion.div>
 
-            {/* Enterprise Plan */}
+            {/* Pro Plan */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -190,11 +190,12 @@ export default function Home() {
               className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 relative"
             >
               <div className="text-center mb-6 sm:mb-8">
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Enterprise</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Pro Plan</h3>
                 <div className="mb-4">
-                  <span className="text-3xl sm:text-4xl font-bold text-gray-900">Coming Soon</span>
+                  <span className="text-3xl sm:text-4xl font-bold text-gray-900">$29.99</span>
+                  <span className="text-gray-600 ml-2 text-sm sm:text-base">per month</span>
                 </div>
-                <p className="text-gray-600 text-sm sm:text-base">For universities and large institutions</p>
+                <p className="text-gray-600 text-sm sm:text-base">Advanced features for power users</p>
               </div>
 
               <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
@@ -204,28 +205,32 @@ export default function Home() {
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Custom integrations</span>
+                  <span className="text-gray-700 text-sm sm:text-base">AI-powered charts and graphs</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Dedicated support</span>
+                  <span className="text-gray-700 text-sm sm:text-base">Multiple export formats (PDF, DOCX, TXT)</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">SLA guarantees</span>
+                  <span className="text-gray-700 text-sm sm:text-base">University-level academic standards</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">Plagiarism-free content</span>
+                </li>
+                <li className="flex items-center">
+                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
+                  <span className="text-gray-700 text-sm sm:text-base">Priority customer support</span>
                 </li>
                 <li className="flex items-center">
                   <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
                   <span className="text-gray-700 text-sm sm:text-base">Advanced analytics</span>
                 </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">White-label options</span>
-                </li>
               </ul>
 
-              <Button asChild variant="outline" className="w-full h-12 sm:h-14 text-base sm:text-lg">
-                <Link href="/contact">Contact Sales</Link>
+              <Button asChild className="w-full bg-gray-900 hover:bg-gray-800 text-white h-12 sm:h-14 text-base sm:text-lg">
+                <Link href="/auth/signup">Upgrade to Pro</Link>
               </Button>
             </motion.div>
           </div>
@@ -263,7 +268,7 @@ export default function Home() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
                 <Link href="/auth/signup" className="flex items-center">
-                  Start Your Free Trial
+                  Start Free Plan
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>

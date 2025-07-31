@@ -1,4 +1,5 @@
 import { supabase } from './supabase-client';
+import PaymentService from './payment-service';
 
 export interface AssignmentWithDates {
   id: string;
@@ -29,9 +30,11 @@ export interface AssignmentInsert {
 
 export class AssignmentService {
   private userId: string;
+  private paymentService: PaymentService;
 
   constructor(userId: string) {
     this.userId = userId;
+    this.paymentService = PaymentService.getInstance();
   }
 
   async getAssignments(): Promise<AssignmentWithDates[]> {
@@ -59,6 +62,12 @@ export class AssignmentService {
 
   async createAssignment(assignment: Partial<AssignmentWithDates>): Promise<AssignmentWithDates | null> {
     try {
+      // Check if user can create assignments based on their subscription
+      const canCreate = await this.paymentService.canCreateAssignment(this.userId);
+      if (!canCreate) {
+        throw new Error('You have reached your assignment limit. Please upgrade your plan to create more assignments.');
+      }
+
       const assignmentData = this.mapAssignmentToDB(assignment);
       
       const { data, error } = await supabase
@@ -72,10 +81,13 @@ export class AssignmentService {
         throw error;
       }
 
+      // Increment assignment count for the user
+      await this.paymentService.incrementAssignmentCount(this.userId);
+
       return data;
     } catch (error) {
       console.error('Error in createAssignment:', error);
-      return null;
+      throw error;
     }
   }
 

@@ -8,7 +8,8 @@ import {
   Zap, 
   Users,
   CheckCircle,
-  Star
+  Star,
+  ArrowRight
 } from 'lucide-react';
 
 export default function FeaturesPage() {
@@ -92,11 +93,12 @@ export default function FeaturesPage() {
             Create professional, well-researched content in minutes, not hours.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth/signup">
-              <Button size="lg" className="bg-blue-600 hover:bg-blue-700">
-                Start Free Trial
-              </Button>
-            </Link>
+            <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Link href="/auth/signup" className="flex items-center gap-2">
+                Start Free Plan
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </Button>
             <Link href="/pricing">
               <Button size="lg" variant="outline">
                 View Pricing
@@ -174,15 +176,16 @@ export default function FeaturesPage() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Ready to Transform Your Academic Writing?
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Start your free trial today and experience the power of AI-driven academic writing.
+          <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+            Start your free plan today and experience the power of AI-driven academic writing.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/auth/signup">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
-                Start Free Trial
-              </Button>
-            </Link>
+            <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Link href="/auth/signup" className="flex items-center gap-2">
+                Start Free Plan
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </Button>
             <Link href="/pricing">
               <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
                 View Pricing

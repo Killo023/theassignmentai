@@ -19,15 +19,13 @@ export default function TestSubscriptionLogic() {
     // Test 1: PaymentService
     const paymentService = PaymentService.getInstance();
     const subscription = await paymentService.checkSubscriptionStatus(user.id);
-    const trialDays = await paymentService.getTrialDaysRemaining(user.id);
-    const isTrialActive = await paymentService.isInTrial(user.id);
-    const hasActiveSub = await paymentService.hasActiveSubscription(user.id);
+    const usage = await paymentService.getAssignmentUsage(user.id);
+    const canCreate = await paymentService.canCreateAssignment(user.id);
 
     setSubscriptionData({
       subscription,
-      trialDays,
-      isTrialActive,
-      hasActiveSub
+      usage,
+      canCreate
     });
 
     // Test 2: Direct Supabase query
@@ -42,11 +40,13 @@ export default function TestSubscriptionLogic() {
     // Test 3: Logic analysis
     const logicAnalysis = {
       status: subscription?.status,
-      isTrialActive: subscription?.isTrialActive,
-      trialDaysRemaining: trialDays,
-      isUpgradedButInTrial: subscription?.status === 'active' && subscription?.isTrialActive && trialDays > 0,
-      shouldShowPro: subscription?.status === 'active',
-      shouldShowTrial: subscription?.status === 'trial' && trialDays > 0
+      planId: subscription?.planId,
+      assignmentsUsed: subscription?.assignmentsUsed,
+      assignmentLimit: subscription?.assignmentLimit,
+      hasCalendarAccess: subscription?.hasCalendarAccess,
+      canCreateAssignment: canCreate,
+      shouldShowPro: subscription?.status === 'basic' || subscription?.status === 'pro',
+      shouldShowFree: subscription?.status === 'free'
     };
 
     setDebugInfo(`
@@ -57,27 +57,36 @@ User Email: ${user.email}
 
 === PaymentService Results ===
 Status: ${subscription?.status}
-Is Trial Active: ${subscription?.isTrialActive}
-Trial Days Remaining: ${trialDays}
-Has Active Subscription: ${hasActiveSub}
+Plan ID: ${subscription?.planId}
+Assignments Used: ${subscription?.assignmentsUsed}
+Assignment Limit: ${subscription?.assignmentLimit}
+Has Calendar Access: ${subscription?.hasCalendarAccess}
+Can Create Assignment: ${canCreate}
+
+=== Assignment Usage ===
+Used: ${usage.used}
+Limit: ${usage.limit}
+Remaining: ${usage.remaining}
 
 === Logic Analysis ===
 Status: ${logicAnalysis.status}
-Is Trial Active: ${logicAnalysis.isTrialActive}
-Trial Days Remaining: ${logicAnalysis.trialDaysRemaining}
-Is Upgraded But In Trial: ${logicAnalysis.isUpgradedButInTrial}
+Plan ID: ${logicAnalysis.planId}
+Assignments Used: ${logicAnalysis.assignmentsUsed}
+Assignment Limit: ${logicAnalysis.assignmentLimit}
+Has Calendar Access: ${logicAnalysis.hasCalendarAccess}
+Can Create Assignment: ${logicAnalysis.canCreateAssignment}
 Should Show Pro: ${logicAnalysis.shouldShowPro}
-Should Show Trial: ${logicAnalysis.shouldShowTrial}
+Should Show Free: ${logicAnalysis.shouldShowFree}
 
 === Supabase Direct Query ===
 Error: ${error ? error.message : 'None'}
 Data: ${JSON.stringify(data, null, 2)}
 
 === Expected Behavior ===
-- If status is 'active' AND trial is still active: Show "Pro Plan (Trial Active)"
-- If status is 'trial' AND trial is active: Show "Free Trial Active"
-- If status is 'active' AND trial ended: Show "Pro Subscription"
-- If status is 'expired': Show "Subscription Expired"
+- If status is 'free': Show "Free Plan" with 4 assignments limit
+- If status is 'basic': Show "Basic Plan" with unlimited assignments
+- If status is 'pro': Show "Pro Plan" with unlimited assignments
+- Calendar access only for paid plans
     `);
   };
 
