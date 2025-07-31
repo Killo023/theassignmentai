@@ -15,7 +15,8 @@ import {
   Bot,
   MessageSquare,
   Download,
-  Trash2
+  Trash2,
+  Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -23,6 +24,7 @@ const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
   { name: "New Assignment", href: "/dashboard/new", icon: Plus },
   { name: "My Assignments", href: "/dashboard/assignments", icon: FileText },
+  { name: "Calendar", href: "/dashboard/calendar", icon: Calendar },
   { name: "History", href: "/dashboard/history", icon: History },
   { name: "Favorites", href: "/dashboard/favorites", icon: Star },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
