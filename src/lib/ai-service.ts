@@ -141,10 +141,22 @@ class AIService {
     const academicStandards = this.getAcademicStandards(request.academicLevel);
     const formattingGuidelines = this.getFormattingGuidelines(request);
     const dataRequirements = this.getDataRequirements(request);
+    const assignmentType = request.assignmentType || 'research_paper';
+    const academicLevel = request.academicLevel || 'undergraduate';
+    const qualityLevel = request.qualityLevel || 'standard';
 
-    return `Generate a university-standard ${request.assignmentType || 'research paper'} on "${request.title}" for ${request.subject} at ${request.academicLevel || 'undergraduate'} level.
+    return `You are an expert academic writer with extensive experience in university-level assignments. Generate a comprehensive, publication-ready ${assignmentType} that meets the highest academic standards.
 
-ACADEMIC REQUIREMENTS:
+ASSIGNMENT DETAILS:
+- Title: "${request.title}"
+- Subject: ${request.subject}
+- Type: ${request.type}
+- Academic Level: ${academicLevel}
+- Quality Level: ${qualityLevel}
+- Word Count: ${request.wordCount} words
+- Citation Style: ${request.citationStyle || 'APA'}
+
+ACADEMIC STANDARDS (${academicLevel.toUpperCase()} LEVEL):
 ${academicStandards}
 
 FORMATTING REQUIREMENTS:
@@ -153,53 +165,130 @@ ${formattingGuidelines}
 DATA AND ANALYSIS REQUIREMENTS:
 ${dataRequirements}
 
-SPECIFIC REQUIREMENTS:
-- Word count: ${request.wordCount} words
-- Subject: ${request.subject}
-- Type: ${request.type}
-- Academic level: ${request.academicLevel || 'undergraduate'}
-- Quality level: ${request.qualityLevel || 'standard'}
+UNIVERSITY-LEVEL STRUCTURE REQUIREMENTS:
 
-Additional requirements: ${request.requirements || 'None specified'}
+1. TITLE PAGE (if cover page requested):
+   - Professional title formatting
+   - Student information
+   - Course and instructor details
+   - Submission date
 
-${request.citations ? `CITATION REQUIREMENTS: Please include ${request.citationStyle || 'APA'} citations with proper in-text citations and a comprehensive reference list.` : ''}
+2. EXECUTIVE SUMMARY (if requested):
+   - Concise overview of key findings
+   - Main conclusions and recommendations
+   - Professional executive summary format
 
-STRUCTURE REQUIREMENTS:
-1. Executive Summary (if requested)
-2. Introduction with clear research objectives
-3. Literature Review with critical analysis
-4. Methodology section (if applicable)
-5. Results and Analysis with ${request.includeTables ? 'detailed tables' : ''} ${request.includeCharts ? 'and charts' : ''}
-6. Discussion with implications
-7. Conclusion with recommendations
-8. References in ${request.citationStyle || 'APA'} format
+3. TABLE OF CONTENTS (if requested):
+   - Complete section listing with page numbers
+   - Professional formatting
 
-Please generate a comprehensive, well-structured assignment that meets university standards with proper academic rigor, critical analysis, and professional presentation.`;
+4. INTRODUCTION:
+   - Clear research problem statement
+   - Specific research objectives and questions
+   - Significance and scope of the study
+   - Brief overview of methodology
+   - Professional academic tone throughout
+
+5. LITERATURE REVIEW:
+   - Comprehensive critical analysis of existing research
+   - Identification of research gaps
+   - Theoretical framework development
+   - Synthesis of key findings from multiple sources
+   - Critical evaluation of methodologies used in previous studies
+
+6. METHODOLOGY (if applicable):
+   - Detailed research design description
+   - Clear justification for chosen methods
+   - Data collection procedures
+   - Analysis approach with statistical methods
+   - Ethical considerations
+   - Limitations and validity measures
+
+7. RESULTS AND ANALYSIS:
+   - Systematic presentation of findings
+   - ${request.includeTables ? 'Professional tables with proper formatting, headers, and captions' : ''}
+   - ${request.includeCharts ? 'Publication-quality charts and graphs with clear labels and legends' : ''}
+   - ${request.includeStatisticalAnalysis ? 'Comprehensive statistical analysis with p-values, confidence intervals, and effect sizes' : ''}
+   - Clear interpretation of results
+   - Statistical significance discussion
+
+8. DISCUSSION:
+   - Critical analysis of findings in context of literature
+   - Implications for theory and practice
+   - Limitations and future research directions
+   - Practical applications and recommendations
+
+9. CONCLUSION:
+   - Summary of key findings
+   - Restatement of research contribution
+   - Practical implications
+   - Recommendations for future research
+
+10. REFERENCES:
+    - Complete reference list in ${request.citationStyle || 'APA'} format
+    - All sources properly cited
+    - Academic sources only (peer-reviewed journals, books, reputable websites)
+
+QUALITY REQUIREMENTS:
+- Use sophisticated academic vocabulary appropriate for ${academicLevel} level
+- Maintain consistent professional tone throughout
+- Ensure logical flow and coherence between sections
+- Include critical analysis and original insights
+- Provide evidence-based arguments with proper citations
+- Use clear, concise, and precise language
+- Avoid colloquialisms and informal language
+- Ensure all claims are supported by evidence
+- Include proper transitions between sections
+- Maintain academic objectivity and neutrality
+
+ADDITIONAL REQUIREMENTS:
+${request.requirements || 'Focus on producing a high-quality, university-standard assignment that demonstrates deep understanding of the subject matter and critical thinking skills.'}
+
+${request.citations ? `CITATION REQUIREMENTS: Include proper ${request.citationStyle || 'APA'} in-text citations and a comprehensive reference list with at least 10-15 academic sources.` : ''}
+
+IMPORTANT: This assignment must meet university-level standards with professional presentation, rigorous analysis, and academic excellence. Write as if this will be submitted to a university professor for grading.`;
   }
 
   private getAcademicStandards(level?: string): string {
     switch (level) {
       case 'graduate':
-        return `- Advanced theoretical framework
-- Comprehensive literature review with critical analysis
-- Sophisticated methodology with statistical rigor
-- Original research contribution
-- Peer-reviewed sources only
-- Advanced statistical analysis where applicable`;
+        return `- Advanced theoretical framework with sophisticated conceptual models
+- Comprehensive literature review with critical analysis and synthesis of 20+ sources
+- Sophisticated methodology with statistical rigor and advanced research design
+- Original research contribution with novel insights and theoretical advancement
+- Peer-reviewed sources only (minimum 15-20 academic sources)
+- Advanced statistical analysis with multivariate techniques, regression analysis, and significance testing
+- Critical evaluation of existing research methodologies and findings
+- Clear identification of research gaps and theoretical contributions
+- Professional academic writing with sophisticated vocabulary and complex sentence structures
+- Rigorous argumentation with multiple supporting evidence sources
+- Comprehensive discussion of limitations and future research directions`;
       case 'postgraduate':
-        return `- Doctoral-level theoretical framework
-- Extensive literature review with gap analysis
-- Rigorous methodology with advanced statistics
-- Significant original contribution
-- High-impact peer-reviewed sources
-- Advanced statistical modeling and analysis`;
+        return `- Doctoral-level theoretical framework with innovative conceptual development
+- Extensive literature review with comprehensive gap analysis and theoretical synthesis
+- Rigorous methodology with advanced statistics, mixed-methods approaches, and sophisticated research design
+- Significant original contribution with substantial theoretical and practical implications
+- High-impact peer-reviewed sources (minimum 25-30 academic sources from top-tier journals)
+- Advanced statistical modeling with complex analyses, structural equation modeling, and advanced techniques
+- Critical evaluation of existing paradigms and theoretical frameworks
+- Clear identification of significant research gaps and theoretical contributions
+- Exceptional academic writing with sophisticated vocabulary and complex argumentation
+- Rigorous critical analysis with multiple evidence streams and theoretical perspectives
+- Comprehensive discussion of limitations, implications, and future research directions
+- Publication-quality analysis suitable for peer-reviewed journals`;
       default:
-        return `- Solid theoretical foundation
-- Comprehensive literature review
-- Clear methodology
-- Evidence-based analysis
-- Academic sources required
-- Basic statistical analysis where applicable`;
+        return `- Solid theoretical foundation with clear conceptual framework
+- Comprehensive literature review with critical analysis of 10-15 sources
+- Clear methodology with appropriate research design and data collection methods
+- Evidence-based analysis with proper statistical techniques where applicable
+- Academic sources required (minimum 8-12 peer-reviewed sources)
+- Basic statistical analysis with descriptive statistics, correlation analysis, and significance testing
+- Critical evaluation of existing research and findings
+- Clear identification of research gaps and practical implications
+- Professional academic writing with appropriate vocabulary and sentence structure
+- Logical argumentation with supporting evidence and citations
+- Discussion of limitations and recommendations for future research
+- Undergraduate-level rigor suitable for university submission`;
     }
   }
 
@@ -219,24 +308,41 @@ Please generate a comprehensive, well-structured assignment that meets universit
     let requirements = '';
     
     if (request.includeTables) {
-      requirements += `- Include 2-3 detailed tables with real data
-- Tables should be properly formatted with headers and captions
-- Include source citations for all data
-- Tables should support the analysis and conclusions\n`;
+      requirements += `- Include 3-5 detailed tables with comprehensive data
+- Tables must be professionally formatted with clear headers, proper alignment, and captions
+- Include source citations for all data with proper academic references
+- Tables should support the analysis and provide evidence for conclusions
+- Use appropriate table formatting with borders, shading, and professional presentation
+- Include descriptive statistics, frequency distributions, and comparative data where applicable
+- Ensure all tables are publication-ready with proper academic formatting\n`;
     }
     
     if (request.includeCharts) {
-      requirements += `- Include 2-3 professional charts/graphs
-- Charts should be properly labeled with titles and axes
-- Include data visualization that supports the analysis
-- Charts should be publication-ready quality\n`;
+      requirements += `- Include 3-5 professional charts/graphs with publication-quality formatting
+- Charts must be properly labeled with clear titles, axis labels, and legends
+- Include comprehensive data visualization that supports the analysis and conclusions
+- Use appropriate chart types (bar charts, line graphs, pie charts, scatter plots) based on data type
+- Ensure charts are publication-ready with professional color schemes and formatting
+- Include trend analysis, comparative visualizations, and statistical representations
+- Provide clear interpretation of chart findings in the accompanying text\n`;
     }
     
     if (request.includeStatisticalAnalysis) {
-      requirements += `- Include statistical analysis where appropriate
-- Provide p-values, confidence intervals, and effect sizes
-- Include proper statistical notation
-- Discuss statistical significance and practical significance\n`;
+      requirements += `- Include comprehensive statistical analysis with proper academic rigor
+- Provide detailed p-values, confidence intervals, effect sizes, and significance levels
+- Include proper statistical notation and formulas with clear explanations
+- Discuss both statistical significance and practical significance of findings
+- Use appropriate statistical tests (t-tests, ANOVA, regression, correlation) based on research design
+- Include descriptive statistics, inferential statistics, and effect size calculations
+- Provide clear interpretation of statistical results with academic precision
+- Address assumptions of statistical tests and discuss limitations of analysis\n`;
+    }
+    
+        if (!request.includeTables && !request.includeCharts && !request.includeStatisticalAnalysis) {
+      requirements += `- Focus on comprehensive textual analysis and argumentation
+- Provide detailed qualitative analysis with supporting evidence
+- Include thorough literature review and critical discussion
+- Ensure all claims are supported by academic sources and logical reasoning\n`;
     }
     
     return requirements || '- No specific data requirements';
