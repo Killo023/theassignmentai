@@ -110,13 +110,27 @@ const FeatureGrid = () => {
               >
                 {/* Feature Image */}
                 <motion.div
-                  className="relative h-48 overflow-hidden rounded-t-xl bg-gradient-to-br from-blue-500 to-purple-600"
+                  className="relative h-48 overflow-hidden rounded-t-xl"
                   whileHover={{ 
                     scale: 1.05,
                     transition: { duration: 0.3 }
                   }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                  {(() => {
+                    const featureImages = [
+                      "https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80", // AI/Robot for AI Document Generation
+                      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80", // Chat/Communication for Real-time Refinement
+                      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"  // Documents for Multi-format Export
+                    ];
+                    return (
+                      <img
+                        src={featureImages[index]}
+                        alt={feature.title}
+                        className="w-full h-full object-cover"
+                      />
+                    );
+                  })()}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                   
                   {/* Floating Icon Overlay */}
                   <motion.div

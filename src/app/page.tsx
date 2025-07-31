@@ -44,6 +44,164 @@ export default function Home() {
       {/* How It Works */}
       <HowItWorks />
 
+      {/* Product Showcase Section */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              See AI Assignment Pro in action
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Real screenshots of our platform helping students create amazing assignments
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Dashboard Screenshot */}
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2015&q=80"
+                  alt="AI Assignment Dashboard Interface"
+                  className="w-full h-80 object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent"></div>
+                
+                {/* Floating UI Elements */}
+                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs font-medium text-gray-700">Live Dashboard</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  Intuitive Dashboard
+                </h3>
+                <p className="text-gray-600">
+                  Manage all your assignments from one beautiful, organized dashboard with real-time progress tracking.
+                </p>
+              </div>
+            </motion.div>
+
+            {/* AI Generation Screenshot */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                <img
+                  src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+                  alt="AI Content Generation Interface"
+                  className="w-full h-80 object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent"></div>
+                
+                {/* Floating UI Elements */}
+                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
+                  <div className="text-xs text-gray-600">Generation Progress</div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div className="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full w-4/5"></div>
+                    </div>
+                    <span className="text-xs font-medium text-gray-700">80%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  AI-Powered Generation
+                </h3>
+                <p className="text-gray-600">
+                  Watch as advanced AI creates high-quality academic content tailored to your specific requirements.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Export Formats Showcase */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="mt-20"
+          >
+            <div className="text-center mb-12">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Export in any format you need
+              </h3>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Professional formatting for every academic requirement
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  format: "PDF",
+                  image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                  description: "Perfect for submission with professional formatting"
+                },
+                {
+                  format: "DOCX",
+                  image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                  description: "Editable Word documents for further customization"
+                },
+                {
+                  format: "Excel",
+                  image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+                  description: "Data analysis and charts in spreadsheet format"
+                }
+              ].map((item, index) => (
+                <motion.div
+                  key={item.format}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.6 }}
+                  viewport={{ once: true }}
+                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                >
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={item.image}
+                      alt={`${item.format} Export Format`}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1 shadow-lg">
+                      <span className="text-sm font-semibold text-gray-700">{item.format}</span>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h4 className="font-semibold text-gray-900 mb-2">{item.format} Format</h4>
+                    <p className="text-sm text-gray-600">{item.description}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Testimonials */}
       <Testimonials />
 

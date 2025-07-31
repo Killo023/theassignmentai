@@ -226,10 +226,24 @@ const Testimonials = () => {
                       }}
                       style={{ transformStyle: "preserve-3d" }}
                     >
-                      <div className="w-16 h-16 rounded-full overflow-hidden shadow-lg border-2 border-white bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                        <span className="text-white font-bold text-lg">
-                          {testimonial.avatar}
-                        </span>
+                      <div className="w-16 h-16 rounded-full overflow-hidden shadow-lg border-2 border-white">
+                        {(() => {
+                          const profileImages = [
+                            "https://images.unsplash.com/photo-1494790108755-2616b612b47c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80", // Sarah
+                            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80", // Michael
+                            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80", // Emily
+                            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80", // David
+                            "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"  // Lisa
+                          ];
+                          const imageIndex = testimonials.findIndex(t => t.id === testimonial.id);
+                          return (
+                            <img
+                              src={profileImages[imageIndex] || profileImages[0]}
+                              alt={testimonial.name}
+                              className="w-full h-full object-cover"
+                            />
+                          );
+                        })()}
                       </div>
                       <motion.div
                         className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white"

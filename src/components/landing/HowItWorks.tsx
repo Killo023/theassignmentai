@@ -60,47 +60,82 @@ const HowItWorks = () => {
           <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-gradient-to-b from-primary/20 via-primary to-primary/20 hidden md:block" />
 
           <div className="space-y-12">
-            {steps.map((step, index) => (
-              <motion.div
-                key={step.title}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className={`flex items-center gap-8 ${
-                  index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
-                } flex-col`}
-              >
-                {/* Content */}
-                <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-center`}>
-                  <div className="bg-background rounded-xl p-8 shadow-sm border hover:shadow-lg transition-all duration-300">
-                    <div className={`w-16 h-16 bg-gradient-to-r ${step.color} rounded-xl flex items-center justify-center mx-auto mb-6 md:mx-0 ${
-                      index % 2 === 0 ? 'md:ml-auto' : 'md:mr-auto'
-                    }`}>
-                      <step.icon className="w-8 h-8 text-white" />
+            {steps.map((step, index) => {
+              const stepImages = [
+                "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80", // Laptop writing
+                "https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80", // AI/Robot
+                "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80", // Chat/Communication
+                "https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"  // Document export
+              ];
+              
+              return (
+                <motion.div
+                  key={step.title}
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  className={`flex items-center gap-8 ${
+                    index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
+                  } flex-col`}
+                >
+                  {/* Content */}
+                  <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-center`}>
+                    <div className="bg-background rounded-xl p-8 shadow-sm border hover:shadow-lg transition-all duration-300">
+                      <div className={`w-16 h-16 bg-gradient-to-r ${step.color} rounded-xl flex items-center justify-center mx-auto mb-6 md:mx-0 ${
+                        index % 2 === 0 ? 'md:ml-auto' : 'md:mr-auto'
+                      }`}>
+                        <step.icon className="w-8 h-8 text-white" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-foreground mb-4">
+                        {step.title}
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {step.description}
+                      </p>
                     </div>
-                    <h3 className="text-xl font-semibold text-foreground mb-4">
-                      {step.title}
-                    </h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {step.description}
-                    </p>
                   </div>
-                </div>
 
-                {/* Timeline Dot */}
-                <div className="relative z-10 flex-shrink-0">
-                  <div className="w-12 h-12 bg-background border-4 border-primary rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-primary font-bold text-lg">{index + 1}</span>
+                  {/* Timeline Dot */}
+                  <div className="relative z-10 flex-shrink-0">
+                    <div className="w-12 h-12 bg-background border-4 border-primary rounded-full flex items-center justify-center shadow-lg">
+                      <span className="text-primary font-bold text-lg">{index + 1}</span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Arrow (mobile only) */}
-                <div className="md:hidden flex justify-center">
-                  <ArrowRight className="w-6 h-6 text-muted-foreground rotate-90" />
-                </div>
-              </motion.div>
-            ))}
+                  {/* Step Image */}
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 + 0.2 }}
+                    viewport={{ once: true }}
+                    className="flex-1"
+                  >
+                    <div className="relative rounded-xl overflow-hidden shadow-lg">
+                      <img
+                        src={stepImages[index]}
+                        alt={`Step ${index + 1}: ${step.title}`}
+                        className="w-full h-64 object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                      
+                      {/* Floating indicator */}
+                      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-2 shadow-lg">
+                        <div className="flex items-center gap-2">
+                          <step.icon className="w-4 h-4 text-gray-700" />
+                          <span className="text-xs font-medium text-gray-700">Step {index + 1}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  {/* Arrow (mobile only) */}
+                  <div className="md:hidden flex justify-center">
+                    <ArrowRight className="w-6 h-6 text-muted-foreground rotate-90" />
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
 
