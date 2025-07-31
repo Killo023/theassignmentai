@@ -49,6 +49,10 @@ export class AssignmentService {
 
       if (error) {
         console.error('Error fetching assignments:', error);
+        if (error.code === '42P01') {
+          console.error('Assignments table does not exist. Please run the Supabase setup script.');
+          return [];
+        }
         throw error;
       }
 
@@ -161,17 +165,6 @@ export class AssignmentService {
     } catch (error) {
       console.error('Error in toggleFavorite:', error);
       return false;
-    }
-  }
-
-  async createAssignmentsTable(): Promise<void> {
-    try {
-      const { error } = await supabase.rpc('create_assignments_table');
-      if (error) {
-        console.error('Error creating assignments table:', error);
-      }
-    } catch (error) {
-      console.error('Error in createAssignmentsTable:', error);
     }
   }
 

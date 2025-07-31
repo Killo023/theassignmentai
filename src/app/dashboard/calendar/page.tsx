@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import PaymentService from "@/lib/payment-service";
-import { Calendar, Plus, Edit, Trash2, Clock, AlertTriangle, CheckCircle, X } from "lucide-react";
+import { Calendar, Plus, Edit, Trash2, Clock, AlertTriangle, CheckCircle, X, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
