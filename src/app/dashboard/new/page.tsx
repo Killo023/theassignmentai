@@ -300,6 +300,14 @@ const AssignmentCreator = () => {
       const updatedUsage = await paymentService.getAssignmentUsage(user.id);
       console.log("Assignment usage after creation:", updatedUsage);
 
+      // Ensure user has subscription record
+      try {
+        await paymentService.createFreeSubscription(user.id);
+        console.log("✅ Ensured user has subscription record");
+      } catch (error) {
+        console.log("ℹ️ User already has subscription record or error:", error);
+      }
+
       await checkSubscriptionStatus();
     } catch (error) {
       console.error("Error generating assignment:", error);

@@ -409,6 +409,9 @@ export class PaymentService {
    * Check if user has active subscription
    */
   async checkSubscriptionStatus(userId: string): Promise<UserSubscription | null> {
+    // Ensure user has a subscription record first
+    await this.ensureUserHasSubscription(userId);
+    
     try {
       console.log(`🔍 Checking subscription status for user: ${userId}`);
       console.log(`🔧 Supabase configured: ${this.isSupabaseConfigured()}`);
@@ -588,6 +591,9 @@ export class PaymentService {
       if (this.isSupabaseConfigured()) {
         console.log(`💾 Using Supabase to increment count for user: ${userId}`);
         
+        // First, ensure user has a subscription record
+        await this.ensureUserHasSubscription(userId);
+        
         // Get current count first, then update
         const { data: currentData, error: fetchError } = await supabase
           .from('subscriptions')
@@ -646,6 +652,36 @@ export class PaymentService {
   }
 
   /**
+   * Ensure user has a subscription record, create one if they don't
+   */
+  private async ensureUserHasSubscription(userId: string): Promise<void> {
+    try {
+      console.log(`🔍 Checking if user ${userId} has a subscription record...`);
+      
+      const { data: existingSub, error: fetchError } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (fetchError && fetchError.code === 'PGRST116') {
+        // No subscription found, create one
+        console.log(`📝 Creating free subscription for user: ${userId}`);
+        await this.createFreeSubscription(userId);
+        console.log(`✅ Created free subscription for user: ${userId}`);
+      } else if (fetchError) {
+        console.error('❌ Error checking subscription:', fetchError);
+        throw fetchError;
+      } else {
+        console.log(`✅ User ${userId} already has a subscription record`);
+      }
+    } catch (error) {
+      console.error('❌ Error ensuring user has subscription:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Check if user can access calendar feature
    */
   async canAccessCalendar(userId?: string): Promise<boolean> {
@@ -672,6 +708,9 @@ export class PaymentService {
    * Get assignment usage for user
    */
   async getAssignmentUsage(userId: string): Promise<{ used: number; limit: number; remaining: number }> {
+    // Ensure user has a subscription record first
+    await this.ensureUserHasSubscription(userId);
+    
     try {
       const subscription = await this.checkSubscriptionStatus(userId);
       if (!subscription) {

@@ -86,6 +86,24 @@ export default function DebugAssignmentCount() {
     }
   };
 
+  const testCreateSubscription = async () => {
+    if (!user?.id) {
+      addLog("❌ No user ID available for subscription creation test");
+      return;
+    }
+
+    try {
+      addLog(`🧪 Testing subscription creation for user: ${user.id}`);
+      await paymentService.createFreeSubscription(user.id);
+      addLog(`✅ Free subscription created for user: ${user.id}`);
+      
+      // Check status after creation
+      await checkStatus();
+    } catch (error) {
+      addLog(`❌ Error creating subscription: ${error}`);
+    }
+  };
+
   const clearLogs = () => {
     setLogs([]);
   };
@@ -141,12 +159,15 @@ export default function DebugAssignmentCount() {
             >
               {isLoading ? "Testing..." : "🧪 Test Increment"}
             </Button>
-            <Button onClick={testCanCreate} variant="outline">
-              🤔 Test Can Create
-            </Button>
-            <Button onClick={clearLogs} variant="outline">
-              🗑️ Clear Logs
-            </Button>
+                         <Button onClick={testCanCreate} variant="outline">
+               🤔 Test Can Create
+             </Button>
+             <Button onClick={testCreateSubscription} variant="outline">
+               📝 Create Subscription
+             </Button>
+             <Button onClick={clearLogs} variant="outline">
+               🗑️ Clear Logs
+             </Button>
           </div>
 
           <div>
