@@ -256,6 +256,15 @@ export class PaymentService {
             if (error) {
               console.error(`❌ Error upserting subscription in Supabase:`, error);
               console.error(`❌ Error details:`, JSON.stringify(error, null, 2));
+              
+              // Check if it's a table not found error
+              if (error.code === '42P01') {
+                return {
+                  success: false,
+                  message: 'Database setup incomplete. Please run the Supabase setup script first.'
+                };
+              }
+              
               return {
                 success: false,
                 message: 'Failed to update subscription status: ' + (error.message || 'Database error')
@@ -382,57 +391,16 @@ export class PaymentService {
         }
       } catch (paypalError) {
         console.error('💳 PayPal payment error:', paypalError);
-        // Fallback to demo mode if PayPal fails
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        if (this.isSupabaseConfigured()) {
-          // Update subscription in Supabase
-          console.log(`💾 Updating subscription in Supabase for user: ${userId}`);
-                      const { error } = await supabase
-              .from('subscriptions')
-              .update({
-                plan_id: planId,
-                status: planId,
-                assignment_limit: plan.assignmentLimit,
-                has_calendar_access: plan.hasCalendarAccess,
-                upgraded_at: new Date().toISOString()
-              })
-              .eq('user_id', userId);
-
-          if (error) {
-            console.error(`❌ Error updating subscription in Supabase:`, error);
-            return {
-              success: false,
-              message: 'Failed to update subscription status'
-            };
-          }
-          console.log(`✅ Successfully updated subscription in Supabase for user: ${userId}`);
-        } else {
-          // Fallback to in-memory storage
-          console.log(`💾 Updating subscription in fallback storage for user: ${userId}`);
-          this.fallbackUpgradedUsers.add(userId);
-          const existingSub = this.fallbackSubscriptions.get(userId);
-          if (existingSub) {
-            this.fallbackSubscriptions.set(userId, {
-              ...existingSub,
-              plan: planId,
-              status: planId,
-              upgraded_at: new Date().toISOString()
-            });
-          }
-        }
-
-        console.log(`🎉 User ${userId} upgraded to ${planId} (demo mode)`);
         return {
-          success: true,
-          message: `Payment processed successfully - upgraded to ${plan.name} (demo mode - PayPal unavailable)`
+          success: false,
+          message: 'PayPal payment failed: ' + (paypalError instanceof Error ? paypalError.message : 'Unknown error')
         };
       }
     } catch (error) {
-      console.error(`❌ Payment processing error for user ${userId}:`, error);
+      console.error('💥 Unexpected error in convertToPaid:', error);
       return {
         success: false,
-        message: `Payment processing failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+        message: 'Upgrade failed: ' + (error instanceof Error ? error.message : 'Unknown error')
       };
     }
   }
