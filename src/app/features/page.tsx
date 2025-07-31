@@ -83,27 +83,47 @@ export default function FeaturesPage() {
 
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Powerful Features for
-            <span className="text-blue-600"> Academic Excellence</span>
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Transform your academic writing with AI-powered tools designed for university-level assignments. 
-            Create professional, well-researched content in minutes, not hours.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link href="/upgrade" className="flex items-center gap-2">
-                Start Free Plan
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </Button>
-            <Link href="/pricing">
-              <Button size="lg" variant="outline">
-                View Pricing
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="text-center lg:text-left">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+              Powerful Features for
+              <span className="text-blue-600"> Academic Excellence</span>
+            </h1>
+            <p className="text-xl text-gray-600 mb-8">
+              Transform your academic writing with AI-powered tools designed for university-level assignments. 
+              Create professional, well-researched content in minutes, not hours.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <Link href="/upgrade" className="flex items-center gap-2">
+                  Start Free Plan
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
               </Button>
-            </Link>
+              <Link href="/pricing">
+                <Button size="lg" variant="outline">
+                  View Pricing
+                </Button>
+              </Link>
+            </div>
+          </div>
+          <div className="relative">
+            <div className="bg-white rounded-2xl shadow-2xl p-8 transform rotate-1 hover:rotate-0 transition-transform duration-300">
+              <img 
+                src="/images/ai-generation.jpg" 
+                alt="AI-powered assignment generation interface"
+                className="w-full h-64 object-cover rounded-lg mb-4"
+              />
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-gray-900">AI Generation</h3>
+                  <p className="text-sm text-gray-600">Create professional content instantly</p>
+                </div>
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -149,7 +169,7 @@ export default function FeaturesPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-center">
             <div className="space-y-6">
               {benefits.slice(0, 4).map((benefit, index) => (
                 <div key={index} className="flex items-start space-x-3">
@@ -158,6 +178,21 @@ export default function FeaturesPage() {
                 </div>
               ))}
             </div>
+            
+            <div className="flex justify-center">
+              <div className="relative">
+                <img 
+                  src="/images/export-formats.jpg" 
+                  alt="Multiple export formats available"
+                  className="w-64 h-80 object-cover rounded-2xl shadow-lg"
+                />
+                <div className="absolute -bottom-4 -right-4 bg-blue-600 text-white p-4 rounded-xl shadow-lg">
+                  <p className="text-sm font-semibold">Export to</p>
+                  <p className="text-xs">PDF, DOCX, TXT, XLSX</p>
+                </div>
+              </div>
+            </div>
+            
             <div className="space-y-6">
               {benefits.slice(4).map((benefit, index) => (
                 <div key={index} className="flex items-start space-x-3">
@@ -165,6 +200,55 @@ export default function FeaturesPage() {
                   <span className="text-gray-700">{benefit}</span>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Student Testimonials */}
+          <div className="mt-20">
+            <h3 className="text-2xl font-bold text-gray-900 text-center mb-12">What Students Say</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="bg-gray-50 rounded-xl p-6">
+                <div className="flex items-center mb-4">
+                  <img 
+                    src="/images/student-1.jpg" 
+                    alt="Student testimonial"
+                    className="w-12 h-12 rounded-full object-cover mr-4"
+                  />
+                  <div>
+                    <p className="font-semibold text-gray-900">Sarah Chen</p>
+                    <p className="text-sm text-gray-600">Harvard University</p>
+                  </div>
+                </div>
+                <p className="text-gray-700 italic">"Saved me 20+ hours per week on research papers. The quality is incredible!"</p>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-6">
+                <div className="flex items-center mb-4">
+                  <img 
+                    src="/images/student-2.jpg" 
+                    alt="Student testimonial"
+                    className="w-12 h-12 rounded-full object-cover mr-4"
+                  />
+                  <div>
+                    <p className="font-semibold text-gray-900">Marcus Johnson</p>
+                    <p className="text-sm text-gray-600">Stanford University</p>
+                  </div>
+                </div>
+                <p className="text-gray-700 italic">"The AI understands academic writing better than any tool I've used."</p>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-6">
+                <div className="flex items-center mb-4">
+                  <img 
+                    src="/images/student-3.jpg" 
+                    alt="Student testimonial"
+                    className="w-12 h-12 rounded-full object-cover mr-4"
+                  />
+                  <div>
+                    <p className="font-semibold text-gray-900">Emma Wilson</p>
+                    <p className="text-sm text-gray-600">MIT</p>
+                  </div>
+                </div>
+                <p className="text-gray-700 italic">"Professional formatting and citations make my work look polished."</p>
+              </div>
             </div>
           </div>
         </div>

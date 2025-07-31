@@ -64,8 +64,14 @@ const CalendarPage = () => {
   const paymentService = PaymentService.getInstance();
 
   useEffect(() => {
-    checkCalendarAccess();
-    loadEvents();
+    const initializeCalendar = async () => {
+      await checkCalendarAccess();
+      loadEvents();
+    };
+    
+    if (user?.id) {
+      initializeCalendar();
+    }
   }, [user]);
 
   const checkCalendarAccess = async () => {

@@ -19,8 +19,13 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [showVerification, setShowVerification] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [canResend, setCanResend] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(0);
   const router = useRouter();
-  const { signup, isLoading } = useAuth();
+  const { signup, verifyEmail, resendVerificationCode, isLoading } = useAuth();
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -52,20 +57,98 @@ export default function SignupPage() {
     if (!validateForm()) return;
 
     try {
-      const success = await signup(formData);
-      if (success) {
-        router.push("/dashboard");
+      const result = await signup(formData);
+      if (result.success) {
+        if (result.needsVerification) {
+          setSuccess(result.message || "Verification email sent!");
+          setShowVerification(true);
+          startResendCountdown();
+        } else {
+          router.push("/dashboard");
+        }
       } else {
-        setError("Account creation failed. Please try again.");
+        setError(result.message || "Account creation failed. Please try again.");
       }
     } catch (err) {
       setError("Signup failed. Please try again.");
     }
   };
 
+  const handleVerification = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!verificationCode || verificationCode.length !== 6) {
+      setError("Please enter the 6-digit verification code");
+      return;
+    }
+
+    try {
+      const success = await verifyEmail(formData.email, verificationCode);
+      if (success) {
+        setSuccess("Email verified successfully! Redirecting...");
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 2000);
+      } else {
+        setError("Invalid verification code. Please try again.");
+      }
+    } catch (err) {
+      setError("Verification failed. Please try again.");
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!canResend) return;
+
+    try {
+      const success = await resendVerificationCode(formData.email);
+      if (success) {
+        setSuccess("New verification code sent!");
+        setError("");
+        startResendCountdown();
+      } else {
+        setError("Failed to resend code. Please try again.");
+      }
+    } catch (err) {
+      setError("Failed to resend code. Please try again.");
+    }
+  };
+
+  const startResendCountdown = () => {
+    setCanResend(false);
+    setResendCountdown(60);
+    const interval = setInterval(() => {
+      setResendCountdown((prev) => {
+        if (prev <= 1) {
+          setCanResend(true);
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center px-4 py-8">
-      <div className="max-w-md w-full">
+      <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        {/* Left side - Image */}
+        <div className="hidden lg:block">
+          <div className="relative">
+            <img 
+              src="/images/hero-dashboard.jpg" 
+              alt="Students using AI assignment tools"
+              className="w-full h-96 object-cover rounded-2xl shadow-2xl"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/50 to-transparent rounded-2xl"></div>
+            <div className="absolute bottom-6 left-6 text-white">
+              <h3 className="text-2xl font-bold mb-2">Join 50,000+ Students</h3>
+              <p className="text-blue-100">Transform your academic writing with AI</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right side - Form */}
+        <div className="max-w-md w-full mx-auto lg:mx-0">
         {/* Back to Home */}
         <Link 
           href="/" 
@@ -139,7 +222,14 @@ export default function SignupPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          {success && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-green-600 text-sm">{success}</p>
+            </div>
+          )}
+
+          {!showVerification ? (
+            <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -306,6 +396,72 @@ export default function SignupPage() {
               {isLoading ? "Creating Account..." : "Start Free Trial"}
             </button>
           </form>
+          ) : (
+            <div className="space-y-6">
+              {/* Email Verification Form */}
+              <div className="text-center mb-6">
+                <Mail className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify Your Email</h2>
+                <p className="text-gray-600">
+                  We've sent a 6-digit verification code to <strong>{formData.email}</strong>
+                </p>
+              </div>
+
+              <form onSubmit={handleVerification} className="space-y-6">
+                <div>
+                  <label htmlFor="verificationCode" className="block text-sm font-medium text-gray-700 mb-2">
+                    Verification Code
+                  </label>
+                  <input
+                    id="verificationCode"
+                    type="text"
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-center text-2xl font-mono tracking-widest"
+                    placeholder="000000"
+                    maxLength={6}
+                    required
+                  />
+                  <p className="text-sm text-gray-500 mt-2 text-center">
+                    Enter the 6-digit code sent to your email
+                  </p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading || verificationCode.length !== 6}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  {isLoading ? "Verifying..." : "Verify Email"}
+                </button>
+
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={handleResendCode}
+                    disabled={!canResend}
+                    className={`text-sm ${canResend ? 'text-blue-600 hover:text-blue-500' : 'text-gray-400 cursor-not-allowed'}`}
+                  >
+                    {canResend ? "Resend verification code" : `Resend in ${resendCountdown}s`}
+                  </button>
+                </div>
+
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowVerification(false);
+                      setError("");
+                      setSuccess("");
+                    }}
+                    className="text-sm text-gray-600 hover:text-gray-800"
+                  >
+                    ← Back to signup form
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
 
           <div className="mt-8 text-center">
             <p className="text-gray-600">
@@ -326,6 +482,7 @@ export default function SignupPage() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

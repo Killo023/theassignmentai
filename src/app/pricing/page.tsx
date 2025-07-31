@@ -88,14 +88,29 @@ export default function PricingPage() {
 
       {/* Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-        <div className="text-center">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-6">
-            Simple, Transparent
-            <span className="text-blue-600"> Pricing</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Choose the plan that works best for you. Start with a free tier and upgrade when you're ready.
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="text-center lg:text-left">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+              Simple, Transparent
+              <span className="text-blue-600"> Pricing</span>
+            </h1>
+            <p className="text-lg sm:text-xl text-gray-600 mb-8">
+              Choose the plan that works best for you. Start with a free tier and upgrade when you're ready.
+            </p>
+          </div>
+          <div className="relative">
+            <div className="bg-white rounded-2xl shadow-xl p-6 transform -rotate-2 hover:rotate-0 transition-transform duration-300">
+              <img 
+                src="/images/hero-dashboard.jpg" 
+                alt="Dashboard showing pricing and features"
+                className="w-full h-48 object-cover rounded-lg mb-4"
+              />
+              <div className="text-center">
+                <p className="text-sm font-semibold text-green-600 mb-2">✓ 14-Day Free Trial</p>
+                <p className="text-xs text-gray-600">No credit card required</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -197,6 +212,70 @@ export default function PricingPage() {
               <p className="text-gray-600">
                 Absolutely. We use industry-standard encryption and security measures to protect your data and assignments.
               </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Student Success Stories */}
+      <div className="bg-gray-50 py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Join Thousands of Successful Students
+            </h2>
+            <p className="text-xl text-gray-600">
+              See how students from top universities are achieving academic excellence
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div className="text-center">
+              <div className="relative inline-block mb-4">
+                <img 
+                  src="/images/student-1.jpg" 
+                  alt="Student success story"
+                  className="w-20 h-20 rounded-full object-cover mx-auto"
+                />
+                <div className="absolute -bottom-2 -right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                  A+
+                </div>
+              </div>
+              <p className="text-lg font-semibold text-gray-900">Sarah Chen</p>
+              <p className="text-gray-600 mb-2">Harvard University</p>
+              <p className="text-gray-700 italic">"Improved my GPA from 3.2 to 3.8 in one semester"</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="relative inline-block mb-4">
+                <img 
+                  src="/images/student-2.jpg" 
+                  alt="Student success story"
+                  className="w-20 h-20 rounded-full object-cover mx-auto"
+                />
+                <div className="absolute -bottom-2 -right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                  Pro
+                </div>
+              </div>
+              <p className="text-lg font-semibold text-gray-900">Marcus Johnson</p>
+              <p className="text-gray-600 mb-2">Stanford University</p>
+              <p className="text-gray-700 italic">"Saved 20+ hours per week on research papers"</p>
+            </div>
+            
+            <div className="text-center">
+              <div className="relative inline-block mb-4">
+                <img 
+                  src="/images/student-3.jpg" 
+                  alt="Student success story"
+                  className="w-20 h-20 rounded-full object-cover mx-auto"
+                />
+                <div className="absolute -bottom-2 -right-2 bg-purple-500 text-white text-xs px-2 py-1 rounded-full">
+                  PhD
+                </div>
+              </div>
+              <p className="text-lg font-semibold text-gray-900">Emma Wilson</p>
+              <p className="text-gray-600 mb-2">MIT</p>
+              <p className="text-gray-700 italic">"Published 3 papers with AI-assisted research"</p>
             </div>
           </div>
         </div>

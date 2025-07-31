@@ -21,12 +21,32 @@ import {
   Moon,
   Sun,
   Monitor,
-  Check
+  Check,
+  AlertTriangle,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import Paywall from "@/components/Paywall";
 import PaymentService from "@/lib/payment-service";
 import { useAuth } from "@/lib/auth-context";
@@ -75,7 +95,7 @@ const mockPreferences: UserPreferences = {
 };
 
 const SettingsPage = () => {
-  const { user } = useAuth();
+  const { user, resetPassword, changePassword } = useAuth();
   const [profile, setProfile] = useState<UserProfile>(mockProfile);
   const [preferences, setPreferences] = useState<UserPreferences>(mockPreferences);
   const [activeTab, setActiveTab] = useState<string>("profile");
@@ -83,6 +103,20 @@ const SettingsPage = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showPaywall, setShowPaywall] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState<any>(null);
+  
+  // Security-related state
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [show2FADialog, setShow2FADialog] = useState(false);
+  const [showAPIDialog, setShowAPIDialog] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    current: '',
+    new: '',
+    confirm: ''
+  });
+  const [resetEmail, setResetEmail] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [message, setMessage] = useState('');
 
   const tabs = [
     { id: "profile", label: "Profile", icon: User },
@@ -115,12 +149,89 @@ const SettingsPage = () => {
     }));
   };
 
+  // Security handlers
+  const handlePasswordChange = async () => {
+    if (!passwordForm.current || !passwordForm.new || !passwordForm.confirm) {
+      setMessage('Please fill in all fields');
+      return;
+    }
+    
+    if (passwordForm.new !== passwordForm.confirm) {
+      setMessage('New passwords do not match');
+      return;
+    }
+    
+    if (passwordForm.new.length < 8) {
+      setMessage('Password must be at least 8 characters long');
+      return;
+    }
+    
+    setIsProcessing(true);
+    setMessage('');
+    
+    try {
+      const success = await changePassword(passwordForm.current, passwordForm.new);
+      if (success) {
+        setMessage('Password changed successfully!');
+        setPasswordForm({ current: '', new: '', confirm: '' });
+        setTimeout(() => {
+          setShowPasswordDialog(false);
+          setMessage('');
+        }, 2000);
+      } else {
+        setMessage('Failed to change password. Please check your current password.');
+      }
+    } catch (error) {
+      setMessage('An error occurred. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!resetEmail) {
+      setMessage('Please enter your email address');
+      return;
+    }
+    
+    setIsProcessing(true);
+    setMessage('');
+    
+    try {
+      const success = await resetPassword(resetEmail);
+      if (success) {
+        setMessage('Password reset email sent! Check your inbox.');
+        setTimeout(() => {
+          setShowResetDialog(false);
+          setMessage('');
+          setResetEmail('');
+        }, 3000);
+      } else {
+        setMessage('Failed to send reset email. Please try again.');
+      }
+    } catch (error) {
+      setMessage('An error occurred. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handle2FAEnable = () => {
+    setMessage('Two-Factor Authentication setup will be available in a future update.');
+    setTimeout(() => setMessage(''), 3000);
+  };
+
+  const handleAPIKeysManage = () => {
+    setMessage('API Keys management will be available in a future update.');
+    setTimeout(() => setMessage(''), 3000);
+  };
+
   const handleUpgrade = async (paymentData: any) => {
     if (!user) return false;
     
     try {
       const paymentService = PaymentService.getInstance();
-      const result = await paymentService.convertTrialToPaid(user.id, paymentData);
+      const result = await paymentService.convertToPaid(user.id, 'basic', paymentData);
       
       if (result.success) {
         setShowPaywall(false);
@@ -509,17 +620,33 @@ const SettingsPage = () => {
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold text-foreground">Security</h2>
                 
+                {message && (
+                  <div className={`p-3 rounded-lg ${
+                    message.includes('success') || message.includes('sent') 
+                      ? 'bg-green-100 text-green-800 border border-green-200' 
+                      : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+                  }`}>
+                    {message}
+                  </div>
+                )}
+                
                 <div className="space-y-4">
                   <div className="border rounded-lg p-4">
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium text-foreground">Password</h3>
-                        <p className="text-sm text-muted-foreground">Last changed 30 days ago</p>
+                        <p className="text-sm text-muted-foreground">Secure your account with a strong password</p>
                       </div>
-                      <Button variant="outline">
-                        <Lock className="w-4 h-4 mr-2" />
-                        Change Password
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button variant="outline" onClick={() => setShowPasswordDialog(true)}>
+                          <Lock className="w-4 h-4 mr-2" />
+                          Change Password
+                        </Button>
+                        <Button variant="outline" onClick={() => setShowResetDialog(true)}>
+                          <Mail className="w-4 h-4 mr-2" />
+                          Reset Password
+                        </Button>
+                      </div>
                     </div>
                   </div>
 
@@ -527,9 +654,9 @@ const SettingsPage = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium text-foreground">Two-Factor Authentication</h3>
-                        <p className="text-sm text-muted-foreground">Add an extra layer of security</p>
+                        <p className="text-sm text-muted-foreground">Add an extra layer of security to your account</p>
                       </div>
-                      <Button variant="outline">
+                      <Button variant="outline" onClick={() => setShow2FADialog(true)}>
                         <Shield className="w-4 h-4 mr-2" />
                         Enable 2FA
                       </Button>
@@ -540,12 +667,28 @@ const SettingsPage = () => {
                     <div className="flex items-center justify-between">
                       <div>
                         <h3 className="font-medium text-foreground">API Keys</h3>
-                        <p className="text-sm text-muted-foreground">Manage your API access</p>
+                        <p className="text-sm text-muted-foreground">Manage your API access tokens and keys</p>
                       </div>
-                      <Button variant="outline">
+                      <Button variant="outline" onClick={() => setShowAPIDialog(true)}>
                         <Key className="w-4 h-4 mr-2" />
                         Manage Keys
                       </Button>
+                    </div>
+                  </div>
+
+                  <div className="border rounded-lg p-4 bg-red-50 border-red-200">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="w-5 h-5 text-red-600 mt-0.5" />
+                      <div className="flex-1">
+                        <h3 className="font-medium text-red-800">Danger Zone</h3>
+                        <p className="text-sm text-red-600 mt-1">
+                          Once you delete your account, there is no going back. Please be certain.
+                        </p>
+                        <Button variant="outline" className="mt-3 text-red-600 border-red-300 hover:bg-red-100">
+                          <Trash2 className="w-4 h-4 mr-2" />
+                          Delete Account
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -631,6 +774,188 @@ const SettingsPage = () => {
         onUpgrade={handleUpgrade}
         onClose={() => setShowPaywall(false)}
       />
+
+      {/* Password Change Dialog */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Change Password</DialogTitle>
+            <DialogDescription>
+              Enter your current password and choose a new password.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="current-password">Current Password</Label>
+              <Input
+                id="current-password"
+                type="password"
+                value={passwordForm.current}
+                onChange={(e) => setPasswordForm(prev => ({ ...prev, current: e.target.value }))}
+                placeholder="Enter current password"
+              />
+            </div>
+            <div>
+              <Label htmlFor="new-password">New Password</Label>
+              <Input
+                id="new-password"
+                type="password"
+                value={passwordForm.new}
+                onChange={(e) => setPasswordForm(prev => ({ ...prev, new: e.target.value }))}
+                placeholder="Enter new password (min 8 characters)"
+              />
+            </div>
+            <div>
+              <Label htmlFor="confirm-password">Confirm New Password</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                value={passwordForm.confirm}
+                onChange={(e) => setPasswordForm(prev => ({ ...prev, confirm: e.target.value }))}
+                placeholder="Confirm new password"
+              />
+            </div>
+            {message && (
+              <div className={`p-3 rounded-lg text-sm ${
+                message.includes('success') 
+                  ? 'bg-green-100 text-green-800 border border-green-200' 
+                  : 'bg-red-100 text-red-800 border border-red-200'
+              }`}>
+                {message}
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowPasswordDialog(false);
+                setPasswordForm({ current: '', new: '', confirm: '' });
+                setMessage('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handlePasswordChange}
+              disabled={isProcessing}
+            >
+              {isProcessing ? 'Changing...' : 'Change Password'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Password Reset Dialog */}
+      <Dialog open={showResetDialog} onOpenChange={setShowResetDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Reset Password</DialogTitle>
+            <DialogDescription>
+              Enter your email address and we'll send you a link to reset your password.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="reset-email">Email Address</Label>
+              <Input
+                id="reset-email"
+                type="email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder="Enter your email address"
+              />
+            </div>
+            {message && (
+              <div className={`p-3 rounded-lg text-sm ${
+                message.includes('sent') 
+                  ? 'bg-green-100 text-green-800 border border-green-200' 
+                  : 'bg-red-100 text-red-800 border border-red-200'
+              }`}>
+                {message}
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowResetDialog(false);
+                setResetEmail('');
+                setMessage('');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handlePasswordReset}
+              disabled={isProcessing}
+            >
+              {isProcessing ? 'Sending...' : 'Send Reset Link'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 2FA Dialog */}
+      <Dialog open={show2FADialog} onOpenChange={setShow2FADialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Two-Factor Authentication</DialogTitle>
+            <DialogDescription>
+              Set up two-factor authentication for enhanced security.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-center py-6">
+              <Shield className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Coming Soon!</h3>
+              <p className="text-muted-foreground">
+                Two-factor authentication will be available in a future update to provide 
+                additional security for your account.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => {
+              setShow2FADialog(false);
+              handle2FAEnable();
+            }}>
+              Got it
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* API Keys Dialog */}
+      <Dialog open={showAPIDialog} onOpenChange={setShowAPIDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>API Keys Management</DialogTitle>
+            <DialogDescription>
+              Manage your API access tokens and keys.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-center py-6">
+              <Key className="w-16 h-16 text-purple-600 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Coming Soon!</h3>
+              <p className="text-muted-foreground">
+                API keys management will be available in a future update to allow 
+                programmatic access to your account.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => {
+              setShowAPIDialog(false);
+              handleAPIKeysManage();
+            }}>
+              Got it
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
