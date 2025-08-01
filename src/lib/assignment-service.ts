@@ -35,11 +35,12 @@ export class AssignmentService {
   constructor(userId: string) {
     this.userId = userId;
     this.paymentService = PaymentService.getInstance();
+    console.log('🔧 AssignmentService initialized with user ID:', userId);
   }
 
   async getAssignments(): Promise<AssignmentWithDates[]> {
     try {
-      console.log('Fetching assignments for user:', this.userId);
+      console.log('📋 Fetching assignments for user:', this.userId);
       
       const { data, error } = await supabase
         .from('assignments')
@@ -48,31 +49,95 @@ export class AssignmentService {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error fetching assignments:', error);
+        console.error('❌ Error fetching assignments:', error);
         if (error.code === '42P01') {
-          console.error('Assignments table does not exist. Please run the Supabase setup script.');
+          console.error('❌ Assignments table does not exist. Please run the Supabase setup script.');
           return [];
         }
         throw error;
       }
 
-      console.log('Successfully fetched assignments:', data?.length || 0);
+      console.log('✅ Successfully fetched assignments:', data?.length || 0);
+      console.log('📊 Assignment data:', data);
       return data || [];
     } catch (error) {
-      console.error('Error in getAssignments:', error);
+      console.error('❌ Error in getAssignments:', error);
       return [];
+    }
+  }
+
+  async testDatabaseConnection(): Promise<boolean> {
+    try {
+      console.log('🔍 Testing database connection...');
+      
+      // Test basic connection
+      const { data: testData, error: testError } = await supabase
+        .from('assignments')
+        .select('count')
+        .limit(1);
+      
+      if (testError) {
+        console.error('❌ Database connection test failed:', testError);
+        return false;
+      }
+      
+      console.log('✅ Database connection successful');
+      
+      // Test if we can insert a test record
+      const testAssignment = {
+        user_id: this.userId,
+        title: 'Test Assignment',
+        subject: 'Test',
+        type: 'Test',
+        status: 'draft' as const,
+        word_count: 100
+      };
+      
+      const { data: insertData, error: insertError } = await supabase
+        .from('assignments')
+        .insert(testAssignment)
+        .select()
+        .single();
+      
+      if (insertError) {
+        console.error('❌ Test insert failed:', insertError);
+        return false;
+      }
+      
+      console.log('✅ Test insert successful:', insertData);
+      
+      // Clean up test record
+      if (insertData?.id) {
+        await supabase
+          .from('assignments')
+          .delete()
+          .eq('id', insertData.id);
+        console.log('✅ Test record cleaned up');
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('❌ Database connection test failed:', error);
+      return false;
     }
   }
 
   async createAssignment(assignment: Partial<AssignmentWithDates>): Promise<AssignmentWithDates | null> {
     try {
+      console.log('🚀 Starting assignment creation...');
+      console.log('👤 User ID:', this.userId);
+      console.log('📝 Assignment data:', assignment);
+      
       // Check if user can create assignments based on their subscription
       const canCreate = await this.paymentService.canCreateAssignment(this.userId);
+      console.log('✅ Can create assignment:', canCreate);
+      
       if (!canCreate) {
         throw new Error('You have reached your assignment limit. Please upgrade your plan to create more assignments.');
       }
 
       const assignmentData = this.mapAssignmentToDB(assignment);
+      console.log('🗄️ Mapped assignment data for DB:', assignmentData);
       
       const { data, error } = await supabase
         .from('assignments')
@@ -81,9 +146,17 @@ export class AssignmentService {
         .single();
 
       if (error) {
-        console.error('Error creating assignment:', error);
+        console.error('❌ Error creating assignment:', error);
+        console.error('❌ Error details:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
         throw error;
       }
+
+      console.log('✅ Assignment created successfully:', data);
 
       // Increment assignment count for the user
       console.log(`📝 Assignment created successfully, incrementing count for user: ${this.userId}`);

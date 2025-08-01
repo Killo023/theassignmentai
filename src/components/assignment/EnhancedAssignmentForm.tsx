@@ -3,15 +3,18 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { 
+  FileText, 
+  BookOpen, 
+  GraduationCap, 
+  Award, 
+  Clock,
+  CheckCircle,
+  Sparkles
+} from "lucide-react";
 
 interface EnhancedAssignmentFormProps {
   onSubmit: (data: any) => void;
@@ -19,164 +22,159 @@ interface EnhancedAssignmentFormProps {
 }
 
 export default function EnhancedAssignmentForm({ onSubmit, isGenerating }: EnhancedAssignmentFormProps) {
-  const [formData, setFormData] = useState({
-    title: "",
-    subject: "",
-    type: "",
-    wordCount: 1000,
-    requirements: "",
-    assignmentType: "research_paper",
-    academicLevel: "undergraduate",
-    qualityLevel: "standard",
-    citations: false,
-    citationStyle: "APA",
-    includeCoverPage: false,
-    includeTableOfContents: false,
-    includeExecutiveSummary: false,
-    includeAppendices: false,
-    fontFamily: "Times New Roman",
-    fontSize: 12,
-    lineSpacing: 1.5,
-    marginSize: 1,
-    pageSize: "A4",
-    includePageNumbers: true,
-    includeHeaders: true,
-    includeFooters: true,
-    includeMCQ: false,
-    mcqCount: 5,
-    mcqDifficulty: "medium",
-    includeAnswerKey: false,
-    includeRubric: false,
-    includePlagiarismCheck: true,
-    includeQualityIndicators: true,
-    includeEducationalDisclaimer: true,
-    exportFormats: ["txt", "docx", "pdf"]
-  });
+  const [assignmentDetails, setAssignmentDetails] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    if (!assignmentDetails.trim()) return;
+    
+    // Parse the assignment details and create a structured request
+    const request = {
+      assignmentDetails: assignmentDetails,
+      // Default values for professional features
+      assignmentType: "research_paper",
+      academicLevel: "undergraduate",
+      qualityLevel: "high",
+      citations: true,
+      citationStyle: "APA",
+      includeCoverPage: true,
+      includeTableOfContents: true,
+      includeExecutiveSummary: false,
+      includeAppendices: false,
+      fontFamily: "Times New Roman",
+      fontSize: 12,
+      lineSpacing: 1.5,
+      marginSize: 1,
+      pageSize: "A4",
+      includePageNumbers: true,
+      includeHeaders: true,
+      includeFooters: true,
+      includeMCQ: false,
+      mcqCount: 5,
+      mcqDifficulty: "medium",
+      includeAnswerKey: false,
+      includeRubric: false,
+      includePlagiarismCheck: true,
+      includeQualityIndicators: true,
+      includeEducationalDisclaimer: true,
+      exportFormats: ["txt", "docx", "pdf"]
+    };
+    
+    onSubmit(request);
   };
 
+  const examples = [
+    {
+      title: "Research Paper",
+      description: "Write a 2000-word research paper on the impact of artificial intelligence on modern healthcare",
+      icon: <FileText className="w-4 h-4" />
+    },
+    {
+      title: "Case Study",
+      description: "Analyze the business strategy of Tesla and its market positioning in the electric vehicle industry",
+      icon: <BookOpen className="w-4 h-4" />
+    },
+    {
+      title: "Literature Review",
+      description: "Review current literature on climate change adaptation strategies in coastal communities",
+      icon: <GraduationCap className="w-4 h-4" />
+    }
+  ];
+
+  const features = [
+    { name: "Cover Page", icon: <FileText className="w-3 h-3" /> },
+    { name: "References", icon: <BookOpen className="w-3 h-3" /> },
+    { name: "Citations", icon: <Award className="w-3 h-3" /> },
+    { name: "Professional Formatting", icon: <CheckCircle className="w-3 h-3" /> }
+  ];
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="title">Assignment Title</Label>
-          <Input
-            id="title"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="Enter assignment title"
-            required
-          />
-        </div>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-purple-600" />
+            Create Professional Assignment
+          </CardTitle>
+          <CardDescription>
+            Describe your assignment requirements in detail. Our AI will generate a complete, 
+            professional assignment with cover page, references, and proper formatting.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="assignmentDetails" className="text-base font-medium">
+                Assignment Requirements
+              </Label>
+              <Textarea
+                id="assignmentDetails"
+                value={assignmentDetails}
+                onChange={(e) => setAssignmentDetails(e.target.value)}
+                placeholder="Describe your assignment in detail. For example: Write a 2000-word research paper on the impact of artificial intelligence on modern healthcare. Include an introduction, literature review, methodology, results, discussion, and conclusion. Use APA citation style and include at least 10 academic sources."
+                rows={8}
+                className="resize-none text-base"
+                required
+              />
+              <p className="text-sm text-muted-foreground">
+                Be as specific as possible about your topic, word count, structure, and requirements.
+              </p>
+            </div>
 
-        <div>
-          <Label htmlFor="subject">Subject</Label>
-          <Input
-            id="subject"
-            value={formData.subject}
-            onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-            placeholder="e.g., Business, Computer Science, Literature"
-            required
-          />
-        </div>
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-medium text-sm mb-2">What's Included:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {features.map((feature, index) => (
+                    <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                      {feature.icon}
+                      {feature.name}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
 
-        <div>
-          <Label htmlFor="type">Assignment Type</Label>
-          <Select
-            value={formData.assignmentType}
-            onValueChange={(value) => setFormData({ ...formData, assignmentType: value })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="research_paper">Research Paper</SelectItem>
-              <SelectItem value="case_study">Case Study</SelectItem>
-              <SelectItem value="literature_review">Literature Review</SelectItem>
-              <SelectItem value="business_report">Business Report</SelectItem>
-              <SelectItem value="essay">Essay</SelectItem>
-              <SelectItem value="thesis">Thesis</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+              <div>
+                <h4 className="font-medium text-sm mb-2">Quick Examples:</h4>
+                <div className="space-y-2">
+                  {examples.map((example, index) => (
+                    <div
+                      key={index}
+                      className="p-3 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                      onClick={() => setAssignmentDetails(example.description)}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        {example.icon}
+                        <span className="font-medium text-sm">{example.title}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{example.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-        <div>
-          <Label htmlFor="academicLevel">Academic Level</Label>
-          <Select
-            value={formData.academicLevel}
-            onValueChange={(value) => setFormData({ ...formData, academicLevel: value })}
-          >
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="undergraduate">Undergraduate</SelectItem>
-              <SelectItem value="graduate">Graduate</SelectItem>
-              <SelectItem value="postgraduate">Postgraduate</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
-          <Label htmlFor="wordCount">Word Count</Label>
-          <Input
-            id="wordCount"
-            type="number"
-            value={formData.wordCount}
-            onChange={(e) => setFormData({ ...formData, wordCount: parseInt(e.target.value) })}
-            min="500"
-            max="10000"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="requirements">Requirements</Label>
-          <Textarea
-            id="requirements"
-            value={formData.requirements}
-            onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
-            placeholder="Describe the assignment requirements, topics to cover, etc."
-            rows={4}
-          />
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="citations"
-            checked={formData.citations}
-            onChange={(e) => setFormData({ ...formData, citations: e.target.checked })}
-          />
-          <Label htmlFor="citations">Include Citations</Label>
-        </div>
-
-        {formData.citations && (
-          <div>
-            <Label htmlFor="citationStyle">Citation Style</Label>
-            <Select
-              value={formData.citationStyle}
-              onValueChange={(value) => setFormData({ ...formData, citationStyle: value })}
+            <Button 
+              type="submit" 
+              disabled={isGenerating || !assignmentDetails.trim()} 
+              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+              size="lg"
             >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="APA">APA</SelectItem>
-                <SelectItem value="MLA">MLA</SelectItem>
-                <SelectItem value="Chicago">Chicago</SelectItem>
-                <SelectItem value="Harvard">Harvard</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-      </div>
-
-      <Button type="submit" disabled={isGenerating} className="w-full">
-        {isGenerating ? "Generating..." : "Generate Assignment"}
-      </Button>
-    </form>
+              {isGenerating ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Generating Assignment...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Generate Professional Assignment
+                </>
+              )}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   );
 } 

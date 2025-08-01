@@ -201,12 +201,54 @@ const AssignmentCreator = () => {
       // Log current usage before assignment creation
       const currentUsage = await paymentService.getAssignmentUsage(user.id);
       console.log("Assignment usage before creation:", currentUsage);
+      
+      // Extract title, subject, and type from the assignment details
+      const assignmentDetails = formData.assignmentDetails;
+      const lines = assignmentDetails.split('\n');
+      const firstLine = lines[0] || '';
+      
+      // Try to extract basic info from the first line
+      let title = firstLine;
+      let subject = "General";
+      let type = "Research Paper";
+      let wordCount = 2000;
+      
+      // Extract word count if mentioned
+      const wordCountMatch = assignmentDetails.match(/(\d+)[-\s]*word/i);
+      if (wordCountMatch) {
+        wordCount = parseInt(wordCountMatch[1]);
+      }
+      
+      // Extract assignment type if mentioned
+      if (assignmentDetails.toLowerCase().includes('research paper')) {
+        type = "Research Paper";
+      } else if (assignmentDetails.toLowerCase().includes('case study')) {
+        type = "Case Study";
+      } else if (assignmentDetails.toLowerCase().includes('literature review')) {
+        type = "Literature Review";
+      } else if (assignmentDetails.toLowerCase().includes('essay')) {
+        type = "Essay";
+      } else if (assignmentDetails.toLowerCase().includes('report')) {
+        type = "Report";
+      }
+      
+      // Extract subject if mentioned
+      if (assignmentDetails.toLowerCase().includes('business')) {
+        subject = "Business Administration";
+      } else if (assignmentDetails.toLowerCase().includes('computer science') || assignmentDetails.toLowerCase().includes('ai') || assignmentDetails.toLowerCase().includes('artificial intelligence')) {
+        subject = "Computer Science";
+      } else if (assignmentDetails.toLowerCase().includes('healthcare') || assignmentDetails.toLowerCase().includes('medical')) {
+        subject = "Healthcare";
+      } else if (assignmentDetails.toLowerCase().includes('climate') || assignmentDetails.toLowerCase().includes('environment')) {
+        subject = "Environmental Science";
+      }
+      
       const request: AssignmentRequest = {
-        title: formData.title,
-        subject: formData.subject,
-        type: formData.type,
-        wordCount: formData.wordCount,
-        requirements: formData.requirements,
+        title: title,
+        subject: subject,
+        type: type,
+        wordCount: wordCount,
+        requirements: assignmentDetails,
         style: formData.citationStyle,
         citations: formData.citations,
         
@@ -247,13 +289,13 @@ const AssignmentCreator = () => {
       
       setAssignment({
         ...assignment,
-        title: formData.title,
-        subject: formData.subject,
-        type: formData.type,
-        wordCount: formData.wordCount,
+        title: title,
+        subject: subject,
+        type: type,
+        wordCount: wordCount,
         content: response.content,
         status: "completed",
-        requirements: formData.requirements,
+        requirements: assignmentDetails,
         assignmentType: formData.assignmentType,
         academicLevel: formData.academicLevel,
         qualityLevel: formData.qualityLevel,
@@ -285,16 +327,25 @@ const AssignmentCreator = () => {
       // Save to database
       console.log("Creating assignment with user ID:", user.id);
       const assignmentService = getAssignmentService();
-      await assignmentService.createAssignment({
-        ...assignment,
-        title: formData.title,
-        subject: formData.subject,
-        type: formData.type,
-        word_count: formData.wordCount,
-        content: response.content,
-        status: "completed",
-        requirements: formData.requirements,
-      });
+      
+      try {
+        const savedAssignment = await assignmentService.createAssignment({
+          ...assignment,
+          title: title,
+          subject: subject,
+          type: type,
+          word_count: wordCount,
+          content: response.content,
+          status: "completed",
+          requirements: assignmentDetails,
+        });
+        
+        console.log("✅ Assignment saved successfully:", savedAssignment);
+      } catch (error) {
+        console.error("❌ Failed to save assignment:", error);
+        // Show user-friendly error message
+        alert("Assignment generated successfully but failed to save. Please try again.");
+      }
 
       // Log usage after assignment creation
       const updatedUsage = await paymentService.getAssignmentUsage(user.id);
@@ -375,23 +426,23 @@ const AssignmentCreator = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
           <Link href="/dashboard" className="inline-flex items-center text-gray-600 hover:text-gray-800 mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Link>
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
             Create Professional Assignment
           </h1>
-          <p className="text-gray-600">
+          <p className="text-gray-600 text-sm sm:text-base">
             Generate high-quality, university-level assignments with advanced formatting and export options.
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row min-h-0">
+        <div className="flex flex-col xl:flex-row gap-6 min-h-0">
           {/* Left Panel - Enhanced Assignment Form */}
-          <div className="w-full lg:w-1/2 border-b lg:border-b-0 lg:border-r bg-muted/30 overflow-y-auto">
+          <div className="w-full xl:w-1/2 bg-white rounded-lg shadow-lg border border-gray-200">
             <div className="p-4 sm:p-6">
               <EnhancedAssignmentForm
                 onSubmit={generateAssignment}
@@ -401,53 +452,55 @@ const AssignmentCreator = () => {
           </div>
 
           {/* Right Panel - Assignment Preview and Export */}
-          <div className="w-full lg:w-1/2 bg-white overflow-y-auto">
+          <div className="w-full xl:w-1/2 bg-white rounded-lg shadow-lg border border-gray-200">
             <div className="p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Assignment Preview</h2>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
+                <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Assignment Preview</h2>
                 <div className="flex items-center space-x-2">
                   {aiStatus === "checking" && (
                     <div className="flex items-center text-yellow-600">
                       <Clock className="w-4 h-4 mr-1" />
-                      <span className="text-sm">Checking AI...</span>
+                      <span className="text-xs sm:text-sm">Checking AI...</span>
                     </div>
                   )}
                   {aiStatus === "available" && (
                     <div className="flex items-center text-green-600">
                       <CheckCircle className="w-4 h-4 mr-1" />
-                      <span className="text-sm">AI Available</span>
+                      <span className="text-xs sm:text-sm">AI Available</span>
                     </div>
                   )}
                   {aiStatus === "unavailable" && (
                     <div className="flex items-center text-red-600">
                       <AlertTriangle className="w-4 h-4 mr-1" />
-                      <span className="text-sm">AI Unavailable</span>
+                      <span className="text-xs sm:text-sm">AI Unavailable</span>
                     </div>
                   )}
                 </div>
               </div>
 
               {assignment.content ? (
-                <ProfessionalAssignmentDisplay
-                  assignment={assignment}
-                  tables={tables}
-                  charts={charts}
-                  references={references}
-                  onExport={exportAssignment}
-                  onCopy={() => copyToClipboard(assignment.content)}
-                  onSave={() => {
-                    // Save functionality
-                    console.log('Saving assignment...');
-                  }}
-                />
+                <div className="max-h-[60vh] overflow-y-auto">
+                  <ProfessionalAssignmentDisplay
+                    assignment={assignment}
+                    tables={tables}
+                    charts={charts}
+                    references={references}
+                    onExport={exportAssignment}
+                    onCopy={() => copyToClipboard(assignment.content)}
+                    onSave={() => {
+                      // Save functionality
+                      console.log('Saving assignment...');
+                    }}
+                  />
+                </div>
               ) : (
-                <div className="text-center py-12">
+                <div className="text-center py-8 sm:py-12">
                   <Wand2 className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
                     Ready to Create
                   </h3>
-                  <p className="text-gray-600">
-                    Fill out the form on the left to generate your professional assignment.
+                  <p className="text-gray-600 text-sm sm:text-base">
+                    Describe your assignment requirements to generate a professional assignment.
                   </p>
                 </div>
               )}

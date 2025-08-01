@@ -112,6 +112,12 @@ const AssignmentsPage = () => {
       
       try {
         setIsLoading(true);
+        
+        // Test database connection first
+        console.log('🔍 Testing database connection...');
+        const dbConnected = await assignmentService.testDatabaseConnection();
+        console.log('📊 Database connection test result:', dbConnected);
+        
         const data = await assignmentService.getAssignments();
         setAssignments(data.map(assignment => ({
           id: assignment.id,
@@ -275,7 +281,7 @@ const AssignmentsPage = () => {
       </div>
 
       {/* Filters and Search */}
-      <div className="flex flex-col lg:flex-row gap-4">
+      <div className="flex flex-col gap-4">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <Input
@@ -286,7 +292,7 @@ const AssignmentsPage = () => {
           />
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -373,29 +379,30 @@ const AssignmentsPage = () => {
                     </span>
                   </div>
                   
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                    <span className="flex items-center gap-1">
-                      <Tag className="w-4 h-4" />
-                      {assignment.subject}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FileText className="w-4 h-4" />
-                      {assignment.type}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {assignment.updatedAt.toLocaleDateString()}
-                    </span>
-                    <span>{assignment.wordCount} words</span>
-                  </div>
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-muted-foreground mb-3">
+                  <span className="flex items-center gap-1">
+                    <Tag className="w-4 h-4" />
+                    {assignment.subject}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <FileText className="w-4 h-4" />
+                    {assignment.type}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    {assignment.updatedAt.toLocaleDateString()}
+                  </span>
+                  <span>{assignment.wordCount} words</span>
+                </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                   <Button 
                     variant="ghost" 
                     size="sm"
                     onClick={() => exportAssignment(assignment, 'pdf')}
                     title="Export as PDF"
+                    className="p-1 sm:p-2"
                   >
                     <Download className="w-4 h-4" />
                   </Button>
@@ -404,6 +411,7 @@ const AssignmentsPage = () => {
                     size="sm"
                     onClick={() => exportAssignment(assignment, 'docx')}
                     title="Export as DOCX"
+                    className="p-1 sm:p-2"
                   >
                     <FileText className="w-4 h-4" />
                   </Button>
@@ -412,6 +420,7 @@ const AssignmentsPage = () => {
                     size="sm"
                     onClick={() => toggleFavorite(assignment.id)}
                     title={assignment.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                    className="p-1 sm:p-2"
                   >
                     <Star className={`w-4 h-4 ${assignment.isFavorite ? 'text-yellow-500 fill-current' : ''}`} />
                   </Button>
@@ -420,6 +429,7 @@ const AssignmentsPage = () => {
                     size="sm"
                     onClick={() => deleteAssignment(assignment.id)}
                     title="Delete assignment"
+                    className="p-1 sm:p-2"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

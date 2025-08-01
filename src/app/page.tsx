@@ -1,461 +1,364 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { 
   ArrowRight, 
   CheckCircle, 
-  Brain, 
-  Zap, 
-  Shield, 
+  Star, 
   Users, 
-  Award, 
-  Star,
-  Sparkles,
-  TrendingUp,
+  Award,
+  BookOpen,
   FileText,
-  Bot,
-  MessageSquare,
-  Download,
-  Eye,
+  Brain,
+  Zap,
+  Shield,
+  Globe,
+  Sparkles,
   X
 } from "lucide-react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import HeroSection from "@/components/landing/HeroSection";
-import FeatureGrid from "@/components/landing/FeatureGrid";
-import HowItWorks from "@/components/landing/HowItWorks";
-import Testimonials from "@/components/landing/Testimonials";
-import PricingCards from "@/components/landing/PricingCards";
-import FAQ from "@/components/landing/FAQ";
-import UniversityLogos from "@/components/landing/UniversityLogos";
+import Link from "next/link";
+import PricingSection from "@/components/landing/PricingSection";
+import FAQSection from "@/components/landing/FAQSection";
 
-export default function Home() {
+const features = [
+  {
+    icon: <Brain className="w-6 h-6" />,
+    title: "AI-Powered Writing",
+    description: "Advanced AI trained by experts for academic excellence"
+  },
+  {
+    icon: <FileText className="w-6 h-6" />,
+    title: "Multiple Formats",
+    description: "Generate essays, research papers, case studies, and more"
+  },
+  {
+    icon: <Shield className="w-6 h-6" />,
+    title: "Plagiarism-Free",
+    description: "Original content with proper citations and references"
+  },
+  {
+    icon: <Zap className="w-6 h-6" />,
+    title: "Instant Results",
+    description: "Get professional assignments in minutes, not hours"
+  },
+  {
+    icon: <Globe className="w-6 h-6" />,
+    title: "Multi-Language",
+    description: "Support for 100+ languages and academic styles"
+  },
+  {
+    icon: <Sparkles className="w-6 h-6" />,
+    title: "Premium Quality",
+    description: "University-level assignments with proper formatting"
+  }
+];
+
+const stats = [
+  { number: "20M+", label: "Words Generated" },
+  { number: "500K+", label: "Active Users" },
+  { number: "500+", label: "Universities" },
+  { number: "200K+", label: "Monthly Visitors" }
+];
+
+export default function HomePage() {
+  const [isHovered, setIsHovered] = useState(false);
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <HeroSection />
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+        </div>
 
-      {/* University Logos */}
-      <UniversityLogos />
+        <div className="relative z-10 container mx-auto px-4 py-20 lg:py-32">
+          <div className="text-center max-w-4xl mx-auto">
+            {/* Main Heading */}
+            <motion.h1 
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
+            >
+              We Help You With{" "}
+              <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+                Homework.
+              </span>
+            </motion.h1>
+
+            {/* Subtitle */}
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto"
+            >
+              Stressed About Homework? Let Us Finish it Fast. Get Detailed Answers 10X Faster!
+            </motion.p>
+
+            {/* Rating */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="flex items-center justify-center gap-2 mb-8"
+            >
+              <div className="flex">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+              <span className="text-white font-semibold">Rated 4.8/5</span>
+            </motion.div>
+
+            {/* Stats */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12"
+            >
+              {stats.map((stat, index) => (
+                <div key={index} className="text-center">
+                  <div className="text-2xl md:text-3xl font-bold text-white">{stat.number}</div>
+                  <div className="text-blue-200 text-sm">{stat.label}</div>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* CTA Buttons */}
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+              <Button 
+                asChild
+                size="lg"
+                className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-black font-bold text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                <Link href="/dashboard/new" className="flex items-center gap-2">
+                  Get Started Now
+                  <motion.div
+                    animate={{ x: isHovered ? 5 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ArrowRight className="w-5 h-5" />
+                  </motion.div>
+                </Link>
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-white text-white hover:bg-white hover:text-blue-600 font-bold text-lg px-8 py-4 rounded-full"
+              >
+                <BookOpen className="w-5 h-5 mr-2" />
+                View Examples
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       {/* Features Section */}
-      <FeatureGrid />
+      <section id="features" className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <motion.h2 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
+            >
+              What Can You Generate With{" "}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                AssignmentGPT AI?
+              </span>
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-xl text-gray-600 max-w-3xl mx-auto"
+            >
+              Our AI is trained by experts in content creation and conversions. With the help of this homework AI solver, students don't have to struggle to do their homework.
+            </motion.p>
+          </div>
 
-      {/* How It Works */}
-      <HowItWorks />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
+              >
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center text-white mb-6">
+                  {feature.icon}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
+                <p className="text-gray-600">{feature.description}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {/* Product Showcase Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-50 via-white to-blue-50">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              See AI Assignment Pro in action
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Real screenshots of our platform helping students create amazing assignments
-            </p>
-          </motion.div>
+      {/* Why Choose Us Section */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <motion.h2 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
+            >
+              Why AssignmentGPT AI is Better than ChatGPT?
+            </motion.h2>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-xl text-gray-600 max-w-3xl mx-auto"
+            >
+              AssignmentGPT AI is better for academic help than ChatGPT. It provides specific answers for assignments and homework, offers clear guidance, and follows academic standards closely.
+            </motion.p>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Dashboard Screenshot */}
+            {/* AssignmentGPT AI Column */}
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
-              viewport={{ once: true }}
-              className="relative"
+              className="bg-white p-8 rounded-2xl shadow-lg border-2 border-blue-200"
             >
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2015&q=80"
-                  alt="AI Assignment Dashboard Interface"
-                  className="w-full h-80 object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent"></div>
-                
-                {/* Floating UI Elements */}
-                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-xs font-medium text-gray-700">Live Dashboard</span>
-                  </div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
+                  <Award className="w-6 h-6 text-white" />
                 </div>
+                <h3 className="text-2xl font-bold text-gray-900">AssignmentGPT AI</h3>
               </div>
-
-              <div className="mt-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Intuitive Dashboard
-                </h3>
-                <p className="text-gray-600">
-                  Manage all your assignments from one beautiful, organized dashboard with real-time progress tracking.
-                </p>
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-gray-700">🎓 Designed for Students and Academia</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-gray-700">🧠 Superior AI Model Built for Students & Academia</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-gray-700">📖 Academic Use Cases: Enriched with 20+ Academia Use Cases</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-gray-700">✔ Specialized Tools: AI Diagram Maker, Bypass AI, Math Solver</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-gray-700">👍 Real-Time Reference: Answers with Real-Time References</span>
+                </div>
               </div>
             </motion.div>
 
-            {/* AI Generation Screenshot */}
+            {/* ChatGPT Column */}
             <motion.div
-              initial={{ opacity: 0, x: 50 }}
+              initial={{ opacity: 0, x: 30 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="relative"
+              className="bg-white p-8 rounded-2xl shadow-lg border border-gray-200"
             >
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
-                  alt="AI Content Generation Interface"
-                  className="w-full h-80 object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent"></div>
-                
-                {/* Floating UI Elements */}
-                <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg">
-                  <div className="text-xs text-gray-600">Generation Progress</div>
-                  <div className="flex items-center gap-2 mt-1">
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div className="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full w-4/5"></div>
-                    </div>
-                    <span className="text-xs font-medium text-gray-700">80%</span>
-                  </div>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gray-500 rounded-xl flex items-center justify-center">
+                  <Brain className="w-6 h-6 text-white" />
                 </div>
+                <h3 className="text-2xl font-bold text-gray-900">ChatGPT</h3>
               </div>
-
-              <div className="mt-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  AI-Powered Generation
-                </h3>
-                <p className="text-gray-600">
-                  Watch as advanced AI creates high-quality academic content tailored to your specific requirements.
-                </p>
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <X className="w-5 h-5 text-red-500" />
+                  <span className="text-gray-700">🌐 Designed for General-Purpose</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <X className="w-5 h-5 text-red-500" />
+                  <span className="text-gray-700">🤖 General-Purpose AI Model</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <X className="w-5 h-5 text-red-500" />
+                  <span className="text-gray-700">📃 Limited Academic Focus</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <X className="w-5 h-5 text-red-500" />
+                  <span className="text-gray-700">❌ Specialized Tools: N/A</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <X className="w-5 h-5 text-red-500" />
+                  <span className="text-gray-700">👎 References may not be real-time</span>
+                </div>
               </div>
             </motion.div>
           </div>
-
-          {/* Export Formats Showcase */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="mt-20"
-          >
-            <div className="text-center mb-12">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                Export in any format you need
-              </h3>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Professional formatting for every academic requirement
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  format: "PDF",
-                  image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-                  description: "Perfect for submission with professional formatting"
-                },
-                {
-                  format: "DOCX",
-                  image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-                  description: "Editable Word documents for further customization"
-                },
-                {
-                  format: "Excel",
-                  image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-                  description: "Data analysis and charts in spreadsheet format"
-                }
-              ].map((item, index) => (
-                <motion.div
-                  key={item.format}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1, duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
-                >
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={item.image}
-                      alt={`${item.format} Export Format`}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1 shadow-lg">
-                      <span className="text-sm font-semibold text-gray-700">{item.format}</span>
-                    </div>
-                  </div>
-                  <div className="p-6">
-                    <h4 className="font-semibold text-gray-900 mb-2">{item.format} Format</h4>
-                    <p className="text-sm text-gray-600">{item.description}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
         </div>
       </section>
-
-      {/* Testimonials */}
-      <Testimonials />
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
-            className="text-center mb-12 sm:mb-16"
-          >
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Simple, transparent pricing
-            </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
-              Start with a free tier, then choose the plan that works for you
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
-            {/* Free Plan */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              viewport={{ once: true }}
-              className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8"
-            >
-              <div className="text-center mb-6 sm:mb-8">
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Free Plan</h3>
-                <div className="mb-4">
-                  <span className="text-3xl sm:text-4xl font-bold text-gray-900">$0</span>
-                  <span className="text-gray-600 ml-2 text-sm sm:text-base">forever</span>
-                </div>
-                <p className="text-gray-600 text-sm sm:text-base">Perfect for trying the platform</p>
-              </div>
-
-              <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">4 assignments per month</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">AI-powered content creation</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Basic formatting options</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Email support</span>
-                </li>
-                <li className="flex items-center">
-                  <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 mr-3 flex-shrink-0" />
-                  <span className="text-gray-500 text-sm sm:text-base">Calendar access</span>
-                </li>
-                <li className="flex items-center">
-                  <X className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 mr-3 flex-shrink-0" />
-                  <span className="text-gray-500 text-sm sm:text-base">Export functionality</span>
-                </li>
-              </ul>
-
-              <Button asChild className="w-full bg-blue-600 hover:bg-blue-700 h-12 sm:h-14 text-base sm:text-lg">
-                <Link href="/auth/signup">Start Free</Link>
-              </Button>
-            </motion.div>
-
-            {/* Basic Plan */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-              className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl shadow-xl border-2 border-blue-500 p-6 sm:p-8 relative transform scale-105"
-            >
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-yellow-400 text-yellow-900 px-3 py-2 rounded-full text-xs sm:text-sm font-semibold">
-                  Most Popular
-                </span>
-              </div>
-
-              <div className="text-center mb-6 sm:mb-8">
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Basic Plan</h3>
-                <div className="mb-4">
-                  <span className="text-4xl sm:text-5xl font-bold text-white">$14.99</span>
-                  <span className="text-blue-100 ml-2 text-sm sm:text-base">per month</span>
-                </div>
-                <p className="text-blue-100 text-sm sm:text-base">Perfect for serious students</p>
-              </div>
-
-              <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
-                  <span className="text-white text-sm sm:text-base">Unlimited assignments</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
-                  <span className="text-white text-sm sm:text-base">Full calendar access</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
-                  <span className="text-white text-sm sm:text-base">Priority AI processing</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
-                  <span className="text-white text-sm sm:text-base">PDF & DOCX export</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
-                  <span className="text-white text-sm sm:text-base">Priority email/chat support</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
-                  <span className="text-white text-sm sm:text-base">Version history</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
-                  <span className="text-white text-sm sm:text-base">Collaboration tools</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
-                  <span className="text-white text-sm sm:text-base">Custom templates</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-400 mr-3 flex-shrink-0" />
-                  <span className="text-white text-sm sm:text-base">Basic usage analytics</span>
-                </li>
-              </ul>
-
-              <Button asChild className="w-full bg-white text-blue-600 hover:bg-gray-100 h-12 sm:h-14 text-base sm:text-lg">
-                <Link href="/upgrade">Upgrade to Basic</Link>
-              </Button>
-
-              <p className="text-sm text-blue-100 mt-4 text-center">
-                🔒 30-day money-back guarantee
-              </p>
-            </motion.div>
-
-            {/* Pro Plan */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              viewport={{ once: true }}
-              className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 relative"
-            >
-              <div className="text-center mb-6 sm:mb-8">
-                <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Pro Plan</h3>
-                <div className="mb-4">
-                  <span className="text-3xl sm:text-4xl font-bold text-gray-900">$29.99</span>
-                  <span className="text-gray-600 ml-2 text-sm sm:text-base">per month</span>
-                </div>
-                <p className="text-gray-600 text-sm sm:text-base">Perfect for researchers & power users</p>
-              </div>
-
-              <ul className="space-y-3 sm:space-y-4 mb-6 sm:mb-8">
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base font-medium">Everything in Basic Plan, PLUS:</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">AI-powered charts and graphs</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Advanced export (PDF, DOCX, TXT + more)</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">University-level academic standards</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Plagiarism-free guarantee</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">24/7 premium support</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Advanced performance analytics</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 mr-3 flex-shrink-0" />
-                  <span className="text-gray-700 text-sm sm:text-base">Highest priority AI processing</span>
-                </li>
-              </ul>
-
-              <Button asChild className="w-full bg-gray-900 hover:bg-gray-800 text-white h-12 sm:h-14 text-base sm:text-lg">
-                <Link href="/upgrade">Upgrade to Pro</Link>
-              </Button>
-            </motion.div>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-            className="text-center mt-8 sm:mt-12"
-          >
-            <p className="text-sm text-gray-500 mt-4">No credit card required • Cancel anytime</p>
-          </motion.div>
-        </div>
-      </section>
+      <PricingSection />
 
       {/* FAQ Section */}
-      <FAQ />
+      <FAQSection />
 
-      {/* CTA Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* Final CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="container mx-auto px-4 text-center">
+          <motion.h2 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-4xl md:text-5xl font-bold text-white mb-6"
+          >
+            🚀 Boost Your Homework Speed By 10x
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto"
+          >
+            Choose the perfect plan for you and say goodbye to long, frustrating hours of homework or research paper.
+          </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-              Ready to transform your academic writing?
-            </h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-              Join thousands of students who are already using AI Assignment Pro to improve their grades and save time.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
-                <Link href="/upgrade" className="flex items-center">
-                  Start Free Plan
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="border-white text-white hover:bg-white hover:text-blue-600">
-                <Link href="/demo" className="flex items-center">
-                  <Play className="mr-2 w-5 h-5" />
-                  Watch Demo
-                </Link>
-              </Button>
-            </div>
+            <Button 
+              asChild
+              size="lg"
+              className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-black font-bold text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
+              <Link href="/dashboard/new" className="flex items-center gap-2">
+                Get Started Free
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </Button>
           </motion.div>
         </div>
       </section>
     </div>
   );
 }
-
-// SVG Components for animations
-const Play = ({ className }: { className?: string }) => (
-  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
-    <path d="M8 5v14l11-7z"/>
-  </svg>
-);

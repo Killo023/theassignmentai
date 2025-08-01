@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import PaymentService from "@/lib/payment-service";
+import { AssignmentService } from "@/lib/assignment-service";
 import { Calendar, Plus, Edit, Trash2, Clock, AlertTriangle, CheckCircle, X, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,11 +63,12 @@ const CalendarPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const paymentService = PaymentService.getInstance();
+  const assignmentService = user ? new AssignmentService(user.id) : null;
 
   useEffect(() => {
     const initializeCalendar = async () => {
       await checkCalendarAccess();
-      loadEvents();
+      await loadEvents();
     };
     
     if (user?.id) {
@@ -89,56 +91,115 @@ const CalendarPage = () => {
   };
 
   const loadEvents = async () => {
-    if (!user?.id) return;
+    if (!user?.id || !assignmentService) return;
     
     try {
-      // Load events from localStorage for now (can be replaced with database)
-      const savedEvents = localStorage.getItem(`calendar_events_${user.id}`);
-      if (savedEvents) {
-        setEvents(JSON.parse(savedEvents));
-      }
+      // Load assignments from database and convert to calendar events
+      const assignments = await assignmentService.getAssignments();
+      const calendarEvents: AssignmentEvent[] = assignments.map(assignment => ({
+        id: assignment.id,
+        title: assignment.title,
+        description: assignment.requirements || '',
+        dueDate: assignment.due_date || new Date().toISOString().split('T')[0],
+        subject: assignment.subject,
+        type: assignment.type,
+        priority: assignment.word_count > 2000 ? 'high' : assignment.word_count > 1000 ? 'medium' : 'low',
+        status: assignment.status,
+        createdAt: assignment.created_at,
+        updatedAt: assignment.updated_at,
+      }));
+      
+      setEvents(calendarEvents);
     } catch (error) {
       console.error("Error loading events:", error);
     }
   };
 
-  const saveEvents = (newEvents: AssignmentEvent[]) => {
-    if (!user?.id) return;
+  const saveEvents = async (newEvents: AssignmentEvent[]) => {
+    if (!user?.id || !assignmentService) return;
     
     try {
-      localStorage.setItem(`calendar_events_${user.id}`, JSON.stringify(newEvents));
+      // Update assignments in database with due dates
+      for (const event of newEvents) {
+        await assignmentService.updateAssignment(event.id, {
+          due_date: event.dueDate,
+          status: event.status,
+        });
+      }
+      
       setEvents(newEvents);
     } catch (error) {
       console.error("Error saving events:", error);
     }
   };
 
-  const addEvent = (eventData: Omit<AssignmentEvent, 'id' | 'createdAt' | 'updatedAt'>) => {
-    const newEvent: AssignmentEvent = {
-      ...eventData,
-      id: Date.now().toString(),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+  const addEvent = async (eventData: Omit<AssignmentEvent, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (!assignmentService) return;
     
-    const updatedEvents = [...events, newEvent];
-    saveEvents(updatedEvents);
-    setShowAddDialog(false);
+    try {
+      // Create new assignment in database
+      const newAssignment = await assignmentService.createAssignment({
+        title: eventData.title,
+        subject: eventData.subject,
+        type: eventData.type,
+        status: eventData.status,
+        word_count: 0,
+        due_date: eventData.dueDate,
+        requirements: eventData.description,
+      });
+      
+      if (newAssignment) {
+        const newEvent: AssignmentEvent = {
+          ...eventData,
+          id: newAssignment.id,
+          createdAt: newAssignment.created_at,
+          updatedAt: newAssignment.updated_at,
+        };
+        
+        setEvents(prev => [...prev, newEvent]);
+      }
+      
+      setShowAddDialog(false);
+    } catch (error) {
+      console.error("Error adding event:", error);
+    }
   };
 
-  const updateEvent = (eventId: string, eventData: Partial<AssignmentEvent>) => {
-    const updatedEvents = events.map(event => 
-      event.id === eventId 
-        ? { ...event, ...eventData, updatedAt: new Date().toISOString() }
-        : event
-    );
-    saveEvents(updatedEvents);
-    setEditingEvent(null);
+  const updateEvent = async (eventId: string, eventData: Partial<AssignmentEvent>) => {
+    if (!assignmentService) return;
+    
+    try {
+      await assignmentService.updateAssignment(eventId, {
+        title: eventData.title,
+        subject: eventData.subject,
+        type: eventData.type,
+        status: eventData.status,
+        due_date: eventData.dueDate,
+        requirements: eventData.description,
+      });
+      
+      const updatedEvents = events.map(event => 
+        event.id === eventId 
+          ? { ...event, ...eventData, updatedAt: new Date().toISOString() }
+          : event
+      );
+      setEvents(updatedEvents);
+      setEditingEvent(null);
+    } catch (error) {
+      console.error("Error updating event:", error);
+    }
   };
 
-  const deleteEvent = (eventId: string) => {
-    const updatedEvents = events.filter(event => event.id !== eventId);
-    saveEvents(updatedEvents);
+  const deleteEvent = async (eventId: string) => {
+    if (!assignmentService) return;
+    
+    try {
+      await assignmentService.deleteAssignment(eventId);
+      const updatedEvents = events.filter(event => event.id !== eventId);
+      setEvents(updatedEvents);
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
   };
 
   const getDaysInMonth = (date: Date) => {
@@ -189,7 +250,7 @@ const CalendarPage = () => {
     
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startingDay; i++) {
-      days.push(<div key={`empty-${i}`} className="h-24 bg-gray-50 border border-gray-200"></div>);
+      days.push(<div key={`empty-${i}`} className="h-20 sm:h-24 bg-gray-50 border border-gray-200"></div>);
     }
     
     // Add cells for each day of the month
@@ -202,13 +263,13 @@ const CalendarPage = () => {
       days.push(
         <div
           key={day}
-          className={`h-24 border border-gray-200 p-1 cursor-pointer transition-colors ${
+          className={`h-20 sm:h-24 border border-gray-200 p-1 cursor-pointer transition-colors ${
             isToday ? 'bg-blue-50 border-blue-300' : ''
           } ${isSelected ? 'ring-2 ring-blue-500' : ''}`}
           onClick={() => setSelectedDate(date)}
         >
-          <div className="text-sm font-medium mb-1">{day}</div>
-          <div className="space-y-1">
+          <div className="text-xs sm:text-sm font-medium mb-1">{day}</div>
+          <div className="space-y-0.5">
             {dayEvents.slice(0, 2).map(event => (
               <div
                 key={event.id}
@@ -234,11 +295,11 @@ const CalendarPage = () => {
     
     return (
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <h3 className="text-lg font-semibold">
             Events for {formatDate(selectedDate)}
           </h3>
-          <Button size="sm" onClick={() => setShowAddDialog(true)}>
+          <Button size="sm" onClick={() => setShowAddDialog(true)} className="w-full sm:w-auto">
             <Plus className="w-4 h-4 mr-2" />
             Add Event
           </Button>
@@ -262,14 +323,14 @@ const CalendarPage = () => {
           <div className="space-y-3">
             {selectedDateEvents.map(event => (
               <div key={event.id} className="bg-white rounded-lg border border-gray-200 p-4">
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div className="flex-1">
                     <h4 className="font-medium text-gray-900">{event.title}</h4>
                     <p className="text-sm text-gray-600 mt-1">{event.subject} • {event.type}</p>
                     {event.description && (
                       <p className="text-sm text-gray-500 mt-2">{event.description}</p>
                     )}
-                    <div className="flex items-center gap-2 mt-3">
+                    <div className="flex flex-wrap items-center gap-2 mt-3">
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium border ${getPriorityColor(event.priority)}`}>
                         {event.priority} priority
                       </span>
@@ -359,7 +420,7 @@ const CalendarPage = () => {
               <X className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Link>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
               Assignment Calendar
             </h1>
             <p className="text-gray-600">
@@ -367,11 +428,11 @@ const CalendarPage = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
             {/* Calendar View */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-6">
+              <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
                   <h2 className="text-xl font-semibold text-gray-900">Calendar</h2>
                   <div className="flex items-center gap-2">
                     <Button
@@ -397,7 +458,7 @@ const CalendarPage = () => {
                 {/* Calendar Grid */}
                 <div className="grid grid-cols-7 gap-1">
                   {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="text-center text-sm font-medium text-gray-500 py-2">
+                    <div key={day} className="text-center text-xs sm:text-sm font-medium text-gray-500 py-2">
                       {day}
                     </div>
                   ))}
@@ -408,7 +469,7 @@ const CalendarPage = () => {
 
             {/* Event List */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6">
+              <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-4 sm:p-6">
                 {renderEventList()}
               </div>
             </div>
@@ -417,7 +478,7 @@ const CalendarPage = () => {
 
         {/* Add Event Dialog */}
         <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add Assignment Event</DialogTitle>
               <DialogDescription>
@@ -434,7 +495,7 @@ const CalendarPage = () => {
 
         {/* Edit Event Dialog */}
         <Dialog open={!!editingEvent} onOpenChange={() => setEditingEvent(null)}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Edit Assignment Event</DialogTitle>
               <DialogDescription>
