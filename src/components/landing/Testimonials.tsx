@@ -229,11 +229,11 @@ const Testimonials = () => {
                       <div className="w-16 h-16 rounded-full overflow-hidden shadow-lg border-2 border-white">
                         {(() => {
                           const profileImages = [
-                            "https://images.unsplash.com/photo-1494790108755-2616b612b47c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80", // Sarah
-                            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80", // Michael
-                            "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80", // Emily
-                            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80", // David
-                            "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"  // Lisa
+                            "/images/student-sarah-johnson.jpg", // Sarah
+                            "/images/student-michael-chen.jpg", // Michael
+                            "/images/student-emily-rodriguez.jpg", // Emily
+                            "/images/student-david-kim.jpg", // David
+                            "/images/student-lisa-thompson.jpg"  // Lisa
                           ];
                           const imageIndex = testimonials.findIndex(t => t.id === testimonial.id);
                           return (
@@ -352,11 +352,11 @@ const Testimonials = () => {
           </div>
           <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
             {[
-              { name: "MIT", logo: "/images/mit-logo.png" },
-              { name: "Stanford", logo: "/images/stanford-logo.png" },
-              { name: "Harvard", logo: "/images/harvard-logo.png" },
-              { name: "Yale", logo: "/images/yale-logo.png" },
-              { name: "UC Berkeley", logo: "/images/berkeley-logo.png" }
+              { name: "MIT", logo: "/images/universities/logo-mit.png" },
+              { name: "Stanford", logo: "/images/universities/logo-stanford.png" },
+              { name: "Harvard", logo: "/images/universities/logo-harvard.png" },
+              { name: "Yale", logo: "/images/universities/logo-yale.png" },
+              { name: "UC Berkeley", logo: "/images/universities/logo-uc-berkeley.png" }
             ].map((university, index) => (
               <motion.div
                 key={university.name}
@@ -368,9 +368,11 @@ const Testimonials = () => {
                 }}
               >
                 <div className="w-16 h-16 bg-white rounded-lg shadow-sm flex items-center justify-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded flex items-center justify-center">
-                    <span className="text-xs font-bold text-gray-600">{university.name.split(' ')[0]}</span>
-                  </div>
+                  <img 
+                    src={university.logo} 
+                    alt={`${university.name} logo`}
+                    className="w-12 h-12 object-contain"
+                  />
                 </div>
               </motion.div>
             ))}

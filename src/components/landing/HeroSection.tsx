@@ -99,7 +99,7 @@ const HeroSection = () => {
               {/* Main Hero Image */}
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img
-                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1471&q=80"
+                  src="/images/hero-main.jpg"
                   alt="Students collaborating on academic work with AI assistance"
                   className="w-full h-96 object-cover"
                 />
@@ -137,7 +137,7 @@ const HeroSection = () => {
               className="absolute -bottom-8 -left-8 w-48 h-32 rounded-xl overflow-hidden shadow-xl border-4 border-white"
             >
               <img
-                src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+                src="/images/hero-secondary.jpg"
                 alt="Academic writing and research materials"
                 className="w-full h-full object-cover"
               />

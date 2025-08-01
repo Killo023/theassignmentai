@@ -10,15 +10,15 @@ const plans = [
     name: "Free Plan",
     price: "$0",
     period: "Forever",
-    description: "Perfect for trying out our platform",
+    description: "Perfect for trying out The Assignment AI",
     features: [
       "4 assignments per month",
-      "AI-powered content creation",
+      "AI-powered assignment generation",
       "Basic formatting options",
       "Email support",
       "Access to core features",
       "Standard AI processing",
-      "Basic export options",
+      "Basic export options (TXT)",
       "Community support"
     ],
     cta: "Start Free",
@@ -34,15 +34,15 @@ const plans = [
     description: "Perfect for serious students",
     features: [
       "Unlimited assignments",
-      "Full calendar access",
+      "Professional tables and charts",
       "Priority AI processing",
       "PDF & DOCX export",
       "Priority email/chat support",
       "Version history",
-      "Collaboration tools",
+      "Advanced formatting options",
       "Custom templates",
       "Basic usage analytics",
-      "Advanced formatting options"
+      "Academic citation styles"
     ],
     cta: "Upgrade to Basic",
     popular: true,
@@ -57,8 +57,8 @@ const plans = [
     description: "Perfect for researchers & power users",
     features: [
       "Everything in Basic Plan, PLUS:",
-      "AI-powered charts and graphs",
-      "Advanced export (PDF, DOCX, TXT + more)",
+      "Advanced visual data generation",
+      "Multiple export formats (PDF, DOCX, TXT, XLSX)",
       "University-level academic standards",
       "Plagiarism-free guarantee",
       "24/7 premium support",
@@ -86,7 +86,7 @@ export default function PricingSection() {
             transition={{ duration: 0.8 }}
             className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
           >
-            🚀 Boost Your Homework Speed By 10x With AssignmentGPT
+            🚀 Complete Your Assignments 10x Faster With The Assignment AI
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -94,7 +94,7 @@ export default function PricingSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-xl text-gray-600 max-w-3xl mx-auto mb-8"
           >
-            Choose the perfect plan for you and say goodbye to long, frustrating hours of homework or research paper. With AssignmentGPT AI, you'll get answers, diagrams, and code in a snap, making your school work 10X easier and quicker!
+            Choose the perfect plan for you and say goodbye to long, frustrating hours of homework or research papers. With The Assignment AI, you'll get complete assignments with visual data, proper citations, and professional formatting in minutes!
           </motion.p>
           
           {/* Discount Banner */}

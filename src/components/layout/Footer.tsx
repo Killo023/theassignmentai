@@ -18,35 +18,32 @@ import {
 import Link from "next/link";
 
 const footerLinks = {
-  "Trending Tools": [
-    "Assignment Writer",
-    "Math Problem Solver", 
-    "Upload Image and Get Answer",
-    "AI Detector & Bypass AI Content",
-    "Writing Assistant",
-    "GPA Calculator",
-    "AI Homework Helper",
-    "Code Solver"
+  "Academic Tools": [
+    "Assignment Generator",
+    "Research Paper Writer", 
+    "Essay Writer",
+    "Case Study Generator",
+    "Literature Review Writer",
+    "Citation Generator",
+    "Plagiarism Checker",
+    "Visual Data Creator"
   ],
-  "Blogs": [
-    "Assignmentgpt AI vs Chatgpt...",
-    "Guide to Writing Essay...",
-    "Best Science calculator...",
-    "13 Free AI Text Generator...",
-    "Best AI Tools for Teachers..."
+  "Resources": [
+    "Academic Writing Guide",
+    "Citation Style Guide",
+    "Research Paper Templates",
+    "Essay Writing Tips",
+    "University Standards"
   ],
   "Company": [
     "Our Affiliate Program",
     "Contact Us", 
-    "Earn Credits 🎁",
     "Pricing",
-    "Blogs",
-    "Services",
+    "Blog",
     "About Us",
-    "Disclaimer",
-    "Write For Us",
-    "Review Us",
-    "AI Agents"
+    "Privacy Policy",
+    "Terms of Service",
+    "Support"
   ]
 };
 
@@ -75,11 +72,11 @@ export default function Footer() {
                 <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
                   <Award className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-2xl font-bold">AssignmentGPT AI</span>
+                <span className="text-2xl font-bold">The Assignment AI</span>
               </div>
               
               <p className="text-gray-300 mb-6 leading-relaxed">
-                Less Stress, Better Grades. Stuck on homework or projects? Use our quick and easy AI tool to sail through your assignments. Get answers, make diagrams, and even code, all without breaking a sweat.
+                Complete assignments 10x faster with AI-powered academic writing. Generate professional university assignments with proper citations, visual data, and academic excellence. Join thousands of students who have transformed their academic experience.
               </p>
               
               <div className="flex items-center gap-4 mb-6">
@@ -89,11 +86,11 @@ export default function Footer() {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-300">
                   <Users className="w-4 h-4" />
-                  <span>500K+ Users</span>
+                  <span>10K+ Students</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-gray-300">
                   <Award className="w-4 h-4" />
-                  <span>4.8/5 Rating</span>
+                  <span>4.9/5 Rating</span>
                 </div>
               </div>
               
@@ -208,7 +205,7 @@ export default function Footer() {
         className="fixed bottom-6 right-6 z-50"
       >
         <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-          🎀 Get 55% off the Lifetime plan! Use coupon code AUTOWRITE 🎀
+          🎀 Get 25% off the Basic plan! Use coupon code STUDENT25 🎀
         </div>
       </motion.div>
     </footer>

@@ -13,7 +13,9 @@ import {
   Award, 
   Clock,
   CheckCircle,
-  Sparkles
+  Sparkles,
+  Table,
+  BarChart3
 } from "lucide-react";
 
 interface EnhancedAssignmentFormProps {
@@ -29,11 +31,39 @@ export default function EnhancedAssignmentForm({ onSubmit, isGenerating }: Enhan
     if (!assignmentDetails.trim()) return;
     
     // Parse the assignment details and create a structured request
+    const details = assignmentDetails.toLowerCase();
+    
+    // Determine assignment type based on content
+    let assignmentType = "research_paper";
+    if (details.includes('case study')) {
+      assignmentType = "case_study";
+    } else if (details.includes('literature review')) {
+      assignmentType = "literature_review";
+    } else if (details.includes('business report')) {
+      assignmentType = "business_report";
+    } else if (details.includes('lab report')) {
+      assignmentType = "lab_report";
+    } else if (details.includes('technical report')) {
+      assignmentType = "technical_report";
+    }
+    
+    // Determine if tables and charts are required
+    const requiresTables = details.includes('table') || details.includes('tables');
+    const requiresCharts = details.includes('chart') || details.includes('figure') || details.includes('diagram') || details.includes('map');
+    
+    // Determine academic level based on content
+    let academicLevel = "undergraduate";
+    if (details.includes('graduate') || details.includes('masters')) {
+      academicLevel = "graduate";
+    } else if (details.includes('phd') || details.includes('doctoral')) {
+      academicLevel = "postgraduate";
+    }
+    
     const request = {
       assignmentDetails: assignmentDetails,
-      // Default values for professional features
-      assignmentType: "research_paper",
-      academicLevel: "undergraduate",
+      // Enhanced parsing for specific assignment types
+      assignmentType: assignmentType,
+      academicLevel: academicLevel,
       qualityLevel: "high",
       citations: true,
       citationStyle: "APA",
@@ -57,7 +87,10 @@ export default function EnhancedAssignmentForm({ onSubmit, isGenerating }: Enhan
       includePlagiarismCheck: true,
       includeQualityIndicators: true,
       includeEducationalDisclaimer: true,
-      exportFormats: ["txt", "docx", "pdf"]
+      exportFormats: ["txt", "docx", "pdf"],
+      includeTables: requiresTables || true, // Default to true but respect specific requirements
+      includeCharts: requiresCharts || true, // Default to true but respect specific requirements
+      includeStatisticalAnalysis: true
     };
     
     onSubmit(request);
@@ -85,7 +118,9 @@ export default function EnhancedAssignmentForm({ onSubmit, isGenerating }: Enhan
     { name: "Cover Page", icon: <FileText className="w-3 h-3" /> },
     { name: "References", icon: <BookOpen className="w-3 h-3" /> },
     { name: "Citations", icon: <Award className="w-3 h-3" /> },
-    { name: "Professional Formatting", icon: <CheckCircle className="w-3 h-3" /> }
+    { name: "Professional Formatting", icon: <CheckCircle className="w-3 h-3" /> },
+    { name: "Data Tables", icon: <Table className="w-3 h-3" /> },
+    { name: "Charts & Graphs", icon: <BarChart3 className="w-3 h-3" /> }
   ];
 
   return (

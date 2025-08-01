@@ -6,52 +6,48 @@ import { ChevronDown, Plus, Minus } from "lucide-react";
 
 const faqs = [
   {
-    question: "What is AssignmentGPT AI?",
-    answer: "AssignmentGPT AI is an AI-powered writing assistant designed to help students, blog writers, and teachers with their writing needs. It provides specific answers for assignments and homework, offers clear guidance, and follows academic standards closely."
+    question: "What is The Assignment AI?",
+    answer: "The Assignment AI is an AI-powered academic writing assistant specifically designed to help students create professional university assignments. It generates complete assignments with proper structure, citations, visual data, and academic formatting."
   },
   {
     question: "How do I get started?",
-    answer: "Simply sign up for a free account and choose your writing goal to begin. You can start with our free trial that includes 800 words/day and access to basic tools."
+    answer: "Simply sign up for a free account and start creating assignments immediately. You can begin with our free plan that includes 4 assignments per month and access to basic AI features."
   },
   {
     question: "Is my data secure?",
-    answer: "Yes, all data is encrypted and stored securely. We prioritize your privacy and follow industry-standard security practices to protect your information."
+    answer: "Yes, all data is encrypted and stored securely. We prioritize your privacy and follow industry-standard security practices to protect your information and assignments."
   },
   {
-    question: "Can AssignmentGPT AI help with academic writing?",
-    answer: "Absolutely, it can assist in generating essays, research papers, case studies, literature reviews, business reports, and even provide homework solutions with proper citations and references."
+    question: "Can The Assignment AI help with academic writing?",
+    answer: "Absolutely! It can generate complete research papers, essays, case studies, literature reviews, business reports, and other academic assignments with proper citations, references, and university-level formatting."
   },
   {
-    question: "What about blog writing?",
-    answer: "Yes, AssignmentGPT AI can generate SEO-friendly, engaging blog posts tailored to your audience with proper formatting and structure."
+    question: "What types of visual data can it generate?",
+    answer: "The Assignment AI can create professional tables, charts, graphs, and diagrams with academic formatting. These visual elements are automatically included in your assignments to support your analysis and conclusions."
   },
   {
-    question: "Is it useful for teachers?",
-    answer: "Certainly, teachers can use it to create lesson plans, quizzes, and other educational content. It's designed to support both students and educators."
+    question: "What citation styles are supported?",
+    answer: "We support all major academic citation styles including APA, MLA, Chicago, and Harvard. The AI automatically formats citations and references according to your chosen style."
   },
   {
     question: "How does the plagiarism checker work?",
-    answer: "Our advanced algorithms compare your content with millions of documents to ensure originality. We provide detailed reports on content authenticity and suggest improvements."
+    answer: "Our advanced algorithms compare your content with millions of academic documents to ensure originality. We provide detailed reports on content authenticity and suggest improvements for academic integrity."
   },
   {
-    question: "Can I use it for social media?",
-    answer: "Yes, you can create compelling social media posts for platforms like Facebook, Twitter, and Instagram with our specialized content generation tools."
-  },
-  {
-    question: "What formats can I download my content in?",
-    answer: "You can download your content in PDF, Word, or Google Docs formats. We also support Excel for data analysis and charts."
+    question: "What formats can I download my assignments in?",
+    answer: "You can download your assignments in PDF, Word (DOCX), or plain text (TXT) formats. Pro plans also support Excel (XLSX) for data analysis and charts."
   },
   {
     question: "Is there a free trial?",
-    answer: "Yes, we offer a limited-time free trial for new users to explore our features. You can start with 800 words/day and basic tools to see how it works."
+    answer: "Yes, we offer a free plan that includes 4 assignments per month with basic features. This allows you to try The Assignment AI and see how it works before upgrading."
   },
   {
     question: "How do I upgrade my account?",
-    answer: "You can upgrade your account through the \"Settings\" tab on your dashboard or by visiting our pricing page to choose the plan that best fits your needs."
+    answer: "You can upgrade your account through the \"Settings\" tab on your dashboard or by visiting our pricing page to choose the plan that best fits your academic needs."
   },
   {
-    question: "Can I collaborate with others?",
-    answer: "Yes, AssignmentGPT AI allows for real-time collaboration on documents. Premium plans include advanced collaboration features for team projects."
+    question: "Can I collaborate with others on assignments?",
+    answer: "Yes, The Assignment AI allows for real-time collaboration on assignments. Premium plans include advanced collaboration features for team projects and group assignments."
   },
   {
     question: "Is customer support available?",
@@ -59,11 +55,15 @@ const faqs = [
   },
   {
     question: "How often are new features added?",
-    answer: "We regularly update our platform to include new features based on user feedback. We're constantly improving our AI models and adding new tools to enhance your experience."
+    answer: "We regularly update our platform to include new features based on student feedback. We're constantly improving our AI models and adding new academic tools to enhance your experience."
   },
   {
     question: "Do you offer an affiliate program?",
-    answer: "Absolutely! We've introduced our affiliate program to make it easy for you to earn by promoting AssignmentGPT AI subscriptions. As an affiliate, you'll earn a 20% commission on each sale you generate with no maximum limit to your potential earnings."
+    answer: "Absolutely! We've introduced our affiliate program to make it easy for you to earn by promoting The Assignment AI subscriptions. As an affiliate, you'll earn a 20% commission on each sale you generate with no maximum limit to your potential earnings."
+  },
+  {
+    question: "What makes The Assignment AI different from other AI tools?",
+    answer: "The Assignment AI is specifically designed for academic assignments with features like automatic citation formatting, visual data generation, university-level structure, and academic integrity checks that general AI tools simply cannot provide."
   }
 ];
 
@@ -93,7 +93,7 @@ export default function FAQSection() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-xl text-gray-600 max-w-3xl mx-auto"
           >
-            Everything you need to know about AssignmentGPT AI. Can't find the answer you're looking for? Please chat to our friendly team.
+            Everything you need to know about The Assignment AI. Can't find the answer you're looking for? Please chat to our friendly team.
           </motion.p>
         </div>
 
@@ -169,7 +169,7 @@ export default function FAQSection() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="mailto:support@assignmentgpt.ai"
+                href="mailto:support@theassignmentai.com"
                 className="inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
               >
                 Contact Support

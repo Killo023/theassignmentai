@@ -15,7 +15,11 @@ import {
   Shield,
   Globe,
   Sparkles,
-  X
+  X,
+  Table,
+  BarChart3,
+  GraduationCap,
+  Clock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -25,41 +29,41 @@ import FAQSection from "@/components/landing/FAQSection";
 const features = [
   {
     icon: <Brain className="w-6 h-6" />,
-    title: "AI-Powered Writing",
-    description: "Advanced AI trained by experts for academic excellence"
+    title: "AI-Powered Assignment Generation",
+    description: "Advanced AI trained by academic experts for university-level assignments"
   },
   {
     icon: <FileText className="w-6 h-6" />,
-    title: "Multiple Formats",
-    description: "Generate essays, research papers, case studies, and more"
+    title: "Professional Academic Writing",
+    description: "Generate research papers, essays, case studies, and literature reviews"
   },
   {
-    icon: <Shield className="w-6 h-6" />,
-    title: "Plagiarism-Free",
-    description: "Original content with proper citations and references"
+    icon: <Table className="w-6 h-6" />,
+    title: "Visual Data & Tables",
+    description: "Professional tables, charts, and diagrams with academic formatting"
   },
   {
     icon: <Zap className="w-6 h-6" />,
     title: "Instant Results",
-    description: "Get professional assignments in minutes, not hours"
+    description: "Get complete assignments in minutes, not hours"
   },
   {
-    icon: <Globe className="w-6 h-6" />,
-    title: "Multi-Language",
-    description: "Support for 100+ languages and academic styles"
+    icon: <GraduationCap className="w-6 h-6" />,
+    title: "Academic Standards",
+    description: "APA, MLA, Chicago, and Harvard citation styles with proper references"
   },
   {
     icon: <Sparkles className="w-6 h-6" />,
     title: "Premium Quality",
-    description: "University-level assignments with proper formatting"
+    description: "University-level assignments with professional formatting and structure"
   }
 ];
 
 const stats = [
-  { number: "20M+", label: "Words Generated" },
-  { number: "500K+", label: "Active Users" },
+  { number: "50K+", label: "Assignments Generated" },
+  { number: "10K+", label: "Active Students" },
   { number: "500+", label: "Universities" },
-  { number: "200K+", label: "Monthly Visitors" }
+  { number: "99%", label: "Satisfaction Rate" }
 ];
 
 export default function HomePage() {
@@ -85,9 +89,9 @@ export default function HomePage() {
               transition={{ duration: 0.8 }}
               className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
             >
-              We Help You With{" "}
+              The Assignment{" "}
               <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-                Homework.
+                AI
               </span>
             </motion.h1>
 
@@ -98,7 +102,7 @@ export default function HomePage() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-xl md:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto"
             >
-              Stressed About Homework? Let Us Finish it Fast. Get Detailed Answers 10X Faster!
+              Generate professional university assignments with AI-powered writing, visual data, and academic excellence. Complete assignments 10x faster with proper citations and formatting.
             </motion.p>
 
             {/* Rating */}
@@ -113,7 +117,7 @@ export default function HomePage() {
                   <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                 ))}
               </div>
-              <span className="text-white font-semibold">Rated 4.8/5</span>
+              <span className="text-white font-semibold">Rated 4.9/5 by 10,000+ students</span>
             </motion.div>
 
             {/* Stats */}
@@ -146,7 +150,7 @@ export default function HomePage() {
                 onMouseLeave={() => setIsHovered(false)}
               >
                 <Link href="/dashboard/new" className="flex items-center gap-2">
-                  Get Started Now
+                  Start Creating Now
                   <motion.div
                     animate={{ x: isHovered ? 5 : 0 }}
                     transition={{ duration: 0.2 }}
@@ -179,9 +183,9 @@ export default function HomePage() {
               transition={{ duration: 0.8 }}
               className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
             >
-              What Can You Generate With{" "}
+              What Can You Create With{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                AssignmentGPT AI?
+                The Assignment AI?
               </span>
             </motion.h2>
             <motion.p 
@@ -190,7 +194,7 @@ export default function HomePage() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
-              Our AI is trained by experts in content creation and conversions. With the help of this homework AI solver, students don't have to struggle to do their homework.
+              Our AI is specifically trained for academic excellence. Generate complete assignments with proper structure, citations, visual data, and university-level quality in minutes.
             </motion.p>
           </div>
 
@@ -224,7 +228,7 @@ export default function HomePage() {
               transition={{ duration: 0.8 }}
               className="text-4xl md:text-5xl font-bold text-gray-900 mb-6"
             >
-              Why AssignmentGPT AI is Better than ChatGPT?
+              Why The Assignment AI is Better than ChatGPT?
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -232,12 +236,12 @@ export default function HomePage() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
-              AssignmentGPT AI is better for academic help than ChatGPT. It provides specific answers for assignments and homework, offers clear guidance, and follows academic standards closely.
+              The Assignment AI is specifically designed for academic assignments and homework. It provides structured, citation-ready content with visual elements that ChatGPT simply cannot match.
             </motion.p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* AssignmentGPT AI Column */}
+            {/* The Assignment AI Column */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -248,29 +252,29 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
                   <Award className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900">AssignmentGPT AI</h3>
+                <h3 className="text-2xl font-bold text-gray-900">The Assignment AI</h3>
               </div>
               
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">🎓 Designed for Students and Academia</span>
+                  <span className="text-gray-700">🎓 Specifically designed for academic assignments</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">🧠 Superior AI Model Built for Students & Academia</span>
+                  <span className="text-gray-700">📊 Generates professional tables and charts</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">📖 Academic Use Cases: Enriched with 20+ Academia Use Cases</span>
+                  <span className="text-gray-700">📖 Proper academic citations and references</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">✔ Specialized Tools: AI Diagram Maker, Bypass AI, Math Solver</span>
+                  <span className="text-gray-700">✅ University-level formatting and structure</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="text-gray-700">👍 Real-Time Reference: Answers with Real-Time References</span>
+                  <span className="text-gray-700">⚡ Complete assignments in minutes</span>
                 </div>
               </div>
             </motion.div>
@@ -292,23 +296,23 @@ export default function HomePage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <X className="w-5 h-5 text-red-500" />
-                  <span className="text-gray-700">🌐 Designed for General-Purpose</span>
+                  <span className="text-gray-700">🌐 General-purpose, not academic-focused</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <X className="w-5 h-5 text-red-500" />
-                  <span className="text-gray-700">🤖 General-Purpose AI Model</span>
+                  <span className="text-gray-700">📊 No visual data generation</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <X className="w-5 h-5 text-red-500" />
-                  <span className="text-gray-700">📃 Limited Academic Focus</span>
+                  <span className="text-gray-700">📃 Limited academic formatting</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <X className="w-5 h-5 text-red-500" />
-                  <span className="text-gray-700">❌ Specialized Tools: N/A</span>
+                  <span className="text-gray-700">❌ No structured assignment output</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <X className="w-5 h-5 text-red-500" />
-                  <span className="text-gray-700">👎 References may not be real-time</span>
+                  <span className="text-gray-700">⏱️ Requires manual formatting and editing</span>
                 </div>
               </div>
             </motion.div>
@@ -331,7 +335,7 @@ export default function HomePage() {
             transition={{ duration: 0.8 }}
             className="text-4xl md:text-5xl font-bold text-white mb-6"
           >
-            🚀 Boost Your Homework Speed By 10x
+            🚀 Complete Your Assignments 10x Faster
           </motion.h2>
           <motion.p 
             initial={{ opacity: 0, y: 20 }}
@@ -339,7 +343,7 @@ export default function HomePage() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto"
           >
-            Choose the perfect plan for you and say goodbye to long, frustrating hours of homework or research paper.
+            Join thousands of students who have transformed their academic experience with The Assignment AI. Start creating professional assignments today.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -352,7 +356,7 @@ export default function HomePage() {
               className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-black font-bold text-lg px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             >
               <Link href="/dashboard/new" className="flex items-center gap-2">
-                Get Started Free
+                Start Creating Free
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </Button>

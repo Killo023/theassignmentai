@@ -338,6 +338,51 @@ const AssignmentCreator = () => {
           content: response.content,
           status: "completed",
           requirements: assignmentDetails,
+          
+          // Enhanced professional fields
+          assignment_type: formData.assignmentType,
+          academic_level: formData.academicLevel,
+          quality_level: formData.qualityLevel,
+          
+          // Citation and References
+          include_citations: formData.citations,
+          citation_style: formData.citationStyle,
+          
+          // Structural Elements
+          include_cover_page: formData.includeCoverPage,
+          include_table_of_contents: formData.includeTableOfContents,
+          include_executive_summary: formData.includeExecutiveSummary,
+          include_appendices: formData.includeAppendices,
+          
+          // Formatting Options
+          font_family: formData.fontFamily,
+          font_size: formData.fontSize,
+          line_spacing: formData.lineSpacing,
+          margin_size: formData.marginSize,
+          page_size: formData.pageSize,
+          include_page_numbers: formData.includePageNumbers,
+          include_headers: formData.includeHeaders,
+          include_footers: formData.includeFooters,
+          
+          // Multiple Choice Questions
+          include_mcq: formData.includeMCQ,
+          mcq_count: formData.mcqCount,
+          mcq_difficulty: formData.mcqDifficulty,
+          include_answer_key: formData.includeAnswerKey,
+          include_rubric: formData.includeRubric,
+          
+          // Quality Assurance
+          include_plagiarism_check: formData.includePlagiarismCheck,
+          include_quality_indicators: formData.includeQualityIndicators,
+          include_educational_disclaimer: formData.includeEducationalDisclaimer,
+          
+          // Export Options
+          export_formats: formData.exportFormats,
+          
+          // Visual Elements
+          tables_data: response.tables,
+          charts_data: response.charts,
+          references_data: response.references,
         });
         
         console.log("✅ Assignment saved successfully:", savedAssignment);

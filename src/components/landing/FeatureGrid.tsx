@@ -118,9 +118,9 @@ const FeatureGrid = () => {
                 >
                   {(() => {
                     const featureImages = [
-                      "https://images.unsplash.com/photo-1677442136019-21780ecad995?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80", // AI/Robot for AI Document Generation
-                      "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80", // Chat/Communication for Real-time Refinement
-                      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"  // Documents for Multi-format Export
+                      "/images/feature-ai-generation.jpg", // AI/Robot for AI Document Generation
+                      "/images/feature-chat-refinement.jpg", // Chat/Communication for Real-time Refinement
+                      "/images/feature-export-formats.jpg"  // Documents for Multi-format Export
                     ];
                     return (
                       <img

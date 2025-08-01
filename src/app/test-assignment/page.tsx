@@ -2,40 +2,58 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { aiService, type AssignmentRequest } from "@/lib/ai-service";
-import ProfessionalAssignmentDisplay from "@/components/assignment/ProfessionalAssignmentDisplay";
+import { useAuth } from "@/lib/auth-context";
+import { AssignmentService } from "@/lib/assignment-service";
+import { aiService } from "@/lib/ai-service";
 
 export default function TestAssignmentPage() {
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [assignment, setAssignment] = useState<any>(null);
-  const [tables, setTables] = useState<any[]>([]);
-  const [charts, setCharts] = useState<any[]>([]);
-  const [references, setReferences] = useState<any[]>([]);
-  const [error, setError] = useState<string>("");
+  const { user } = useAuth();
+  const [status, setStatus] = useState<string>("Ready to test");
+  const [logs, setLogs] = useState<string[]>([]);
 
-  const testAssignment = async () => {
-    setIsGenerating(true);
-    setError("");
-    
+  const addLog = (message: string) => {
+    const timestamp = new Date().toLocaleTimeString();
+    setLogs(prev => [...prev, `${timestamp}: ${message}`]);
+    console.log(message);
+  };
+
+  const testAssignmentCreation = async () => {
+    if (!user?.id) {
+      addLog("❌ No user ID available");
+      return;
+    }
+
     try {
-      // Check current usage before assignment creation
-      const paymentService = (await import("@/lib/payment-service")).default.getInstance();
-      const beforeUsage = await paymentService.getAssignmentUsage("test-user-id");
-      console.log("Usage before assignment:", beforeUsage);
+      addLog("🧪 Starting assignment creation test...");
       
-      // Test increment function directly
-      await paymentService.incrementAssignmentCount("test-user-id");
-      const afterIncrement = await paymentService.getAssignmentUsage("test-user-id");
-      console.log("Usage after direct increment:", afterIncrement);
-      const request: AssignmentRequest = {
-        title: "The Impact of Digital Transformation on Business Strategy",
-        subject: "Business Management",
+      const assignmentService = new AssignmentService(user.id);
+      
+      // Test database connection
+      addLog("🔍 Testing database connection...");
+      const connectionOk = await assignmentService.testDatabaseConnection();
+      if (!connectionOk) {
+        addLog("❌ Database connection failed");
+        return;
+      }
+      addLog("✅ Database connection successful");
+      
+      // Test AI service
+      addLog("🤖 Testing AI service...");
+      const aiOk = await aiService.validateAPIKey();
+      if (!aiOk) {
+        addLog("❌ AI service not available");
+        return;
+      }
+      addLog("✅ AI service available");
+      
+      // Generate a test assignment
+      addLog("📝 Generating test assignment...");
+      const testRequest = {
+        title: "Test Research Paper",
+        subject: "Computer Science",
         type: "Research Paper",
-        wordCount: 2000,
-        requirements: "Analyze how digital transformation affects business strategy, include case studies, and provide recommendations for organizations.",
+        wordCount: 1000,
+        requirements: "Write a research paper on artificial intelligence in healthcare. Include tables and charts with data.",
         assignmentType: "research_paper",
         academicLevel: "undergraduate",
         qualityLevel: "high",
@@ -43,141 +61,106 @@ export default function TestAssignmentPage() {
         citationStyle: "APA",
         includeTables: true,
         includeCharts: true,
-        includeStatisticalAnalysis: true,
-        includeCoverPage: true,
-        includeTableOfContents: true,
-        includeExecutiveSummary: true,
-        fontFamily: "Times New Roman",
-        fontSize: 12,
-        lineSpacing: 1.5,
-        marginSize: 1,
-        pageSize: "A4",
-        includePageNumbers: true,
-        includeHeaders: true,
-        includeFooters: true,
-        includePlagiarismCheck: true,
-        includeQualityIndicators: true,
-        includeEducationalDisclaimer: true,
-        exportFormats: ["pdf", "docx"]
+        includeStatisticalAnalysis: true
       };
-
-      const response = await aiService.generateAssignment(request);
       
-      console.log("AI Response:", response);
-      console.log("Content length:", response.content.length);
-      console.log("Tables:", response.tables.length);
-      console.log("Charts:", response.charts.length);
-      console.log("References:", response.references.length);
+      const aiResponse = await aiService.generateAssignment(testRequest);
+      addLog(`✅ AI generated assignment with ${aiResponse.tables.length} tables, ${aiResponse.charts.length} charts, ${aiResponse.references.length} references`);
       
-      setAssignment({
-        title: request.title,
-        subject: request.subject,
-        type: request.type,
-        wordCount: request.wordCount,
-        content: response.content,
+      // Save to database
+      addLog("💾 Saving assignment to database...");
+      const savedAssignment = await assignmentService.createAssignment({
+        user_id: user.id,
+        title: testRequest.title,
+        subject: testRequest.subject,
+        type: testRequest.type,
+        word_count: testRequest.wordCount,
+        content: aiResponse.content,
         status: "completed",
-        requirements: request.requirements,
-        assignmentType: request.assignmentType,
-        academicLevel: request.academicLevel,
-        qualityLevel: request.qualityLevel,
-        citations: request.citations,
-        citationStyle: request.citationStyle,
-        includeCoverPage: request.includeCoverPage,
-        includeTableOfContents: request.includeTableOfContents,
-        includeExecutiveSummary: request.includeExecutiveSummary,
-        fontFamily: request.fontFamily,
-        fontSize: request.fontSize,
-        lineSpacing: request.lineSpacing,
-        marginSize: request.marginSize,
-        pageSize: request.pageSize,
-        includePageNumbers: request.includePageNumbers,
-        includeHeaders: request.includeHeaders,
-        includeFooters: request.includeFooters,
-        includePlagiarismCheck: request.includePlagiarismCheck,
-        includeQualityIndicators: request.includeQualityIndicators,
-        includeEducationalDisclaimer: request.includeEducationalDisclaimer,
-        exportFormats: request.exportFormats,
+        requirements: testRequest.requirements,
+        assignment_type: testRequest.assignmentType,
+        academic_level: testRequest.academicLevel,
+        quality_level: testRequest.qualityLevel,
+        include_citations: testRequest.citations,
+        citation_style: testRequest.citationStyle,
+        include_tables: testRequest.includeTables,
+        include_charts: testRequest.includeCharts,
+        include_statistical_analysis: testRequest.includeStatisticalAnalysis,
+        tables_data: aiResponse.tables,
+        charts_data: aiResponse.charts,
+        references_data: aiResponse.references
       });
       
-      setTables(response.tables);
-      setCharts(response.charts);
-      setReferences(response.references);
+      if (savedAssignment) {
+        addLog("✅ Assignment saved successfully!");
+        addLog(`📊 Saved assignment ID: ${savedAssignment.id}`);
+        addLog(`📊 Tables: ${savedAssignment.tables_data?.length || 0}`);
+        addLog(`📊 Charts: ${savedAssignment.charts_data?.length || 0}`);
+        addLog(`📊 References: ${savedAssignment.references_data?.length || 0}`);
+      } else {
+        addLog("❌ Failed to save assignment");
+      }
+      
+      // Fetch assignments to verify
+      addLog("📋 Fetching assignments to verify...");
+      const assignments = await assignmentService.getAssignments();
+      addLog(`✅ Found ${assignments.length} assignments for user`);
+      
+      if (assignments.length > 0) {
+        const latest = assignments[0];
+        addLog(`📊 Latest assignment: ${latest.title}`);
+        addLog(`📊 Has tables: ${latest.tables_data?.length || 0}`);
+        addLog(`📊 Has charts: ${latest.charts_data?.length || 0}`);
+        addLog(`📊 Has references: ${latest.references_data?.length || 0}`);
+      }
       
     } catch (error) {
-      console.error("Error generating test assignment:", error);
-      setError(error instanceof Error ? error.message : "Unknown error occurred");
-    } finally {
-      setIsGenerating(false);
+      addLog(`❌ Error during test: ${error}`);
     }
+  };
+
+  const clearLogs = () => {
+    setLogs([]);
   };
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">
-            Assignment Generation Test
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-6">
+            Assignment Creation Test
           </h1>
-          <p className="text-gray-600 mb-4">
-            This page tests the assignment generation functionality to ensure it produces complete, university-standard assignments.
-          </p>
           
-          <Button 
-            onClick={testAssignment} 
-            disabled={isGenerating}
-            className="mb-4"
-          >
-            {isGenerating ? "Generating..." : "Generate Test Assignment"}
-          </Button>
-          
-          {error && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="text-red-800">Error: {error}</p>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2">User Info</h3>
+            <div className="bg-gray-100 p-3 rounded">
+              <p><strong>User ID:</strong> {user?.id || "Not authenticated"}</p>
+              <p><strong>Email:</strong> {user?.email || "N/A"}</p>
             </div>
-          )}
-        </div>
-
-        {assignment && (
-          <div className="bg-white rounded-lg shadow-lg">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                Test Results
-              </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div>
-                  <span className="font-medium">Content Length:</span>
-                  <br />
-                  {assignment.content.length} characters
-                </div>
-                <div>
-                  <span className="font-medium">Expected Words:</span>
-                  <br />
-                  {assignment.wordCount} words
-                </div>
-                <div>
-                  <span className="font-medium">Tables Generated:</span>
-                  <br />
-                  {tables.length} tables
-                </div>
-                <div>
-                  <span className="font-medium">Charts Generated:</span>
-                  <br />
-                  {charts.length} charts
-                </div>
-              </div>
-            </div>
-            
-            <ProfessionalAssignmentDisplay
-              assignment={assignment}
-              tables={tables}
-              charts={charts}
-              references={references}
-              onExport={(format) => console.log(`Export as ${format}`)}
-              onCopy={() => console.log("Copy content")}
-              onSave={() => console.log("Save assignment")}
-            />
           </div>
-        )}
+
+          <div className="flex gap-3 mb-6">
+            <Button onClick={testAssignmentCreation}>
+              🧪 Test Assignment Creation
+            </Button>
+            <Button onClick={clearLogs} variant="outline">
+              🗑️ Clear Logs
+            </Button>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold mb-2">Test Logs</h3>
+            <div className="bg-black text-green-400 p-4 rounded font-mono text-sm h-96 overflow-y-auto">
+              {logs.length === 0 ? (
+                <p>No logs yet...</p>
+              ) : (
+                logs.map((log, index) => (
+                  <div key={index}>{log}</div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

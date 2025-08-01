@@ -1,5 +1,6 @@
 import { supabase } from './supabase-client';
 import PaymentService from './payment-service';
+import { TableData, ChartData, Reference } from './ai-service';
 
 export interface AssignmentWithDates {
   id: string;
@@ -15,6 +16,55 @@ export interface AssignmentWithDates {
   updated_at: string;
   content?: string;
   requirements?: string;
+  
+  // Enhanced professional fields
+  assignment_type?: string;
+  academic_level?: string;
+  quality_level?: string;
+  
+  // Citation and References
+  include_citations?: boolean;
+  citation_style?: string;
+  
+  // Structural Elements
+  include_cover_page?: boolean;
+  include_table_of_contents?: boolean;
+  include_executive_summary?: boolean;
+  include_appendices?: boolean;
+  
+  // Formatting Options
+  font_family?: string;
+  font_size?: number;
+  line_spacing?: number;
+  margin_size?: number;
+  page_size?: string;
+  include_page_numbers?: boolean;
+  include_headers?: boolean;
+  include_footers?: boolean;
+  
+  // Multiple Choice Questions
+  include_mcq?: boolean;
+  mcq_count?: number;
+  mcq_difficulty?: string;
+  include_answer_key?: boolean;
+  include_rubric?: boolean;
+  
+  // Quality Assurance
+  include_plagiarism_check?: boolean;
+  include_quality_indicators?: boolean;
+  include_educational_disclaimer?: boolean;
+  
+  // Export Options
+  export_formats?: string[];
+  
+  // Visual Elements
+  tables_data?: TableData[];
+  charts_data?: ChartData[];
+  references_data?: Reference[];
+  
+  // Quality Metrics
+  quality_metrics?: any;
+  formatting_preferences?: any;
 }
 
 export interface AssignmentInsert {
@@ -26,6 +76,57 @@ export interface AssignmentInsert {
   word_count?: number;
   is_favorite?: boolean;
   due_date?: string | null;
+  content?: string;
+  requirements?: string;
+  
+  // Enhanced professional fields
+  assignment_type?: string;
+  academic_level?: string;
+  quality_level?: string;
+  
+  // Citation and References
+  include_citations?: boolean;
+  citation_style?: string;
+  
+  // Structural Elements
+  include_cover_page?: boolean;
+  include_table_of_contents?: boolean;
+  include_executive_summary?: boolean;
+  include_appendices?: boolean;
+  
+  // Formatting Options
+  font_family?: string;
+  font_size?: number;
+  line_spacing?: number;
+  margin_size?: number;
+  page_size?: string;
+  include_page_numbers?: boolean;
+  include_headers?: boolean;
+  include_footers?: boolean;
+  
+  // Multiple Choice Questions
+  include_mcq?: boolean;
+  mcq_count?: number;
+  mcq_difficulty?: string;
+  include_answer_key?: boolean;
+  include_rubric?: boolean;
+  
+  // Quality Assurance
+  include_plagiarism_check?: boolean;
+  include_quality_indicators?: boolean;
+  include_educational_disclaimer?: boolean;
+  
+  // Export Options
+  export_formats?: string[];
+  
+  // Visual Elements - Stored as JSON strings in database
+  tables_data?: string;
+  charts_data?: string;
+  references_data?: string;
+  
+  // Quality Metrics - Stored as JSON strings in database
+  quality_metrics?: string;
+  formatting_preferences?: string;
 }
 
 export class AssignmentService {
@@ -59,7 +160,18 @@ export class AssignmentService {
 
       console.log('✅ Successfully fetched assignments:', data?.length || 0);
       console.log('📊 Assignment data:', data);
-      return data || [];
+      
+      // Parse visual elements from JSONB fields
+      const assignments = (data || []).map(assignment => ({
+        ...assignment,
+        tables_data: assignment.tables_data ? JSON.parse(assignment.tables_data) : [],
+        charts_data: assignment.charts_data ? JSON.parse(assignment.charts_data) : [],
+        references_data: assignment.references_data ? JSON.parse(assignment.references_data) : [],
+        quality_metrics: assignment.quality_metrics ? JSON.parse(assignment.quality_metrics) : {},
+        formatting_preferences: assignment.formatting_preferences ? JSON.parse(assignment.formatting_preferences) : {}
+      }));
+      
+      return assignments;
     } catch (error) {
       console.error('❌ Error in getAssignments:', error);
       return [];
@@ -90,7 +202,10 @@ export class AssignmentService {
         subject: 'Test',
         type: 'Test',
         status: 'draft' as const,
-        word_count: 100
+        word_count: 100,
+        tables_data: JSON.stringify([]),
+        charts_data: JSON.stringify([]),
+        references_data: JSON.stringify([])
       };
       
       const { data: insertData, error: insertError } = await supabase
@@ -163,7 +278,17 @@ export class AssignmentService {
       await this.paymentService.incrementAssignmentCount(this.userId);
       console.log(`✅ Assignment count incremented for user: ${this.userId}`);
 
-      return data;
+      // Parse visual elements from JSONB fields
+      const parsedAssignment = {
+        ...data,
+        tables_data: data.tables_data ? JSON.parse(data.tables_data) : [],
+        charts_data: data.charts_data ? JSON.parse(data.charts_data) : [],
+        references_data: data.references_data ? JSON.parse(data.references_data) : [],
+        quality_metrics: data.quality_metrics ? JSON.parse(data.quality_metrics) : {},
+        formatting_preferences: data.formatting_preferences ? JSON.parse(data.formatting_preferences) : {}
+      };
+
+      return parsedAssignment;
     } catch (error) {
       console.error('❌ Error in createAssignment:', error);
       throw error;
@@ -172,9 +297,11 @@ export class AssignmentService {
 
   async updateAssignment(id: string, updates: Partial<AssignmentWithDates>): Promise<AssignmentWithDates | null> {
     try {
+      const mappedUpdates = this.mapAssignmentToDB(updates);
+      
       const { data, error } = await supabase
         .from('assignments')
-        .update(updates)
+        .update(mappedUpdates)
         .eq('id', id)
         .eq('user_id', this.userId)
         .select()
@@ -185,7 +312,17 @@ export class AssignmentService {
         throw error;
       }
 
-      return data;
+      // Parse visual elements from JSONB fields
+      const parsedAssignment = {
+        ...data,
+        tables_data: data.tables_data ? JSON.parse(data.tables_data) : [],
+        charts_data: data.charts_data ? JSON.parse(data.charts_data) : [],
+        references_data: data.references_data ? JSON.parse(data.references_data) : [],
+        quality_metrics: data.quality_metrics ? JSON.parse(data.quality_metrics) : {},
+        formatting_preferences: data.formatting_preferences ? JSON.parse(data.formatting_preferences) : {}
+      };
+
+      return parsedAssignment;
     } catch (error) {
       console.error('Error in updateAssignment:', error);
       return null;
@@ -253,6 +390,57 @@ export class AssignmentService {
       word_count: assignment.word_count || 0,
       is_favorite: assignment.is_favorite || false,
       due_date: assignment.due_date || null,
+      content: assignment.content,
+      requirements: assignment.requirements,
+      
+      // Enhanced professional fields
+      assignment_type: assignment.assignment_type,
+      academic_level: assignment.academic_level,
+      quality_level: assignment.quality_level,
+      
+      // Citation and References
+      include_citations: assignment.include_citations,
+      citation_style: assignment.citation_style,
+      
+      // Structural Elements
+      include_cover_page: assignment.include_cover_page,
+      include_table_of_contents: assignment.include_table_of_contents,
+      include_executive_summary: assignment.include_executive_summary,
+      include_appendices: assignment.include_appendices,
+      
+      // Formatting Options
+      font_family: assignment.font_family,
+      font_size: assignment.font_size,
+      line_spacing: assignment.line_spacing,
+      margin_size: assignment.margin_size,
+      page_size: assignment.page_size,
+      include_page_numbers: assignment.include_page_numbers,
+      include_headers: assignment.include_headers,
+      include_footers: assignment.include_footers,
+      
+      // Multiple Choice Questions
+      include_mcq: assignment.include_mcq,
+      mcq_count: assignment.mcq_count,
+      mcq_difficulty: assignment.mcq_difficulty,
+      include_answer_key: assignment.include_answer_key,
+      include_rubric: assignment.include_rubric,
+      
+      // Quality Assurance
+      include_plagiarism_check: assignment.include_plagiarism_check,
+      include_quality_indicators: assignment.include_quality_indicators,
+      include_educational_disclaimer: assignment.include_educational_disclaimer,
+      
+      // Export Options
+      export_formats: assignment.export_formats,
+      
+      // Visual Elements - Convert to JSON strings for storage
+      tables_data: assignment.tables_data ? JSON.stringify(assignment.tables_data) : '[]',
+      charts_data: assignment.charts_data ? JSON.stringify(assignment.charts_data) : '[]',
+      references_data: assignment.references_data ? JSON.stringify(assignment.references_data) : '[]',
+      
+      // Quality Metrics
+      quality_metrics: assignment.quality_metrics ? JSON.stringify(assignment.quality_metrics) : JSON.stringify({}),
+      formatting_preferences: assignment.formatting_preferences ? JSON.stringify(assignment.formatting_preferences) : JSON.stringify({})
     };
   }
 
@@ -271,6 +459,55 @@ export class AssignmentService {
       updated_at: data.updated_at,
       content: data.content,
       requirements: data.requirements,
+      
+      // Enhanced professional fields
+      assignment_type: data.assignment_type,
+      academic_level: data.academic_level,
+      quality_level: data.quality_level,
+      
+      // Citation and References
+      include_citations: data.include_citations,
+      citation_style: data.citation_style,
+      
+      // Structural Elements
+      include_cover_page: data.include_cover_page,
+      include_table_of_contents: data.include_table_of_contents,
+      include_executive_summary: data.include_executive_summary,
+      include_appendices: data.include_appendices,
+      
+      // Formatting Options
+      font_family: data.font_family,
+      font_size: data.font_size,
+      line_spacing: data.line_spacing,
+      margin_size: data.margin_size,
+      page_size: data.page_size,
+      include_page_numbers: data.include_page_numbers,
+      include_headers: data.include_headers,
+      include_footers: data.include_footers,
+      
+      // Multiple Choice Questions
+      include_mcq: data.include_mcq,
+      mcq_count: data.mcq_count,
+      mcq_difficulty: data.mcq_difficulty,
+      include_answer_key: data.include_answer_key,
+      include_rubric: data.include_rubric,
+      
+      // Quality Assurance
+      include_plagiarism_check: data.include_plagiarism_check,
+      include_quality_indicators: data.include_quality_indicators,
+      include_educational_disclaimer: data.include_educational_disclaimer,
+      
+      // Export Options
+      export_formats: data.export_formats,
+      
+      // Visual Elements - Parse from JSON strings
+      tables_data: data.tables_data ? JSON.parse(data.tables_data) : [],
+      charts_data: data.charts_data ? JSON.parse(data.charts_data) : [],
+      references_data: data.references_data ? JSON.parse(data.references_data) : [],
+      
+      // Quality Metrics
+      quality_metrics: data.quality_metrics ? JSON.parse(data.quality_metrics) : {},
+      formatting_preferences: data.formatting_preferences ? JSON.parse(data.formatting_preferences) : {}
     };
   }
 } 
