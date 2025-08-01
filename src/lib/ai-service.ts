@@ -92,14 +92,27 @@ class AIService {
 
   async generateAssignment(request: AssignmentRequest): Promise<AIResponse> {
     try {
+      console.log('🚀 Starting assignment generation...');
+      
+      // Validate API key first
+      const isValid = await this.validateAPIKey();
+      if (!isValid) {
+        throw new Error('Together AI API key is not properly configured. Please check your .env.local file.');
+      }
+
       const prompt = this.buildAssignmentPrompt(request);
+      console.log(`📝 Generated prompt for ${request.wordCount} word assignment`);
+      
       const response = await this.callTogetherAI(prompt, request.wordCount * 3);
+      console.log('✅ AI response received successfully');
       
       // Parse the response to extract tables, charts, and references
       const parsedContent = this.parseAssignmentContent(response.content, request);
+      console.log(`📊 Parsed content: ${parsedContent.tables.length} tables, ${parsedContent.charts.length} charts, ${parsedContent.references.length} references`);
       
       // Validate and enhance the content
       const validatedContent = this.validateAndEnhanceContent(parsedContent.content, request);
+      console.log('✅ Content validation and enhancement completed');
       
       return {
         content: validatedContent,
@@ -109,7 +122,7 @@ class AIService {
         usage: response.usage
       };
     } catch (error) {
-      console.error('Error generating assignment:', error);
+      console.error('❌ Error generating assignment:', error);
       
       // Provide more specific error messages
       let errorMessage = 'Error generating assignment. Please try again.';
@@ -120,9 +133,11 @@ class AIService {
         } else if (error.message.includes('All AI models failed')) {
           errorMessage = 'All AI models are currently unavailable. Please try again in a few minutes.';
         } else if (error.message.includes('API key not configured')) {
-          errorMessage = 'AI service is not properly configured. Please contact support.';
+          errorMessage = 'AI service is not properly configured. Please check your Together AI API key configuration.';
         } else if (error.message.includes('API request failed')) {
           errorMessage = 'AI service is temporarily unavailable. Please try again later.';
+        } else if (error.message.includes('Together AI API key')) {
+          errorMessage = 'Together AI API key is not properly configured. Please check your .env.local file.';
         }
       }
       
@@ -138,9 +153,12 @@ class AIService {
 
   async validateAPIKey(): Promise<boolean> {
     try {
-      if (!this.apiKey) {
+      if (!this.apiKey || this.apiKey === 'your_together_ai_api_key_here') {
+        console.error('❌ Together AI API key not configured. Please set NEXT_PUBLIC_TOGETHER_API_KEY in your .env.local file');
         return false;
       }
+
+      console.log('🔍 Validating Together AI API key...');
       
       const response = await fetch('https://api.together.xyz/v1/models', {
         headers: {
@@ -148,10 +166,20 @@ class AIService {
           'Content-Type': 'application/json'
         }
       });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`❌ API key validation failed: ${response.status} - ${errorText}`);
+        return false;
+      }
+
+      const data = await response.json();
+      console.log('✅ Together AI API key validated successfully');
+      console.log(`📊 Available models: ${data.data?.length || 0} models`);
       
-      return response.ok;
+      return true;
     } catch (error) {
-      console.error('Error validating API key:', error);
+      console.error('❌ API key validation failed:', error);
       return false;
     }
   }
