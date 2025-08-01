@@ -13,6 +13,7 @@ A modern, AI-powered academic assignment creation platform built with Next.js 14
 
 ### AI Integration
 - **Together AI Integration** - Free LLM access for assignment generation
+- **Restricted Model Usage** - Only uses specified free LLMs for cost control
 - **Smart Prompts** - Context-aware AI responses based on assignment details
 - **Citation Generation** - Automatic APA-style citations and references
 - **Content Refinement** - AI-powered suggestions for improvement
@@ -73,6 +74,27 @@ A modern, AI-powered academic assignment creation platform built with Next.js 14
 
 6. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 🤖 AI Model Configuration
+
+### Restricted Model Usage
+
+This application is configured to use only specific free LLMs through Together.ai to ensure cost-effective operation:
+
+#### Available Models
+- **Arcee AI**: `AFM-4.5B`, `chat`
+- **Meta**: `Meta Llama Vision Free`, `chat`, `Meta Llama 3.3 70B Instruct Turbo Free`
+- **DeepSeek**: `DeepSeek R1 Distill Llama 70B Free`, `chat`
+- **LG AI**: `EXAONE Deep 32B`, `chat`, `EXAONE 3.5 32B Instruct`
+
+#### Model Selection Logic
+1. **API Validation**: Checks available models from Together.ai
+2. **Filtering**: Only uses models from the allowed list
+3. **Fallback**: If API is unavailable, uses the predefined list
+4. **Error Handling**: Provides clear error messages if no models are available
+
+#### Testing Model Restrictions
+Visit `/test-restricted-models` to verify that only the specified models are being used.
 
 ## 🎯 Usage
 

@@ -177,6 +177,28 @@ class AIService {
       console.log('✅ Together AI API key validated successfully');
       console.log(`📊 Available models: ${data.data?.length || 0} models`);
       
+      // Validate that our required models are available
+      const availableModels = data.data?.map((model: any) => model.id) || [];
+      const requiredModels = [
+        'arcee-ai/AFM-4.5B',
+        'arcee-ai/chat',
+        'meta-llama/Meta Llama Vision Free',
+        'meta-llama/chat',
+        'deepseek-ai/DeepSeek R1 Distill Llama 70B Free',
+        'deepseek-ai/chat',
+        'lg-ai/EXAONE Deep 32B',
+        'lg-ai/chat',
+        'lg-ai/EXAONE 3.5 32B Instruct',
+        'meta-llama/Meta Llama 3.3 70B Instruct Turbo Free'
+      ];
+      
+      const availableRequiredModels = requiredModels.filter(model => availableModels.includes(model));
+      console.log(`📋 Available required models: ${availableRequiredModels.length}/${requiredModels.length}`);
+      
+      if (availableRequiredModels.length === 0) {
+        console.warn('⚠️ No required models are available. Some features may not work properly.');
+      }
+      
       return true;
     } catch (error) {
       console.error('❌ API key validation failed:', error);
@@ -192,19 +214,24 @@ class AIService {
     const academicLevel = request.academicLevel || 'undergraduate';
     const qualityLevel = request.qualityLevel || 'standard';
 
+    // Parse specific requirements for better handling
+    const specificRequirements = this.parseSpecificRequirements(request.requirements || '');
+    const requiredDeliverables = this.extractRequiredDeliverables(request.requirements || '');
+
     return `You are an expert academic writer with extensive experience in creating university-level assignments. Generate a comprehensive, complete ${assignmentType} for the following requirements.
 
 CRITICAL INSTRUCTIONS:
 - Write the COMPLETE assignment content with proper academic structure
-- Ensure the content meets the specified word count requirement
+- Ensure the content meets the specified word count requirement (${request.wordCount} words minimum)
 - Do NOT include any confirmation messages, repetitive text, or placeholders
 - Do NOT ask for confirmation or additional information
-- Generate the full assignment as requested with all sections
+- Generate the full assignment as requested with ALL required sections and deliverables
 - Focus on the specific topic and requirements provided
 - Use professional academic language throughout
 - Include proper academic formatting and structure
 - Ensure all sections are complete and well-developed
 - Make sure the assignment is suitable for university submission
+- MUST include all deliverables specified in the requirements
 
 ASSIGNMENT SPECIFICATIONS:
 Title: "${request.title}"
@@ -212,8 +239,14 @@ Subject: ${request.subject}
 Type: ${request.type}
 Academic Level: ${academicLevel}
 Quality Level: ${qualityLevel}
-Word Count: ${request.wordCount} words
+Word Count: ${request.wordCount} words minimum
 Citation Style: ${request.citationStyle || 'APA'}
+
+SPECIFIC REQUIREMENTS ANALYSIS:
+${specificRequirements}
+
+REQUIRED DELIVERABLES:
+${requiredDeliverables}
 
 ACADEMIC STANDARDS (${academicLevel.toUpperCase()} LEVEL):
 ${academicStandards}
@@ -223,9 +256,6 @@ ${formattingGuidelines}
 
 DATA AND ANALYSIS REQUIREMENTS:
 ${dataRequirements}
-
-SPECIFIC REQUIREMENTS:
-${request.requirements || 'Focus on producing a high-quality, university-standard assignment that demonstrates deep understanding of the subject matter and critical thinking skills.'}
 
 ${request.citations ? `CITATION REQUIREMENTS: Include proper ${request.citationStyle || 'APA'} in-text citations and a comprehensive reference list with at least 10-15 academic sources.` : ''}
 
@@ -327,7 +357,7 @@ ${request.includeCharts ? `CHART FORMATTING REQUIREMENTS:
 - Ensure data is consistent with the analysis and conclusions
 - Use professional color schemes and formatting` : ''}
 
-IMPORTANT: Generate the complete assignment content now. Do not ask for confirmation or provide repetitive text. Write the full assignment as specified above. Include realistic tables and charts with proper formatting as requested.`;
+CRITICAL: You MUST generate the complete assignment content now. Do not ask for confirmation or provide repetitive text. Write the full assignment as specified above. Include ALL required deliverables and realistic tables/charts with proper formatting as requested. The assignment must be complete and ready for submission.`;
   }
 
   private getAcademicStandards(level?: string): string {
@@ -383,6 +413,97 @@ IMPORTANT: Generate the complete assignment content now. Do not ask for confirma
 - Headers/Footers: ${request.includeHeaders ? 'Included' : 'Not included'}
 - Cover page: ${request.includeCoverPage ? 'Required' : 'Not required'}
 - Table of contents: ${request.includeTableOfContents ? 'Required' : 'Not required'}`;
+  }
+
+  private parseSpecificRequirements(requirements: string): string {
+    if (!requirements) return 'Focus on producing a high-quality, university-standard assignment that demonstrates deep understanding of the subject matter and critical thinking skills.';
+    
+    // Extract key information from requirements
+    const lines = requirements.split('\n').filter(line => line.trim());
+    let analysis = '';
+    
+    // Look for specific assignment types
+    if (requirements.toLowerCase().includes('archaeological') || requirements.toLowerCase().includes('artifact')) {
+      analysis += '- This is an archaeological assignment requiring analysis of artifact data\n';
+      analysis += '- Focus on archaeological methodology and data analysis\n';
+      analysis += '- Include proper archaeological terminology and concepts\n';
+    }
+    
+    if (requirements.toLowerCase().includes('research paper')) {
+      analysis += '- This is a research paper requiring comprehensive analysis\n';
+      analysis += '- Include proper research methodology and literature review\n';
+    }
+    
+    if (requirements.toLowerCase().includes('case study')) {
+      analysis += '- This is a case study requiring detailed analysis of specific examples\n';
+      analysis += '- Include comprehensive case analysis and recommendations\n';
+    }
+    
+    // Look for specific deliverables
+    if (requirements.toLowerCase().includes('table') || requirements.toLowerCase().includes('tables')) {
+      analysis += '- Tables are specifically required as deliverables\n';
+    }
+    
+    if (requirements.toLowerCase().includes('figure') || requirements.toLowerCase().includes('figures') || requirements.toLowerCase().includes('chart') || requirements.toLowerCase().includes('diagram')) {
+      analysis += '- Figures, charts, or diagrams are specifically required as deliverables\n';
+    }
+    
+    // Look for word count requirements
+    const wordCountMatch = requirements.match(/(\d+)[-\s]*word/i);
+    if (wordCountMatch) {
+      analysis += `- Specific word count requirement: ${wordCountMatch[1]} words\n`;
+    }
+    
+    // Look for citation requirements
+    if (requirements.toLowerCase().includes('apa') || requirements.toLowerCase().includes('citation')) {
+      analysis += '- APA citation style is specifically required\n';
+    }
+    
+    return analysis || requirements;
+  }
+
+  private extractRequiredDeliverables(requirements: string): string {
+    if (!requirements) return 'Standard academic assignment with introduction, body, conclusion, and references.';
+    
+    const deliverables = [];
+    
+    // Check for specific deliverables mentioned
+    if (requirements.toLowerCase().includes('table') || requirements.toLowerCase().includes('tables')) {
+      deliverables.push('- Tables: Catalog and analyze data in tabular format');
+    }
+    
+    if (requirements.toLowerCase().includes('figure') || requirements.toLowerCase().includes('figures')) {
+      deliverables.push('- Figures: Include visual representations, charts, or diagrams');
+    }
+    
+    if (requirements.toLowerCase().includes('chart') || requirements.toLowerCase().includes('charts')) {
+      deliverables.push('- Charts: Include data visualizations and graphs');
+    }
+    
+    if (requirements.toLowerCase().includes('map') || requirements.toLowerCase().includes('maps')) {
+      deliverables.push('- Maps: Include geographical or spatial representations');
+    }
+    
+    if (requirements.toLowerCase().includes('diagram') || requirements.toLowerCase().includes('diagrams')) {
+      deliverables.push('- Diagrams: Include schematic or process diagrams');
+    }
+    
+    if (requirements.toLowerCase().includes('analysis') || requirements.toLowerCase().includes('analyze')) {
+      deliverables.push('- Analysis: Comprehensive data analysis and interpretation');
+    }
+    
+    if (requirements.toLowerCase().includes('report') || requirements.toLowerCase().includes('findings')) {
+      deliverables.push('- Report: Structured findings report with clear sections');
+    }
+    
+    // If no specific deliverables found, provide standard ones
+    if (deliverables.length === 0) {
+      deliverables.push('- Complete assignment with all required academic sections');
+      deliverables.push('- Professional formatting and structure');
+      deliverables.push('- Proper citations and references');
+    }
+    
+    return deliverables.join('\n');
   }
 
   private getDataRequirements(request: AssignmentRequest): string {
@@ -497,13 +618,17 @@ IMPORTANT: Generate the complete assignment content now. Do not ask for confirma
       }
     }
     
-    // Ensure content has proper academic structure
-    if (!cleanContent.includes('Introduction') && !cleanContent.includes('INTRODUCTION')) {
+    // Check if content is complete and well-structured
+    const isComplete = this.isContentComplete(cleanContent, request);
+    
+    if (!isComplete) {
+      console.warn('Content appears incomplete, enhancing structure...');
       cleanContent = this.enhanceContentStructure(cleanContent, request);
     }
     
     // Ensure minimum content length
     if (cleanContent.length < request.wordCount * 0.2) {
+      console.warn('Content too short, generating structured content...');
       cleanContent = this.generateStructuredContent(request);
     }
     
@@ -828,6 +953,34 @@ IMPORTANT: Generate the complete assignment content now. Do not ask for confirma
     }
   }
 
+  private isContentComplete(content: string, request: AssignmentRequest): boolean {
+    // Check if content has proper academic structure
+    const hasIntroduction = content.toLowerCase().includes('introduction');
+    const hasConclusion = content.toLowerCase().includes('conclusion');
+    const hasBody = content.length > request.wordCount * 0.3;
+    
+    // Check for specific requirements based on assignment type
+    const requirements = request.requirements?.toLowerCase() || '';
+    let hasRequiredElements = true;
+    
+    if (requirements.includes('table') || requirements.includes('tables')) {
+      // Check if tables are mentioned in content or if we have table data
+      hasRequiredElements = hasRequiredElements && (content.toLowerCase().includes('table') || content.toLowerCase().includes('data'));
+    }
+    
+    if (requirements.includes('figure') || requirements.includes('figures') || requirements.includes('chart')) {
+      // Check if figures/charts are mentioned in content
+      hasRequiredElements = hasRequiredElements && (content.toLowerCase().includes('figure') || content.toLowerCase().includes('chart') || content.toLowerCase().includes('graph'));
+    }
+    
+    if (requirements.includes('analysis') || requirements.includes('analyze')) {
+      // Check if analysis is present
+      hasRequiredElements = hasRequiredElements && (content.toLowerCase().includes('analysis') || content.toLowerCase().includes('analyze'));
+    }
+    
+    return hasIntroduction && hasConclusion && hasBody && hasRequiredElements;
+  }
+
   private enhanceContentStructure(content: string, request: AssignmentRequest): string {
     // If content is too short or lacks structure, enhance it
     if (content.length < request.wordCount * 0.3) {
@@ -887,31 +1040,58 @@ IMPORTANT: Generate the complete assignment content now. Do not ask for confirma
   private generateStructuredContent(request: AssignmentRequest): string {
     const academicLevel = request.academicLevel || 'undergraduate';
     const qualityLevel = request.qualityLevel || 'standard';
+    const requirements = request.requirements?.toLowerCase() || '';
     
     let structure = '';
     
     // Add title and introduction
     structure += `${request.title.toUpperCase()}\n\n`;
     structure += `Introduction\n\n`;
-    structure += `This ${request.assignmentType?.replace('_', ' ') || 'research paper'} examines ${request.title.toLowerCase()} within the context of ${request.subject.toLowerCase()}. `;
-    structure += `The study addresses critical aspects of this topic and provides a comprehensive analysis suitable for ${academicLevel} level academic standards.\n\n`;
+    
+    // Customize introduction based on assignment type
+    if (requirements.includes('archaeological') || requirements.includes('artifact')) {
+      structure += `This archaeological findings report presents a comprehensive analysis of artifact data from ${request.title.toLowerCase()}. `;
+      structure += `The study employs established archaeological methodologies to examine bone measurements, material composition, and carbon-dating results. `;
+      structure += `This analysis contributes to our understanding of ${request.subject.toLowerCase()} and provides valuable insights for archaeological research.\n\n`;
+    } else {
+      structure += `This ${request.assignmentType?.replace('_', ' ') || 'research paper'} examines ${request.title.toLowerCase()} within the context of ${request.subject.toLowerCase()}. `;
+      structure += `The study addresses critical aspects of this topic and provides a comprehensive analysis suitable for ${academicLevel} level academic standards.\n\n`;
+    }
     
     // Add main content sections
-    structure += `Literature Review\n\n`;
-    structure += `A thorough review of existing literature reveals significant insights into ${request.title.toLowerCase()}. `;
-    structure += `Previous research has established important foundations for understanding this topic, while also identifying gaps that this study addresses.\n\n`;
-    
-    structure += `Methodology\n\n`;
-    structure += `This study employs a systematic approach to analyze ${request.title.toLowerCase()}. `;
-    structure += `The methodology ensures rigor and reliability in data collection and analysis, following established academic standards.\n\n`;
-    
-    structure += `Results and Analysis\n\n`;
-    structure += `The analysis reveals important findings regarding ${request.title.toLowerCase()}. `;
-    structure += `These results provide valuable insights that contribute to the broader understanding of ${request.subject.toLowerCase()}.\n\n`;
-    
-    structure += `Discussion\n\n`;
-    structure += `The implications of these findings are significant for both theory and practice. `;
-    structure += `This discussion explores the broader context and applications of the research outcomes.\n\n`;
+    if (requirements.includes('archaeological') || requirements.includes('artifact')) {
+      structure += `Archaeological Context and Background\n\n`;
+      structure += `The archaeological context of this study provides essential background for understanding the significance of the artifact analysis. `;
+      structure += `Previous excavations and research in this area have established important foundations for understanding the cultural and historical context of these findings.\n\n`;
+      
+      structure += `Methodology and Data Collection\n\n`;
+      structure += `This study employs standard archaeological methodologies for artifact analysis, including precise measurement techniques, material composition analysis, and carbon-dating procedures. `;
+      structure += `The methodology ensures accuracy and reliability in data collection and analysis, following established archaeological standards.\n\n`;
+      
+      structure += `Artifact Analysis and Results\n\n`;
+      structure += `The analysis of artifact data reveals important findings regarding ${request.title.toLowerCase()}. `;
+      structure += `The examination of bone measurements, material composition, and carbon-dating results provides valuable insights into the archaeological context and historical significance of these artifacts.\n\n`;
+      
+      structure += `Discussion and Interpretation\n\n`;
+      structure += `The implications of these archaeological findings are significant for understanding ${request.subject.toLowerCase()}. `;
+      structure += `This discussion explores the broader context and applications of the research outcomes within archaeological science.\n\n`;
+    } else {
+      structure += `Literature Review\n\n`;
+      structure += `A thorough review of existing literature reveals significant insights into ${request.title.toLowerCase()}. `;
+      structure += `Previous research has established important foundations for understanding this topic, while also identifying gaps that this study addresses.\n\n`;
+      
+      structure += `Methodology\n\n`;
+      structure += `This study employs a systematic approach to analyze ${request.title.toLowerCase()}. `;
+      structure += `The methodology ensures rigor and reliability in data collection and analysis, following established academic standards.\n\n`;
+      
+      structure += `Results and Analysis\n\n`;
+      structure += `The analysis reveals important findings regarding ${request.title.toLowerCase()}. `;
+      structure += `These results provide valuable insights that contribute to the broader understanding of ${request.subject.toLowerCase()}.\n\n`;
+      
+      structure += `Discussion\n\n`;
+      structure += `The implications of these findings are significant for both theory and practice. `;
+      structure += `This discussion explores the broader context and applications of the research outcomes.\n\n`;
+    }
     
     structure += `Conclusion\n\n`;
     structure += `This study has successfully examined ${request.title.toLowerCase()} and provided valuable insights into ${request.subject.toLowerCase()}. `;
@@ -1006,11 +1186,48 @@ IMPORTANT: Generate the complete assignment content now. Do not ask for confirma
       throw new Error('API key not configured');
     }
 
-    const models = [
-      'meta-llama/Llama-2-70b-chat-hf',
-      'meta-llama/Llama-2-13b-chat-hf',
-      'meta-llama/Llama-Vision-Free'
+    // Only use the specified LLMs from Together.ai (free models only)
+    const allowedModels = [
+      'arcee-ai/AFM-4.5B',
+      'arcee-ai/chat',
+      'meta-llama/Meta Llama Vision Free',
+      'meta-llama/chat',
+      'deepseek-ai/DeepSeek R1 Distill Llama 70B Free',
+      'deepseek-ai/chat',
+      'lg-ai/EXAONE Deep 32B',
+      'lg-ai/chat',
+      'lg-ai/EXAONE 3.5 32B Instruct',
+      'meta-llama/Meta Llama 3.3 70B Instruct Turbo Free'
     ];
+
+    // Get available models from Together.ai API
+    let availableModels: string[] = [];
+    try {
+      const modelsResponse = await fetch('https://api.together.xyz/v1/models', {
+        headers: {
+          'Authorization': `Bearer ${this.apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (modelsResponse.ok) {
+        const modelsData = await modelsResponse.json();
+        availableModels = modelsData.data?.map((model: any) => model.id) || [];
+      }
+    } catch (error) {
+      console.warn('Could not fetch available models, using fallback list');
+    }
+
+    // Filter to only use allowed models that are available
+    const models = allowedModels.filter(model => 
+      availableModels.length === 0 || availableModels.includes(model)
+    );
+
+    if (models.length === 0) {
+      throw new Error('No allowed models are available. Please check your Together.ai API access.');
+    }
+
+    console.log(`🎯 Using ${models.length} allowed models: ${models.join(', ')}`);
 
     for (const model of models) {
       try {
@@ -1024,11 +1241,11 @@ IMPORTANT: Generate the complete assignment content now. Do not ask for confirma
             model: model,
             prompt: prompt,
             max_tokens: maxTokens,
-            temperature: 0.2, // Lower temperature for more focused and complete outputs
-            top_p: 0.85,
-            frequency_penalty: 0.2, // Increase frequency penalty to reduce repetition
-            presence_penalty: 0.2, // Increase presence penalty to encourage diverse content
-            stop: ['\n\n\n\n', 'END_OF_ASSIGNMENT', '---', 'CONCLUSION:', 'References:'] // Better stop sequences
+            temperature: 0.1, // Even lower temperature for more focused and complete outputs
+            top_p: 0.9,
+            frequency_penalty: 0.3, // Increase frequency penalty to reduce repetition
+            presence_penalty: 0.3, // Increase presence penalty to encourage diverse content
+            stop: ['\n\n\n\n', 'END_OF_ASSIGNMENT', '---', 'CONCLUSION:', 'References:', 'Thank you', 'Please note'] // Better stop sequences
           })
         });
 
@@ -1051,6 +1268,12 @@ IMPORTANT: Generate the complete assignment content now. Do not ask for confirma
         // Check for repetitive content
         if (this.isRepetitiveContent(content)) {
           console.error(`Model ${model} generated repetitive content`);
+          continue; // Try next model
+        }
+
+        // Check if content is too short or incomplete
+        if (content.length < maxTokens * 0.1) {
+          console.error(`Model ${model} generated content that is too short`);
           continue; // Try next model
         }
 

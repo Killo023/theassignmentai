@@ -21,11 +21,15 @@ NEXT_PUBLIC_TOGETHER_API_KEY=your_actual_api_key_here
 
 ### 3. Available Models
 
-The application is configured to use these Together AI models with fallback support:
+The application is configured to use only these specific Together AI models with fallback support:
 
-- **Primary**: `meta-llama/Llama-2-70b-chat-hf` (Best quality)
-- **Secondary**: `meta-llama/Llama-2-13b-chat-hf` (Fast, good quality)
-- **Vision**: `meta-llama/Llama-Vision-Free` (For image analysis)
+**Free Models Only:**
+- **Arcee AI**: `arcee-ai/AFM-4.5B` and `arcee-ai/chat`
+- **Meta**: `meta-llama/Meta Llama Vision Free`, `meta-llama/chat`, and `meta-llama/Meta Llama 3.3 70B Instruct Turbo Free`
+- **DeepSeek**: `deepseek-ai/DeepSeek R1 Distill Llama 70B Free` and `deepseek-ai/chat`
+- **LG AI**: `lg-ai/EXAONE Deep 32B`, `lg-ai/chat`, `lg-ai/EXAONE 3.5 32B Instruct`
+
+**Note**: Only free models are used to ensure cost-effective operation.
 
 ### 4. Configuration Details
 
@@ -102,9 +106,16 @@ You can modify the model selection in `src/lib/ai-service.ts`:
 
 ```typescript
 const models = [
-  'meta-llama/Llama-2-70b-chat-hf',    // Best quality
-  'meta-llama/Llama-2-13b-chat-hf',    // Fast, good quality
-  'meta-llama/Llama-Vision-Free'        // Vision capabilities
+  'arcee-ai/AFM-4.5B',                                    // Arcee AI free model
+  'arcee-ai/chat',                                        // Arcee AI chat
+  'meta-llama/Meta Llama Vision Free',                    // Meta vision model
+  'meta-llama/chat',                                      // Meta chat
+  'deepseek-ai/DeepSeek R1 Distill Llama 70B Free',      // DeepSeek free model
+  'deepseek-ai/chat',                                     // DeepSeek chat
+  'lg-ai/EXAONE Deep 32B',                               // LG AI model
+  'lg-ai/chat',                                           // LG AI chat
+  'lg-ai/EXAONE 3.5 32B Instruct',                       // LG AI instruct model
+  'meta-llama/Meta Llama 3.3 70B Instruct Turbo Free'    // Meta instruct model
 ];
 ```
 
