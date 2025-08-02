@@ -26,9 +26,17 @@ export default function PayPalSubscriptionButton({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Check if PayPal is configured
+    const paypalClientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+    if (!paypalClientId || paypalClientId === 'your_paypal_client_id_here') {
+      setError('PayPal is not configured. Please set NEXT_PUBLIC_PAYPAL_CLIENT_ID in your environment variables.');
+      setIsLoading(false);
+      return;
+    }
+
     // Load PayPal SDK
     const script = document.createElement("script");
-    script.src = "https://www.paypal.com/sdk/js?client-id=AaCE9oXQW0CbpRM3y1uqYemvuMQlBHR0NYD_TmirJtGEIjVDFM5VDf4_ibt2fwO1Vug4CrZh3Gvy7zyk&vault=true&intent=subscription";
+    script.src = `https://www.paypal.com/sdk/js?client-id=${paypalClientId}&vault=true&intent=subscription`;
     script.setAttribute("data-sdk-integration-source", "button-factory");
     
     script.onload = () => {
@@ -41,8 +49,11 @@ export default function PayPalSubscriptionButton({
             label: 'subscribe'
           },
           createSubscription: function(data: any, actions: any) {
+            // Use environment variable for plan ID or fallback to a test plan
+            const planId = process.env.NEXT_PUBLIC_PAYPAL_BASIC_PLAN_ID || 'P-9YA223448D5519637NCHHMTY';
+            console.log('Creating PayPal subscription with plan ID:', planId);
             return actions.subscription.create({
-              plan_id: 'P-9YA223448D5519637NCHHMTY'
+              plan_id: planId
             });
           },
           onApprove: async function(data: any, actions: any) {
@@ -78,7 +89,7 @@ export default function PayPalSubscriptionButton({
             console.log('PayPal subscription cancelled');
             onCancel?.();
           }
-        }).render('#paypal-button-container-P-9YA223448D5519637NCHHMTY');
+        }).render('#paypal-button-container-basic');
         
         setIsLoading(false);
       }
@@ -92,7 +103,9 @@ export default function PayPalSubscriptionButton({
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, [user, onSuccess, onError, onCancel]);
 
@@ -109,13 +122,18 @@ export default function PayPalSubscriptionButton({
     return (
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <p className="text-red-600 text-sm">{error}</p>
+        <p className="text-red-500 text-xs mt-2">
+          To fix this, add your PayPal Client ID to your .env.local file:
+          <br />
+          <code className="bg-red-100 px-1 rounded">NEXT_PUBLIC_PAYPAL_CLIENT_ID=your_actual_client_id</code>
+        </p>
       </div>
     );
   }
 
   return (
     <div className="w-full">
-      <div id="paypal-button-container-P-9YA223448D5519637NCHHMTY"></div>
+      <div id="paypal-button-container-basic"></div>
     </div>
   );
 } 

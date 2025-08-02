@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS subscriptions (
     assignments_used INTEGER DEFAULT 0,
     assignment_limit INTEGER DEFAULT 4,
     has_calendar_access BOOLEAN DEFAULT false,
+    paypal_subscription_id TEXT,
     upgraded_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -99,6 +100,7 @@ CREATE POLICY "Enable all operations for assignments" ON assignments
 CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON subscriptions(status);
 CREATE INDEX IF NOT EXISTS idx_subscriptions_plan_id ON subscriptions(plan_id);
+CREATE INDEX IF NOT EXISTS idx_subscriptions_paypal_id ON subscriptions(paypal_subscription_id);
 
 CREATE INDEX IF NOT EXISTS idx_assignments_user_id ON assignments(user_id);
 CREATE INDEX IF NOT EXISTS idx_assignments_status ON assignments(status);
