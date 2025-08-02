@@ -35,7 +35,9 @@ export default function UpgradePage() {
       console.log('💳 Payment data:', { ...paymentData, cardNumber: '***' });
       
       const paymentService = PaymentService.getInstance();
-      const result = await paymentService.convertToPaid(user.id, 'basic', paymentData);
+      // Determine plan based on payment data or default to basic
+      const plan = paymentData.plan || 'basic';
+      const result = await paymentService.convertToPaid(user.id, plan, paymentData);
       
       console.log('📊 Payment result:', result);
       

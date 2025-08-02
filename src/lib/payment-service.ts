@@ -733,6 +733,150 @@ export class PaymentService {
   }
 
   /**
+   * Handle PayPal subscription success
+   */
+  async handlePayPalSubscription(userId: string, subscriptionId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      console.log(`🎉 PayPal subscription successful for user: ${userId}, subscription ID: ${subscriptionId}`);
+      
+      const plan = this.getPlan('basic'); // $14.99 plan
+      if (!plan) {
+        return { success: false, message: 'Invalid plan selected' };
+      }
+      
+      if (this.isSupabaseConfigured()) {
+        // Upsert subscription in Supabase
+        console.log(`💾 Upserting PayPal subscription in Supabase for user: ${userId}`);
+        const { error } = await supabase
+          .from('subscriptions')
+          .upsert({
+            user_id: userId,
+            plan_id: 'basic',
+            status: 'basic',
+            assignments_used: 0,
+            assignment_limit: plan.assignmentLimit,
+            has_calendar_access: plan.hasCalendarAccess,
+            paypal_subscription_id: subscriptionId,
+            upgraded_at: new Date().toISOString(),
+            created_at: new Date().toISOString()
+          });
+
+        if (error) {
+          console.error(`❌ Error upserting PayPal subscription in Supabase:`, error);
+          return {
+            success: false,
+            message: 'Payment successful but failed to update subscription status'
+          };
+        }
+        console.log(`✅ Successfully upserted PayPal subscription in Supabase for user: ${userId}`);
+      } else {
+        // Fallback to in-memory storage
+        console.log(`💾 Updating PayPal subscription in fallback storage for user: ${userId}`);
+        this.fallbackUpgradedUsers.add(userId);
+        const existingSub = this.fallbackSubscriptions.get(userId);
+        if (existingSub) {
+          this.fallbackSubscriptions.set(userId, {
+            ...existingSub,
+            plan_id: 'basic',
+            status: 'basic',
+            assignment_limit: plan.assignmentLimit,
+            has_calendar_access: plan.hasCalendarAccess,
+            paypal_subscription_id: subscriptionId,
+            upgraded_at: new Date().toISOString()
+          });
+        }
+      }
+
+      console.log(`🎉 User ${userId} upgraded to basic via PayPal`);
+      // Notify all listeners about the subscription change
+      this.notifySubscriptionChange();
+      
+      return {
+        success: true,
+        message: `Successfully upgraded to ${plan.name} via PayPal`
+      };
+    } catch (error) {
+      console.error('❌ PayPal subscription handling error:', error);
+      return {
+        success: false,
+        message: 'PayPal subscription processing failed: ' + (error instanceof Error ? error.message : 'Unknown error')
+      };
+    }
+  }
+
+  /**
+   * Handle PayPal Pro subscription success
+   */
+  async handlePayPalProSubscription(userId: string, subscriptionId: string): Promise<{ success: boolean; message: string }> {
+    try {
+      console.log(`🎉 PayPal Pro subscription successful for user: ${userId}, subscription ID: ${subscriptionId}`);
+      
+      const plan = this.getPlan('pro'); // $29.99 plan
+      if (!plan) {
+        return { success: false, message: 'Invalid plan selected' };
+      }
+      
+      if (this.isSupabaseConfigured()) {
+        // Upsert subscription in Supabase
+        console.log(`💾 Upserting PayPal Pro subscription in Supabase for user: ${userId}`);
+        const { error } = await supabase
+          .from('subscriptions')
+          .upsert({
+            user_id: userId,
+            plan_id: 'pro',
+            status: 'pro',
+            assignments_used: 0,
+            assignment_limit: plan.assignmentLimit,
+            has_calendar_access: plan.hasCalendarAccess,
+            paypal_subscription_id: subscriptionId,
+            upgraded_at: new Date().toISOString(),
+            created_at: new Date().toISOString()
+          });
+
+        if (error) {
+          console.error(`❌ Error upserting PayPal Pro subscription in Supabase:`, error);
+          return {
+            success: false,
+            message: 'Payment successful but failed to update subscription status'
+          };
+        }
+        console.log(`✅ Successfully upserted PayPal Pro subscription in Supabase for user: ${userId}`);
+      } else {
+        // Fallback to in-memory storage
+        console.log(`💾 Updating PayPal Pro subscription in fallback storage for user: ${userId}`);
+        this.fallbackUpgradedUsers.add(userId);
+        const existingSub = this.fallbackSubscriptions.get(userId);
+        if (existingSub) {
+          this.fallbackSubscriptions.set(userId, {
+            ...existingSub,
+            plan_id: 'pro',
+            status: 'pro',
+            assignment_limit: plan.assignmentLimit,
+            has_calendar_access: plan.hasCalendarAccess,
+            paypal_subscription_id: subscriptionId,
+            upgraded_at: new Date().toISOString()
+          });
+        }
+      }
+
+      console.log(`🎉 User ${userId} upgraded to pro via PayPal`);
+      // Notify all listeners about the subscription change
+      this.notifySubscriptionChange();
+      
+      return {
+        success: true,
+        message: `Successfully upgraded to ${plan.name} via PayPal`
+      };
+    } catch (error) {
+      console.error('❌ PayPal Pro subscription handling error:', error);
+      return {
+        success: false,
+        message: 'PayPal Pro subscription processing failed: ' + (error instanceof Error ? error.message : 'Unknown error')
+      };
+    }
+  }
+
+  /**
    * Cancel subscription
    */
   async cancelSubscription(userId: string): Promise<void> {

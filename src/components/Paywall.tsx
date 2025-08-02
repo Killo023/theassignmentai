@@ -17,6 +17,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import PayPalSubscriptionButton from "@/components/paypal/PayPalSubscriptionButton";
+import PayPalProSubscriptionButton from "@/components/paypal/PayPalProSubscriptionButton";
 
 interface PaywallProps {
   onUpgrade: (paymentData: any) => Promise<boolean>;
@@ -33,8 +35,11 @@ const Paywall: React.FC<PaywallProps> = ({ onUpgrade, onClose, isVisible }) => {
     nameOnCard: ''
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal'>('card');
+  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'pro'>('basic');
+  const [paypalError, setPaypalError] = useState<string | null>(null);
 
-  const features = [
+  const basicFeatures = [
     "Unlimited assignments",
     "Full calendar access",
     "Priority AI processing",
@@ -45,6 +50,22 @@ const Paywall: React.FC<PaywallProps> = ({ onUpgrade, onClose, isVisible }) => {
     "Custom templates",
     "Basic usage analytics"
   ];
+
+  const proFeatures = [
+    "Everything in Basic Plan, PLUS:",
+    "AI-powered charts and graphs",
+    "Advanced export (PDF, DOCX, TXT + more)",
+    "University-level academic standards",
+    "Plagiarism-free guarantee",
+    "24/7 premium support",
+    "Advanced performance analytics",
+    "Highest priority AI processing",
+    "Custom branding options",
+    "API access",
+    "White-label solutions"
+  ];
+
+  const features = selectedPlan === 'basic' ? basicFeatures : proFeatures;
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -93,6 +114,34 @@ const Paywall: React.FC<PaywallProps> = ({ onUpgrade, onClose, isVisible }) => {
     }
   };
 
+  const handlePayPalSuccess = async (subscriptionId: string) => {
+    console.log('PayPal subscription successful:', subscriptionId);
+    setIsProcessing(true);
+    try {
+      // The PayPal subscription is already handled in the PayPalSubscriptionButton component
+      // We just need to notify the parent that the upgrade was successful
+      const success = true; // PayPal subscription was successful
+      if (success) {
+        // Payment successful - component will be unmounted by parent
+        // The subscription is already updated in the database
+      }
+    } catch (error) {
+      console.error('PayPal payment failed:', error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handlePayPalError = (error: string) => {
+    console.error('PayPal error:', error);
+    setPaypalError(error);
+  };
+
+  const handlePayPalCancel = () => {
+    console.log('PayPal payment cancelled');
+    setPaypalError(null);
+  };
+
   const formatCardNumber = (value: string) => {
     const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
     const matches = v.match(/\d{4,16}/g);
@@ -138,8 +187,12 @@ const Paywall: React.FC<PaywallProps> = ({ onUpgrade, onClose, isVisible }) => {
               <Crown className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-foreground">Upgrade to Basic</h2>
-              <p className="text-muted-foreground">Upgrade to continue with unlimited access.</p>
+              <h2 className="text-2xl font-bold text-foreground">
+                Upgrade to {selectedPlan === 'basic' ? 'Basic' : 'Pro'}
+              </h2>
+              <p className="text-muted-foreground">
+                Upgrade to continue with unlimited access and advanced features.
+              </p>
             </div>
           </div>
           
@@ -193,12 +246,68 @@ const Paywall: React.FC<PaywallProps> = ({ onUpgrade, onClose, isVisible }) => {
             {/* Payment Form */}
             <div>
               <div className="text-center mb-6">
-                <div className="text-3xl font-bold text-foreground mb-2">$14.99</div>
+                <div className="flex items-center justify-center gap-4 mb-4">
+                  <button
+                    onClick={() => setSelectedPlan('basic')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      selectedPlan === 'basic'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    Basic - $14.99
+                  </button>
+                  <button
+                    onClick={() => setSelectedPlan('pro')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      selectedPlan === 'pro'
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    Pro - $29.99
+                  </button>
+                </div>
+                <div className="text-3xl font-bold text-foreground mb-2">
+                  ${selectedPlan === 'basic' ? '14.99' : '29.99'}
+                </div>
                 <div className="text-muted-foreground">per month</div>
                 <div className="text-sm text-muted-foreground mt-1">Cancel anytime</div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Payment Method Toggle */}
+              <div className="flex items-center justify-center space-x-4 mb-6">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('card')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    paymentMethod === 'card'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <CreditCard className="w-4 h-4 inline mr-2" />
+                  Credit Card
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod('paypal')}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    paymentMethod === 'paypal'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <svg className="w-4 h-4 inline mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.067 8.478c.492.315.844.825.844 1.478 0 .653-.352 1.163-.844 1.478-.492.315-1.163.478-1.844.478H5.777c-.681 0-1.352-.163-1.844-.478C3.441 11.316 3.089 10.806 3.089 10.153c0-.653.352-1.163.844-1.478.492-.315 1.163-.478 1.844-.478h12.446c.681 0 1.352.163 1.844.478z"/>
+                  </svg>
+                  PayPal
+                </button>
+              </div>
+
+              {paymentMethod === 'card' ? (
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <input type="hidden" name="plan" value={selectedPlan} />
                 <div>
                   <Label htmlFor="nameOnCard">Name on Card</Label>
                   <Input
@@ -292,6 +401,33 @@ const Paywall: React.FC<PaywallProps> = ({ onUpgrade, onClose, isVisible }) => {
                   By upgrading, you agree to our Terms of Service and Privacy Policy.
                 </p>
               </form>
+                              ) : (
+                  <div className="space-y-4">
+                    {paypalError && (
+                      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-red-600 text-sm">{paypalError}</p>
+                      </div>
+                    )}
+                    
+                    {selectedPlan === 'basic' ? (
+                      <PayPalSubscriptionButton
+                        onSuccess={handlePayPalSuccess}
+                        onError={handlePayPalError}
+                        onCancel={handlePayPalCancel}
+                      />
+                    ) : (
+                      <PayPalProSubscriptionButton
+                        onSuccess={handlePayPalSuccess}
+                        onError={handlePayPalError}
+                        onCancel={handlePayPalCancel}
+                      />
+                    )}
+                    
+                    <p className="text-xs text-muted-foreground text-center">
+                      By upgrading, you agree to our Terms of Service and Privacy Policy.
+                    </p>
+                  </div>
+                )}
             </div>
           </div>
         </div>
