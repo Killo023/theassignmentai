@@ -16,11 +16,11 @@ import {
 } from "lucide-react";
 
 const navigation = [
-  { name: "Home", href: "/" },
-  { name: "Features", href: "/#features" },
+  { name: "Why Assignment AI", href: "/#features" },
+  { name: "Products", href: "/#features" },
+  { name: "Use Cases", href: "/#features" },
   { name: "Pricing", href: "/#pricing" },
-  { name: "Blog", href: "/blog" },
-  { name: "Affiliate", href: "/affiliate" }
+  { name: "Resources", href: "/blog" }
 ];
 
 export default function Navbar() {
@@ -65,27 +65,27 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <nav className="bg-white backdrop-blur-md bg-white/95 border-b border-gray-100 sticky top-0 z-50">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                <Award className="w-5 h-5 text-white" />
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Award className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-gray-900">The Assignment AI</span>
+              <span className="text-2xl font-bold text-gray-900">Assignment AI</span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-8">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
                 onClick={() => handleNavClick(item.href)}
-                className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium"
+                className="text-gray-700 hover:text-gray-900 transition-colors duration-200 font-medium text-lg"
               >
                 {item.name}
               </Link>
@@ -93,7 +93,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Auth Buttons */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             {user ? (
               <div className="relative">
                 <button
@@ -142,13 +142,13 @@ export default function Navbar() {
               <>
                 <Link
                   href="/auth/login"
-                  className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium"
+                  className="text-gray-700 hover:text-gray-900 transition-colors duration-200 font-medium text-lg px-4 py-2"
                 >
                   Sign In
                 </Link>
-                <Button asChild className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
+                <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-200">
                   <Link href="/auth/signup">
-                    Get Started
+                    Free Trial
                   </Link>
                 </Button>
               </>
@@ -156,7 +156,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
@@ -172,7 +172,7 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 py-4">
+          <div className="lg:hidden border-t border-gray-200 py-4">
             <div className="space-y-4">
               {navigation.map((item) => (
                 <Link
