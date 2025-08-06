@@ -510,4 +510,7 @@ export class AssignmentService {
       formatting_preferences: data.formatting_preferences ? JSON.parse(data.formatting_preferences) : {}
     };
   }
-} 
+}
+
+// Add default export
+export default AssignmentService; 
