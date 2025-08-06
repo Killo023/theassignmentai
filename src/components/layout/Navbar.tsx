@@ -17,8 +17,7 @@ import {
 
 const navigation = [
   { name: "Why Assignment AI", href: "/#features" },
-  { name: "Products", href: "/#features" },
-  { name: "Use Cases", href: "/#features" },
+  { name: "Features", href: "/#features" },
   { name: "Pricing", href: "/#pricing" },
   { name: "Resources", href: "/blog" }
 ];
@@ -52,12 +51,14 @@ export default function Navbar() {
     }
   };
 
-  const handleNavClick = (href: string) => {
+  const handleNavClick = (href: string, e?: React.MouseEvent) => {
     setIsMenuOpen(false);
     
-    // Handle anchor links
+    // Handle anchor links on the current page
     if (href.startsWith('/#')) {
-      const element = document.querySelector(href.substring(1));
+      e?.preventDefault();
+      const targetId = href.substring(2); // Remove '/#'
+      const element = document.getElementById(targetId);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth' });
       }
@@ -84,7 +85,7 @@ export default function Navbar() {
               <Link
                 key={item.name}
                 href={item.href}
-                onClick={() => handleNavClick(item.href)}
+                onClick={(e) => handleNavClick(item.href, e)}
                 className="text-gray-700 hover:text-gray-900 transition-colors duration-200 font-medium text-lg"
               >
                 {item.name}
@@ -178,7 +179,7 @@ export default function Navbar() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  onClick={() => handleNavClick(item.href)}
+                  onClick={(e) => handleNavClick(item.href, e)}
                   className="block text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium"
                 >
                   {item.name}

@@ -197,17 +197,7 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Floating CTA */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.4 }}
-        className="fixed bottom-6 right-6 z-50"
-      >
-        <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-black font-bold py-3 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-          🎀 Get 25% off the Basic plan! Use coupon code STUDENT25 🎀
-        </div>
-      </motion.div>
+
     </footer>
   );
 } 
