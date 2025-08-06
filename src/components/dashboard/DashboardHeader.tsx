@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -41,7 +40,7 @@ const DashboardHeader = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur border-b">
+    <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
       <div className="container flex h-16 items-center justify-between px-4">
         <div className="flex items-center gap-4">
           {/* Mobile Menu Button */}
@@ -57,14 +56,8 @@ const DashboardHeader = () => {
 
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
-              <Image 
-                src="/logo.svg" 
-                alt="The Assignment AI Logo" 
-                width={32} 
-                height={32}
-                className="w-full h-full object-cover"
-              />
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+              <Home className="w-5 h-5 text-white" />
             </div>
             <span className="font-bold text-lg hidden sm:block">Dashboard</span>
           </Link>
@@ -80,8 +73,8 @@ const DashboardHeader = () => {
                 href={item.href}
                 className={`text-sm font-medium transition-colors ${
                   isActive
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "text-blue-600"
+                    : "text-gray-600 hover:text-blue-600"
                 }`}
               >
                 {item.name}
@@ -107,15 +100,10 @@ const DashboardHeader = () => {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-background/95 backdrop-blur lg:hidden"
-          >
+          <div className="fixed inset-0 z-50 bg-white lg:hidden">
             <div className="flex flex-col h-full">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
                 <span className="font-bold text-lg">Menu</span>
                 <Button
                   variant="ghost"
@@ -139,8 +127,8 @@ const DashboardHeader = () => {
                         onClick={() => setMobileMenuOpen(false)}
                         className={`flex items-center gap-3 px-3 py-3 rounded-lg text-base font-medium transition-colors ${
                           isActive
-                            ? "bg-primary text-primary-foreground"
-                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                            ? "bg-blue-600 text-white"
+                            : "text-gray-600 hover:bg-gray-100"
                         }`}
                       >
                         <item.icon className="w-5 h-5" />
@@ -152,28 +140,28 @@ const DashboardHeader = () => {
               </nav>
 
               {/* User Info */}
-              <div className="border-t p-4">
+              <div className="border-t border-gray-200 p-4">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                    <User className="h-5 w-5 text-primary-foreground" />
+                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                    <User className="h-5 w-5 text-white" />
                   </div>
                   <div>
                     <p className="font-medium">{user?.firstName} {user?.lastName}</p>
-                    <p className="text-sm text-muted-foreground">{user?.email}</p>
+                    <p className="text-sm text-gray-500">{user?.email}</p>
                   </div>
                 </div>
                 
                 <Button
                   variant="ghost"
                   onClick={handleLogout}
-                  className="w-full justify-start text-red-600"
+                  className="w-full justify-start text-red-600 hover:text-red-700"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
                   Log out
                 </Button>
               </div>
             </div>
-          </motion.div>
+          </div>
         )}
       </div>
     </header>

@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
@@ -18,10 +17,9 @@ import {
 
 const navigation = [
   { name: "Home", href: "/" },
-  { name: "Products", href: "/#features" },
   { name: "Features", href: "/#features" },
-  { name: "Blogs", href: "/blog" },
   { name: "Pricing", href: "/#pricing" },
+  { name: "Blog", href: "/blog" },
   { name: "Affiliate", href: "/affiliate" }
 ];
 
@@ -30,9 +28,25 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isDropdownOpen) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
   const handleSignOut = async () => {
     try {
       logout();
+      setIsDropdownOpen(false);
+      setIsMenuOpen(false);
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -55,49 +69,33 @@ export default function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center gap-2"
-          >
+          <div className="flex items-center gap-2">
             <Link href="/" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
                 <Award className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold text-gray-900">The Assignment AI</span>
             </Link>
-          </motion.div>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {navigation.map((item, index) => (
-              <motion.div
+            {navigation.map((item) => (
+              <Link
                 key={item.name}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                href={item.href}
+                onClick={() => handleNavClick(item.href)}
+                className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium"
               >
-                <Link
-                  href={item.href}
-                  onClick={() => handleNavClick(item.href)}
-                  className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium"
-                >
-                  {item.name}
-                </Link>
-              </motion.div>
+                {item.name}
+              </Link>
             ))}
           </div>
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center gap-4">
             {user ? (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5 }}
-                className="relative"
-              >
+              <div className="relative">
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
@@ -106,22 +104,18 @@ export default function Navbar() {
                     <User className="w-4 h-4 text-white" />
                   </div>
                   <span className="text-sm font-medium text-gray-700">
-                    {user.email?.split('@')[0] || 'User'}
+                    {user.firstName || user.email?.split('@')[0] || 'User'}
                   </span>
                   <ChevronDown className="w-4 h-4 text-gray-500" />
                 </button>
 
                 {/* User Dropdown */}
                 {isDropdownOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2"
-                  >
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                     <Link
                       href="/dashboard"
                       className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                      onClick={() => setIsDropdownOpen(false)}
                     >
                       <User className="w-4 h-4" />
                       Dashboard
@@ -129,6 +123,7 @@ export default function Navbar() {
                     <Link
                       href="/dashboard/settings"
                       className="flex items-center gap-3 px-4 py-2 text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+                      onClick={() => setIsDropdownOpen(false)}
                     >
                       <Settings className="w-4 h-4" />
                       Settings
@@ -140,34 +135,22 @@ export default function Navbar() {
                       <LogOut className="w-4 h-4" />
                       Sign Out
                     </button>
-                  </motion.div>
+                  </div>
                 )}
-              </motion.div>
+              </div>
             ) : (
               <>
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.2 }}
+                <Link
+                  href="/auth/login"
+                  className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium"
                 >
-                  <Link
-                    href="/auth/login"
-                    className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium"
-                  >
-                    Sign In
+                  Sign In
+                </Link>
+                <Button asChild className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
+                  <Link href="/auth/signup">
+                    Get Started
                   </Link>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: 0.3 }}
-                >
-                  <Button asChild className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600">
-                    <Link href="/auth/signup">
-                      Get Started
-                    </Link>
-                  </Button>
-                </motion.div>
+                </Button>
               </>
             )}
           </div>
@@ -189,12 +172,7 @@ export default function Navbar() {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-gray-200 py-4"
-          >
+          <div className="md:hidden border-t border-gray-200 py-4">
             <div className="space-y-4">
               {navigation.map((item) => (
                 <Link
@@ -253,17 +231,9 @@ export default function Navbar() {
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
         )}
       </div>
-
-      {/* Click outside to close dropdown */}
-      {isDropdownOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setIsDropdownOpen(false)}
-        />
-      )}
     </nav>
   );
 } 
