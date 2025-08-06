@@ -21,10 +21,20 @@ The Assignment AI application cannot save or retrieve assignments because the `a
 2. Click **"New Query"** button
 
 ### Step 3: Run the Setup Script
-1. Open the file `supabase-setup.sql` from your project root
-2. Copy ALL the contents (144 lines of SQL)
+
+**Option A: Full Setup (Recommended)**
+1. Open the file `supabase-setup.sql` from your project root  
+2. Copy ALL the contents (SQL without the final SELECT statements)
 3. Paste it into the Supabase SQL editor
 4. Click **"Run"** to execute the script
+
+**Option B: Quick Fix (Assignments table only)**
+1. Open the file `create-assignments-table-only.sql` from your project root
+2. Copy ALL the contents
+3. Paste it into the Supabase SQL editor  
+4. Click **"Run"** to execute the script
+
+> 💡 **Note**: The SQL syntax error at "UNION" has been fixed. Use the updated files.
 
 ### Step 4: Verify Setup
 Run this command to test the database:

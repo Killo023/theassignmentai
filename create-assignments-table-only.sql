@@ -1,24 +1,7 @@
--- Supabase Setup Script for Subscriptions and Assignments Tables
--- Run this in your Supabase SQL Editor
+-- Simple script to create only the assignments table
+-- Use this if you only need to create the assignments table
 
--- 1. Drop the old tables if they exist
-DROP TABLE IF EXISTS assignments;
-DROP TABLE IF EXISTS subscriptions;
-
--- 2. Create the new subscriptions table with assignment tracking
-CREATE TABLE IF NOT EXISTS subscriptions (
-    user_id TEXT PRIMARY KEY,
-    plan_id TEXT DEFAULT 'free' CHECK (plan_id IN ('free', 'basic', 'pro')),
-    status TEXT DEFAULT 'free' CHECK (status IN ('free', 'basic', 'pro', 'cancelled', 'expired')),
-    assignments_used INTEGER DEFAULT 0,
-    assignment_limit INTEGER DEFAULT 4,
-    has_calendar_access BOOLEAN DEFAULT false,
-    paypal_subscription_id TEXT,
-    upgraded_at TIMESTAMP WITH TIME ZONE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- 3. Create the assignments table with enhanced fields for visual elements
+-- Create the assignments table with enhanced fields for visual elements
 CREATE TABLE IF NOT EXISTS assignments (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id TEXT NOT NULL,
@@ -84,63 +67,16 @@ CREATE TABLE IF NOT EXISTS assignments (
     formatting_preferences JSONB DEFAULT '{}'::jsonb
 );
 
--- 4. Enable Row Level Security
-ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+-- Enable Row Level Security
 ALTER TABLE assignments ENABLE ROW LEVEL SECURITY;
 
--- 5. Create policies for subscriptions table
-CREATE POLICY "Enable all operations for subscriptions" ON subscriptions
-    FOR ALL USING (true);
-
--- 6. Create policies for assignments table
+-- Create policies for assignments table
 CREATE POLICY "Enable all operations for assignments" ON assignments
     FOR ALL USING (true);
 
--- 7. Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id ON subscriptions(user_id);
-CREATE INDEX IF NOT EXISTS idx_subscriptions_status ON subscriptions(status);
-CREATE INDEX IF NOT EXISTS idx_subscriptions_plan_id ON subscriptions(plan_id);
-CREATE INDEX IF NOT EXISTS idx_subscriptions_paypal_id ON subscriptions(paypal_subscription_id);
-
+-- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_assignments_user_id ON assignments(user_id);
 CREATE INDEX IF NOT EXISTS idx_assignments_status ON assignments(status);
 CREATE INDEX IF NOT EXISTS idx_assignments_created_at ON assignments(created_at);
 CREATE INDEX IF NOT EXISTS idx_assignments_type ON assignments(type);
 CREATE INDEX IF NOT EXISTS idx_assignments_subject ON assignments(subject);
-
--- 8. Insert a test record (optional - for testing)
--- INSERT INTO subscriptions (user_id, plan_id, status, assignments_used, assignment_limit, has_calendar_access, created_at)
--- VALUES (
---     'test-user-123',
---     'free',
---     'free',
---     0,
---     4,
---     false,
---     NOW()
--- );
-
--- 9. View the table structures (optional - run separately if needed)
--- Uncomment and run these queries separately to view table structures:
-
-/*
-SELECT 
-    'subscriptions' as table_name,
-    column_name,
-    data_type,
-    is_nullable,
-    column_default
-FROM information_schema.columns 
-WHERE table_name = 'subscriptions'
-ORDER BY ordinal_position;
-
-SELECT 
-    'assignments' as table_name,
-    column_name,
-    data_type,
-    is_nullable,
-    column_default
-FROM information_schema.columns 
-WHERE table_name = 'assignments'
-ORDER BY ordinal_position;
-*/ 
