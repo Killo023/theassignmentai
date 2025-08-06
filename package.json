@@ -9,6 +9,8 @@
     "lint": "next lint",
     "test:signup": "node scripts/test-signup-verification.js",
     "test:email": "node scripts/test-email-service.js",
+    "test:db": "node scripts/test-database-connection.js",
+    "setup:db": "node scripts/setup-missing-tables.js",
     "quick-fix": "node scripts/quick-fix.js"
   },
   "dependencies": {

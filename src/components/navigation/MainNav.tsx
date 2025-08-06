@@ -135,7 +135,8 @@ const MainNav: React.FC = () => {
                     name: `${user.firstName} ${user.lastName}`,
                     subscription: {
                       status: subscriptionStatus?.status as "active" | "trial" | "expired" || "trial",
-                      plan: subscriptionStatus?.status === 'active' ? "Basic" : "Free"
+                      plan: subscriptionStatus?.planId === 'basic' ? "Basic" : 
+                            subscriptionStatus?.planId === 'pro' ? "Pro" : "Free"
                     }
                   }} 
                 />

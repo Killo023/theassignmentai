@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import UserDropdown from "@/components/UserDropdown";
+import PaymentService from "@/lib/payment-service";
 
 const navigation = [
   { name: "Dashboard", href: "/dashboard", icon: Home },
@@ -33,6 +34,23 @@ const DashboardHeader = () => {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [subscriptionStatus, setSubscriptionStatus] = useState<any>(null);
+
+  useEffect(() => {
+    const getSubscriptionStatus = async () => {
+      if (user?.id) {
+        try {
+          const paymentService = PaymentService.getInstance();
+          const status = await paymentService.checkSubscriptionStatus(user.id);
+          setSubscriptionStatus(status);
+        } catch (error) {
+          console.error('Error fetching subscription status:', error);
+        }
+      }
+    };
+
+    getSubscriptionStatus();
+  }, [user?.id]);
 
   const handleLogout = () => {
     logout();
@@ -91,8 +109,11 @@ const DashboardHeader = () => {
               email: user?.email || "",
               name: `${user?.firstName || ""} ${user?.lastName || ""}`,
               subscription: {
-                status: "active" as "active" | "trial" | "expired",
-                plan: "Basic"
+                status: (subscriptionStatus?.status === 'free' ? 'trial' : 
+                         subscriptionStatus?.status === 'basic' || subscriptionStatus?.status === 'pro' ? 'active' : 
+                         'expired') as "active" | "trial" | "expired",
+                plan: subscriptionStatus?.planId === 'basic' ? "Basic" : 
+                      subscriptionStatus?.planId === 'pro' ? "Pro" : "Free"
               }
             }} 
           />
