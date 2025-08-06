@@ -1,136 +1,163 @@
-# MailerLite Email Service Setup
+# MailerLite Email Service Setup Guide
 
-This guide will help you set up MailerLite as the email service for The Assignment AI application.
+This guide will help you set up MailerLite for sending verification emails, password resets, and welcome emails in production.
 
-## What MailerLite Provides
+## Prerequisites
 
-MailerLite is used to send the following types of emails:
-- **Verification emails** - Sent when users sign up to verify their email address
-- **Password reset emails** - Sent when users request to reset their password
-- **Welcome emails** - Sent after successful email verification
+1. A MailerLite account (free tier available)
+2. Access to your application's environment variables
 
-## Setup Instructions
+## Step 1: Create MailerLite Account
 
-### 1. Create a MailerLite Account
+1. Go to [MailerLite](https://app.mailerlite.com/)
+2. Sign up for a free account
+3. Verify your email address
 
-1. Go to [MailerLite](https://www.mailerlite.com/) and create a free account
-2. Verify your email address and complete the account setup
+## Step 2: Get Your API Key
 
-### 2. Get Your API Key
-
-1. Log in to your MailerLite account
+1. Log in to your MailerLite dashboard
 2. Go to **Integrations** → **API**
-3. Click **Generate API Key**
-4. Copy the API key (it will look something like `ml_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`)
+3. Copy your API key
+4. Keep this key secure - never share it publicly
 
-### 3. Configure Environment Variables
+## Step 3: Configure Environment Variables
 
-1. Copy the `env.template` file to `.env.local`:
-   ```bash
-   cp env.template .env.local
-   ```
+Add your MailerLite API key to your `.env.local` file:
 
-2. Add your MailerLite API key to `.env.local`:
-   ```
-   MAILERLITE_API_KEY=ml_your_actual_api_key_here
-   ```
+```bash
+# MailerLite Configuration
+MAILERLITE_API_KEY=your_mailerlite_api_key_here
+```
 
-3. Set your app URL (for password reset links):
-   ```
-   NEXT_PUBLIC_APP_URL=http://localhost:3000
-   ```
+## Step 4: Test Email Functionality
 
-### 4. Test the Integration
+The application includes a test script to verify email functionality:
 
-1. Start your development server:
-   ```bash
-   npm run dev
-   ```
+```bash
+npm run test:email
+```
 
-2. Try signing up with a new email address
-3. Check the console logs to see if the email is being sent
-4. If the API key is not set, emails will be simulated in the console
+Or run the test manually:
+
+```bash
+node scripts/test-email-service.js
+```
+
+## Step 5: Production Deployment
+
+### Vercel Deployment
+
+1. Add your environment variables in Vercel:
+   - Go to your project dashboard
+   - Navigate to **Settings** → **Environment Variables**
+   - Add `MAILERLITE_API_KEY` with your API key
+   - Deploy to production
+
+### Other Platforms
+
+Add the environment variable to your hosting platform's configuration.
 
 ## Email Templates
 
-The application includes beautiful, responsive email templates for:
+The application uses three email templates:
 
-### Verification Email
-- Clean, modern design with gradient header
-- Large, easy-to-read verification code
-- 10-minute expiration notice
-- Branded with The Assignment AI colors
+### 1. Verification Email
+- **Purpose**: Verify new user email addresses
+- **Content**: 6-digit verification code
+- **Expiration**: 10 minutes
 
-### Password Reset Email
-- Secure reset link with 1-hour expiration
-- Clear call-to-action button
-- Security notice for unintended requests
+### 2. Password Reset Email
+- **Purpose**: Reset user passwords
+- **Content**: Secure reset link
+- **Expiration**: 1 hour
 
-### Welcome Email
-- Warm welcome message
-- List of available features
-- Direct link to dashboard
-- Support information
+### 3. Welcome Email
+- **Purpose**: Welcome new verified users
+- **Content**: Welcome message and dashboard link
 
-## Development vs Production
+## Development Mode
 
-### Development Mode
-- If no API key is provided, emails are simulated in the console
-- You'll see logs like: `📧 Simulated email sent: { type: 'verification', data: {...} }`
-- This allows development without a MailerLite account
-
-### Production Mode
-- Requires valid MailerLite API key
-- Real emails are sent to users
-- All email templates are fully functional
+When `MAILERLITE_API_KEY` is not set, the application will:
+- Log email content to the console
+- Simulate successful email sending
+- Allow testing without actual email delivery
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **"MailerLite API key not found"**
-   - Make sure you've added `MAILERLITE_API_KEY` to your `.env.local` file
-   - Restart your development server after adding the environment variable
+1. **Emails not sending**
+   - Check if API key is correctly set
+   - Verify MailerLite account is active
+   - Check browser console for errors
 
-2. **"Email sending failed"**
-   - Check that your API key is valid
-   - Verify your MailerLite account is active
-   - Check the console for detailed error messages
+2. **Verification codes not received**
+   - Check spam folder
+   - Verify email address is correct
+   - Check MailerLite sending limits
 
-3. **Emails not being sent**
-   - In development, emails are simulated by default
-   - Add a valid API key to send real emails
-   - Check the browser console for simulation logs
+3. **API errors**
+   - Verify API key format
+   - Check MailerLite account status
+   - Review API usage limits
 
-### API Rate Limits
+### Testing Without MailerLite
 
-MailerLite has the following limits on their free plan:
+For development, you can test without setting up MailerLite:
+
+1. Leave `MAILERLITE_API_KEY` unset
+2. Check browser console for email logs
+3. Use the verification codes shown in console
+
+### Alternative Email Services
+
+If you prefer a different email service:
+
+1. **SendGrid**
+   ```bash
+   SENDGRID_API_KEY=your_sendgrid_api_key
+   ```
+
+2. **Resend**
+   ```bash
+   RESEND_API_KEY=your_resend_api_key
+   ```
+
+3. **AWS SES**
+   ```bash
+   AWS_SES_ACCESS_KEY=your_aws_access_key
+   AWS_SES_SECRET_KEY=your_aws_secret_key
+   ```
+
+## Security Best Practices
+
+1. **Never commit API keys to version control**
+2. **Use environment variables for all secrets**
+3. **Rotate API keys regularly**
+4. **Monitor email sending logs**
+5. **Set up email authentication (SPF, DKIM, DMARC)**
+
+## Rate Limiting
+
+MailerLite free tier limits:
 - 1,000 emails per month
 - 100 emails per hour
 - 10 emails per second
 
 For higher limits, consider upgrading to a paid plan.
 
-## Security Considerations
+## Monitoring
 
-- Never commit your API key to version control
-- Use environment variables for all sensitive data
-- The API key is only used server-side in the `/api/email` route
-- Password reset tokens are stored locally (in production, use a database)
-
-## Customization
-
-You can customize the email templates by editing the HTML and text generation methods in `src/lib/mailerlite-service.ts`:
-
-- `generateVerificationEmailHtml()` - Verification email template
-- `generatePasswordResetEmailHtml()` - Password reset email template  
-- `generateWelcomeEmailHtml()` - Welcome email template
-
-Each method has both HTML and text versions for email client compatibility.
+Monitor your email delivery:
+1. Check MailerLite dashboard for delivery reports
+2. Monitor bounce rates
+3. Track open rates and engagement
+4. Set up alerts for failed deliveries
 
 ## Support
 
-If you need help with MailerLite integration:
-1. Check the [MailerLite API Documentation](https://developers.mailerlite.com/)
-2. Review the console logs for error messages
-3. Ensure your API key has the necessary permissions 
+If you need help:
+1. Check MailerLite documentation
+2. Review application logs
+3. Test with the provided test scripts
+4. Contact support with specific error messages 

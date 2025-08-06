@@ -9,26 +9,27 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { resetPassword } = useAuth();
+  const { resetPassword, isLoading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    setIsLoading(true);
+
+    if (!email) {
+      setError("Please enter your email address");
+      return;
+    }
 
     try {
-      const success = await resetPassword(email);
-      if (success) {
-        setSuccess("Password reset email sent! Check your inbox for instructions.");
+      const result = await resetPassword(email);
+      if (result.success) {
+        setSuccess(result.message || "Password reset email sent. Please check your inbox.");
       } else {
-        setError("Failed to send reset email. Please try again.");
+        setError(result.message || "Failed to send password reset email. Please try again.");
       }
     } catch (err) {
       setError("Password reset failed. Please try again.");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -65,12 +66,12 @@ export default function ForgotPasswordPage() {
           <div className="space-y-8">
             <div className="space-y-6">
               <h1 className="text-5xl font-bold text-gray-900 leading-tight">
-                Reset your
-                <span className="text-blue-600"> password</span>
+                Reset Your
+                <span className="text-blue-600"> Password</span>
               </h1>
               
               <p className="text-xl text-gray-600 leading-relaxed">
-                Don't worry! Enter your email address and we'll send you a link to reset your password.
+                Enter your email address and we'll send you a link to reset your password.
               </p>
             </div>
 
@@ -82,15 +83,11 @@ export default function ForgotPasswordPage() {
               </div>
               <div className="flex items-center space-x-3">
                 <CheckCircle className="w-5 h-5 text-green-600" />
+                <span className="text-gray-700">Link expires in 1 hour for security</span>
+              </div>
+              <div className="flex items-center space-x-3">
+                <CheckCircle className="w-5 h-5 text-green-600" />
                 <span className="text-gray-700">Instant email delivery</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-gray-700">24/7 account recovery</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <CheckCircle className="w-5 h-5 text-green-600" />
-                <span className="text-gray-700">Industry-standard security</span>
               </div>
             </div>
 
@@ -98,11 +95,11 @@ export default function ForgotPasswordPage() {
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-center mb-2">
                 <Shield className="w-5 h-5 text-blue-600 mr-2" />
-                <h3 className="font-semibold text-blue-800">Secure Recovery</h3>
+                <h3 className="font-semibold text-blue-800">Secure Process</h3>
               </div>
               <p className="text-blue-700 text-sm">
-                Your password reset link is encrypted and will expire after 1 hour for security.
-                We'll only send reset emails to verified email addresses.
+                Your password reset link is encrypted and will expire automatically 
+                for your security. We'll never share your email with third parties.
               </p>
             </div>
           </div>
@@ -111,9 +108,9 @@ export default function ForgotPasswordPage() {
           <div className="max-w-md w-full mx-auto">
             <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Forgot Password</h2>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Forgot Password?</h2>
                 <p className="text-gray-600">
-                  Enter your email to receive reset instructions
+                  Enter your email address and we'll send you a reset link
                 </p>
               </div>
 
@@ -144,7 +141,7 @@ export default function ForgotPasswordPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="Enter your email address"
+                      placeholder="Enter your email"
                       required
                     />
                   </div>
@@ -162,7 +159,7 @@ export default function ForgotPasswordPage() {
               <div className="mt-8 text-center">
                 <Link 
                   href="/auth/login" 
-                  className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+                  className="inline-flex items-center text-blue-600 hover:text-blue-500 font-semibold"
                 >
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   Back to Sign In

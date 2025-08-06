@@ -82,14 +82,14 @@ export default function SignupPage() {
     }
 
     try {
-      const success = await verifyEmail(formData.email, verificationCode);
-      if (success) {
-        setSuccess("Email verified successfully! Redirecting...");
+      const result = await verifyEmail(formData.email, verificationCode);
+      if (result.success) {
+        setSuccess(result.message || "Email verified successfully! Redirecting...");
         setTimeout(() => {
           router.push("/dashboard");
         }, 2000);
       } else {
-        setError("Invalid verification code. Please try again.");
+        setError(result.message || "Invalid verification code. Please try again.");
       }
     } catch (err) {
       setError("Verification failed. Please try again.");
@@ -100,13 +100,13 @@ export default function SignupPage() {
     if (!canResend) return;
 
     try {
-      const success = await resendVerificationCode(formData.email);
-      if (success) {
-        setSuccess("New verification code sent!");
+      const result = await resendVerificationCode(formData.email);
+      if (result.success) {
+        setSuccess(result.message || "New verification code sent!");
         setError("");
         startResendCountdown();
       } else {
-        setError("Failed to resend code. Please try again.");
+        setError(result.message || "Failed to resend code. Please try again.");
       }
     } catch (err) {
       setError("Failed to resend code. Please try again.");

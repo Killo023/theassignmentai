@@ -9,17 +9,23 @@ interface User {
   firstName: string;
   lastName: string;
   isAuthenticated: boolean;
+  verified: boolean;
+  subscription?: {
+    status: string;
+    plan: string;
+    expiresAt?: string;
+  };
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; message?: string }>;
   signup: (userData: any) => Promise<{ success: boolean; needsVerification?: boolean; message?: string }>;
   logout: () => void;
-  resetPassword: (email: string) => Promise<boolean>;
-  changePassword: (currentPassword: string, newPassword: string) => Promise<boolean>;
-  verifyEmail: (email: string, code: string) => Promise<boolean>;
-  resendVerificationCode: (email: string) => Promise<boolean>;
+  resetPassword: (email: string) => Promise<{ success: boolean; message?: string }>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; message?: string }>;
+  verifyEmail: (email: string, code: string) => Promise<{ success: boolean; message?: string }>;
+  resendVerificationCode: (email: string) => Promise<{ success: boolean; message?: string }>;
   isLoading: boolean;
 }
 
@@ -27,14 +33,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Generate a consistent user ID from email
 const generateUserId = (email: string): string => {
-  // Create a simple hash of the email to ensure consistent user IDs
   let hash = 0;
   for (let i = 0; i < email.length; i++) {
     const char = email.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+    hash = hash & hash;
   }
   return `user-${Math.abs(hash)}`;
+};
+
+// Simple password hashing (in production, use bcrypt or similar)
+const hashPassword = (password: string): string => {
+  return btoa(password + 'salt'); // Simple base64 encoding with salt
+};
+
+const verifyPassword = (password: string, hashedPassword: string): boolean => {
+  return hashPassword(password) === hashedPassword;
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -42,16 +56,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session
     const checkAuth = async () => {
       try {
-        // In a real app, you would check with your backend
         const savedUser = localStorage.getItem('ai-assignment-user');
         if (savedUser) {
-          setUser(JSON.parse(savedUser));
+          const userData = JSON.parse(savedUser);
+          // Check if user is still valid (not expired)
+          if (userData.verified && userData.isAuthenticated) {
+            setUser(userData);
+          } else {
+            // Clear invalid session
+            localStorage.removeItem('ai-assignment-user');
+          }
         }
       } catch (error) {
         console.error('Auth check failed:', error);
+        localStorage.removeItem('ai-assignment-user');
       } finally {
         setIsLoading(false);
       }
@@ -60,33 +80,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; message?: string }> => {
     try {
       setIsLoading(true);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, accept any valid email/password
-      if (email && password) {
-        const userId = generateUserId(email);
-        const userData: User = {
-          id: userId,
-          email,
-          firstName: 'Demo',
-          lastName: 'User',
-          isAuthenticated: true
-        };
-        
-        setUser(userData);
-        localStorage.setItem('ai-assignment-user', JSON.stringify(userData));
-        return true;
+      if (!email || !password) {
+        return { success: false, message: 'Please enter both email and password' };
       }
+
+      // Check if user exists
+      const existingUser = localStorage.getItem(`user-${email}`);
+      if (!existingUser) {
+        return { success: false, message: 'No account found with this email address. Please sign up first.' };
+      }
+
+      const userData = JSON.parse(existingUser);
       
-      return false;
+      // Verify password
+      if (!verifyPassword(password, userData.password)) {
+        return { success: false, message: 'Invalid password. Please try again.' };
+      }
+
+      // Check if email is verified
+      if (!userData.verified) {
+        return { success: false, message: 'Please verify your email address before signing in. Check your inbox for the verification code.' };
+      }
+
+      // Create authenticated user object
+      const authenticatedUser: User = {
+        id: userData.id,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        isAuthenticated: true,
+        verified: true,
+        subscription: userData.subscription
+      };
+      
+      setUser(authenticatedUser);
+      localStorage.setItem('ai-assignment-user', JSON.stringify(authenticatedUser));
+      
+      return { success: true };
     } catch (error) {
       console.error('Login failed:', error);
-      return false;
+      return { success: false, message: 'Login failed. Please try again.' };
     } finally {
       setIsLoading(false);
     }
@@ -96,24 +133,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
       
-      // Simulate API call for signup
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
+      // Validate required fields
+      if (!userData.email || !userData.password || !userData.firstName || !userData.lastName) {
+        return { success: false, message: 'Please fill in all required fields' };
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(userData.email)) {
+        return { success: false, message: 'Please enter a valid email address' };
+      }
+
+      // Validate password strength
+      if (userData.password.length < 8) {
+        return { success: false, message: 'Password must be at least 8 characters long' };
+      }
+
       // Check if email already exists
       const existingUser = localStorage.getItem(`user-${userData.email}`);
       if (existingUser) {
-        return { 
-          success: false, 
-          message: 'An account with this email already exists. Please sign in instead.' 
-        };
+        const parsedUser = JSON.parse(existingUser);
+        if (parsedUser.verified) {
+          return { success: false, message: 'An account with this email already exists. Please sign in instead.' };
+        } else {
+          // User exists but not verified, allow re-signup
+          localStorage.removeItem(`temp-user-${userData.email}`);
+        }
       }
       
       // Generate verification code
       const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
       
-      // Store user data temporarily (not authenticated yet)
+      // Hash password
+      const hashedPassword = hashPassword(userData.password);
+      
+      // Store user data temporarily
       const tempUserData = {
         ...userData,
+        id: generateUserId(userData.email),
+        password: hashedPassword,
         verificationCode,
         verified: false,
         createdAt: new Date().toISOString()
@@ -121,13 +179,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       localStorage.setItem(`temp-user-${userData.email}`, JSON.stringify(tempUserData));
       
-      // Send verification email via EmailService
+      // Send verification email
       const emailService = EmailService.getInstance();
-      await emailService.sendVerificationEmail({
+      const emailSent = await emailService.sendVerificationEmail({
         to: userData.email,
         code: verificationCode,
         firstName: userData.firstName
       });
+      
+      if (!emailSent) {
+        return { success: false, message: 'Failed to send verification email. Please try again.' };
+      }
       
       return { 
         success: true, 
@@ -136,46 +198,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
     } catch (error) {
       console.error('Signup failed:', error);
-      return { 
-        success: false, 
-        message: 'Signup failed. Please try again.' 
-      };
+      return { success: false, message: 'Signup failed. Please try again.' };
     } finally {
       setIsLoading(false);
     }
   };
 
-  const verifyEmail = async (email: string, code: string): Promise<boolean> => {
+  const verifyEmail = async (email: string, code: string): Promise<{ success: boolean; message?: string }> => {
     try {
       setIsLoading(true);
+      
+      if (!email || !code || code.length !== 6) {
+        return { success: false, message: 'Please enter a valid 6-digit verification code' };
+      }
       
       // Get temporary user data
       const tempUserData = localStorage.getItem(`temp-user-${email}`);
       if (!tempUserData) {
-        return false;
+        return { success: false, message: 'No pending verification found for this email. Please sign up again.' };
       }
       
       const userData = JSON.parse(tempUserData);
       
+      // Check if code is expired (10 minutes)
+      const createdAt = new Date(userData.createdAt);
+      const now = new Date();
+      const timeDiff = now.getTime() - createdAt.getTime();
+      const minutesDiff = timeDiff / (1000 * 60);
+      
+      if (minutesDiff > 10) {
+        localStorage.removeItem(`temp-user-${email}`);
+        return { success: false, message: 'Verification code has expired. Please request a new one.' };
+      }
+      
       // Verify code
       if (userData.verificationCode !== code) {
-        return false;
+        return { success: false, message: 'Invalid verification code. Please try again.' };
       }
       
       // Create verified user
-      const userId = generateUserId(email);
       const newUser: User = {
-        id: userId,
+        id: userData.id,
         email: userData.email,
         firstName: userData.firstName,
         lastName: userData.lastName,
-        isAuthenticated: true
+        isAuthenticated: true,
+        verified: true,
+        subscription: {
+          status: 'trial',
+          plan: 'free',
+          expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString() // 14 days
+        }
       };
-      
-      // Create trial subscription automatically
-      const PaymentService = (await import('./payment-service')).default;
-      const paymentService = PaymentService.getInstance();
-      await paymentService.createFreeSubscription(newUser.id);
       
       // Store verified user
       setUser(newUser);
@@ -193,21 +267,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         lastName: userData.lastName
       });
       
-      return true;
+      return { success: true, message: 'Email verified successfully!' };
     } catch (error) {
       console.error('Email verification failed:', error);
-      return false;
+      return { success: false, message: 'Verification failed. Please try again.' };
     } finally {
       setIsLoading(false);
     }
   };
 
-  const resendVerificationCode = async (email: string): Promise<boolean> => {
+  const resendVerificationCode = async (email: string): Promise<{ success: boolean; message?: string }> => {
     try {
       // Get temporary user data
       const tempUserData = localStorage.getItem(`temp-user-${email}`);
       if (!tempUserData) {
-        return false;
+        return { success: false, message: 'No pending verification found for this email. Please sign up again.' };
       }
       
       const userData = JSON.parse(tempUserData);
@@ -219,23 +293,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const updatedUserData = {
         ...userData,
         verificationCode,
-        resendAt: new Date().toISOString()
+        createdAt: new Date().toISOString() // Reset expiration
       };
       
       localStorage.setItem(`temp-user-${email}`, JSON.stringify(updatedUserData));
       
-      // Send new verification email via EmailService
+      // Send new verification email
       const emailService = EmailService.getInstance();
-      await emailService.sendVerificationEmail({
+      const emailSent = await emailService.sendVerificationEmail({
         to: email,
         code: verificationCode,
         firstName: userData.firstName
       });
       
-      return true;
+      if (!emailSent) {
+        return { success: false, message: 'Failed to send verification email. Please try again.' };
+      }
+      
+      return { success: true, message: 'New verification code sent!' };
     } catch (error) {
       console.error('Resend verification failed:', error);
-      return false;
+      return { success: false, message: 'Failed to resend code. Please try again.' };
     }
   };
 
@@ -244,54 +322,94 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('ai-assignment-user');
   };
 
-  const resetPassword = async (email: string): Promise<boolean> => {
+  const resetPassword = async (email: string): Promise<{ success: boolean; message?: string }> => {
     try {
       setIsLoading(true);
       
-      // Simulate API call for password reset
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (!email) {
+        return { success: false, message: 'Please enter your email address' };
+      }
       
-      // Generate reset token (in a real app, this would be stored securely)
+      // Check if user exists
+      const existingUser = localStorage.getItem(`user-${email}`);
+      if (!existingUser) {
+        return { success: false, message: 'No account found with this email address.' };
+      }
+      
+      // Generate reset token
       const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
       const resetLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://theassignmentai.com'}/reset-password?token=${resetToken}`;
       
-      // Store reset token temporarily (in a real app, this would be in a database)
+      // Store reset token temporarily
       localStorage.setItem(`reset-token-${email}`, JSON.stringify({
         token: resetToken,
         email,
         expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString() // 1 hour
       }));
       
-      // Send password reset email via EmailService
+      // Send password reset email
       const emailService = EmailService.getInstance();
-      await emailService.sendPasswordResetEmail({
+      const emailSent = await emailService.sendPasswordResetEmail({
         to: email,
         resetLink,
-        firstName: 'User' // In a real app, get from user data
+        firstName: 'User' // In production, get from user data
       });
       
-      return true;
+      if (!emailSent) {
+        return { success: false, message: 'Failed to send password reset email. Please try again.' };
+      }
+      
+      return { success: true, message: 'Password reset email sent. Please check your inbox.' };
     } catch (error) {
       console.error('Password reset failed:', error);
-      return false;
+      return { success: false, message: 'Password reset failed. Please try again.' };
     } finally {
       setIsLoading(false);
     }
   };
 
-  const changePassword = async (currentPassword: string, newPassword: string): Promise<boolean> => {
+  const changePassword = async (currentPassword: string, newPassword: string): Promise<{ success: boolean; message?: string }> => {
     try {
       setIsLoading(true);
       
-      // Simulate API call for password change
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!user) {
+        return { success: false, message: 'You must be logged in to change your password.' };
+      }
       
-      // In a real app, you would verify current password and update
-      console.log('Password changed successfully');
-      return true;
+      if (!currentPassword || !newPassword) {
+        return { success: false, message: 'Please enter both current and new passwords.' };
+      }
+      
+      if (newPassword.length < 8) {
+        return { success: false, message: 'New password must be at least 8 characters long.' };
+      }
+      
+      // Get user data
+      const userData = localStorage.getItem(`user-${user.email}`);
+      if (!userData) {
+        return { success: false, message: 'User data not found.' };
+      }
+      
+      const storedUser = JSON.parse(userData);
+      
+      // Verify current password
+      if (!verifyPassword(currentPassword, storedUser.password)) {
+        return { success: false, message: 'Current password is incorrect.' };
+      }
+      
+      // Update password
+      const hashedNewPassword = hashPassword(newPassword);
+      const updatedUser = {
+        ...storedUser,
+        password: hashedNewPassword
+      };
+      
+      localStorage.setItem(`user-${user.email}`, JSON.stringify(updatedUser));
+      
+      return { success: true, message: 'Password changed successfully!' };
     } catch (error) {
       console.error('Password change failed:', error);
-      return false;
+      return { success: false, message: 'Password change failed. Please try again.' };
     } finally {
       setIsLoading(false);
     }

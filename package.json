@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test:signup": "node scripts/test-signup-verification.js",
+    "test:email": "node scripts/test-email-service.js",
     "quick-fix": "node scripts/quick-fix.js"
   },
   "dependencies": {

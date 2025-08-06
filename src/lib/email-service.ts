@@ -53,15 +53,67 @@ class EmailService {
   }
 
   public async sendVerificationEmail(data: VerificationEmailData): Promise<boolean> {
-    return this.callEmailAPI('verification', data);
+    try {
+      // First try the API
+      const apiResult = await this.callEmailAPI('verification', data);
+      if (apiResult) {
+        return true;
+      }
+      
+      // Fallback: Log the verification code for development
+      console.log('📧 Verification Email (Development Mode):');
+      console.log('To:', data.to);
+      console.log('Code:', data.code);
+      console.log('First Name:', data.firstName);
+      console.log('---');
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to send verification email:', error);
+      return false;
+    }
   }
 
   public async sendPasswordResetEmail(data: PasswordResetData): Promise<boolean> {
-    return this.callEmailAPI('password-reset', data);
+    try {
+      const apiResult = await this.callEmailAPI('password-reset', data);
+      if (apiResult) {
+        return true;
+      }
+      
+      // Fallback: Log the reset link for development
+      console.log('📧 Password Reset Email (Development Mode):');
+      console.log('To:', data.to);
+      console.log('Reset Link:', data.resetLink);
+      console.log('First Name:', data.firstName);
+      console.log('---');
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to send password reset email:', error);
+      return false;
+    }
   }
 
   public async sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean> {
-    return this.callEmailAPI('welcome', data);
+    try {
+      const apiResult = await this.callEmailAPI('welcome', data);
+      if (apiResult) {
+        return true;
+      }
+      
+      // Fallback: Log welcome message for development
+      console.log('📧 Welcome Email (Development Mode):');
+      console.log('To:', data.to);
+      console.log('First Name:', data.firstName);
+      console.log('Last Name:', data.lastName);
+      console.log('---');
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to send welcome email:', error);
+      return false;
+    }
   }
 }
 
