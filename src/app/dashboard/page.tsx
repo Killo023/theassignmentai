@@ -7,6 +7,7 @@ import { CheckCircle, X } from 'lucide-react';
 import SubscriptionStatus from '@/components/dashboard/SubscriptionStatus';
 import SubscriptionFeatures from '@/components/dashboard/SubscriptionFeatures';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -29,7 +30,7 @@ export default function Dashboard() {
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Please log in to access your dashboard</h1>
           <Button asChild>
-            <a href="/auth/login">Login</a>
+            <Link href="/auth/login">Login</Link>
           </Button>
         </div>
       </div>
@@ -86,16 +87,16 @@ export default function Dashboard() {
               <h2 className="text-xl font-semibold text-foreground mb-4">Quick Actions</h2>
               <div className="grid grid-cols-1 gap-4">
                 <Button asChild className="h-16 text-lg">
-                  <a href="/dashboard/new">Create New Assignment</a>
+                  <Link href="/dashboard/new">Create New Assignment</Link>
                 </Button>
                 <Button asChild variant="outline" className="h-16 text-lg">
-                  <a href="/dashboard/assignments">View All Assignments</a>
+                  <Link href="/dashboard/assignments">View All Assignments</Link>
                 </Button>
                 <Button asChild variant="outline" className="h-16 text-lg">
-                  <a href="/dashboard/favorites">Favorites</a>
+                  <Link href="/dashboard/favorites">Favorites</Link>
                 </Button>
                 <Button asChild variant="outline" className="h-16 text-lg">
-                  <a href="/dashboard/history">History</a>
+                  <Link href="/dashboard/history">History</Link>
                 </Button>
               </div>
             </div>
