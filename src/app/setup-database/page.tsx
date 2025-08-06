@@ -48,7 +48,7 @@ export default function SetupDatabase() {
         // Try to create the assignments table using RPC if available
         addResult('🔧 Attempting to create assignments table...');
         
-        const createAssignmentsSQL = \`
+        const createAssignmentsSQL = `
         CREATE TABLE IF NOT EXISTS assignments (
           id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
           user_id TEXT NOT NULL,
@@ -113,7 +113,7 @@ export default function SetupDatabase() {
           quality_metrics JSONB DEFAULT '{}'::jsonb,
           formatting_preferences JSONB DEFAULT '{}'::jsonb
         );
-        \`;
+        `;
         
         try {
           const { error: createError } = await supabase.rpc('exec', { sql: createAssignmentsSQL });
